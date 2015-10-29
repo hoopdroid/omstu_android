@@ -5,7 +5,9 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,8 +46,8 @@ public class AuthorizationFragment extends Fragment {
         inputPassword = (EditText) view.findViewById(R.id.input_password);
         btnSignIn = (Button) view.findViewById(R.id.btn_signin);
 
-//        inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
-//        inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
+       // TODO change vovik0134 to vovik0134@gmail.com inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
+        //inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {
@@ -73,13 +75,13 @@ public class AuthorizationFragment extends Fragment {
     private void submitForm() {
 
 
-//        if (!validateEmail()) {
-//            return;
-//        }
+       // if (!validateEmail()) {
+          // return;
+     // }
 
-//        if (!validatePassword()) {
-//            return;
-//        }
+       if (!validatePassword()) {
+           return;
+        }
         String[] autorization = {inputEmail.getText().toString(), inputPassword.getText().toString()};
         AuthorizationTask at = new AuthorizationTask(getActivity().getApplicationContext());
         at.execute(autorization);
@@ -98,19 +100,19 @@ public class AuthorizationFragment extends Fragment {
     }
 
 
-//    private boolean validateEmail() {
-//        String email = inputEmail.getText().toString().trim();
-//
-//        if (email.isEmpty() || !isValidEmail(email)) {
-//            inputLayoutEmail.setError(getString(R.string.err_msg_email));
-//            requestFocus(inputEmail);
-//            return false;
-//        } else {
-//            inputLayoutEmail.setErrorEnabled(false);
-//        }
-//
-//        return true;
-//    }
+    private boolean validateEmail() {
+        String email = inputEmail.getText().toString().trim();
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            inputLayoutEmail.setError(getString(R.string.err_msg_email));
+            requestFocus(inputEmail);
+            return false;
+        } else {
+            inputLayoutEmail.setErrorEnabled(false);
+        }
+
+        return true;
+    }
 
     private boolean validatePassword() {
         if (inputPassword.getText().toString().trim().isEmpty()) {
@@ -135,30 +137,30 @@ public class AuthorizationFragment extends Fragment {
     }
 
 
-//    public class MyTextWatcher implements TextWatcher {
-//
-//        private View view;
-//
-//        private MyTextWatcher(View view) {
-//            this.view = view;
-//        }
-//
-//        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//        }
-//
-//        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//        }
-//
-//        public void afterTextChanged(Editable editable) {
-//            switch (view.getId()) {
-//
-//                case R.id.input_email:
-//                    validateEmail();
-//                    break;
-//                case R.id.input_password:
-//                    validatePassword();
-//                    break;
-//            }
-//        }
-//    }
+        public class MyTextWatcher implements TextWatcher {
+
+            private View view;
+
+            private MyTextWatcher(View view) {
+                this.view = view;
+            }
+
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            public void afterTextChanged(Editable editable) {
+                switch (view.getId()) {
+
+                    case R.id.input_email:
+                        validateEmail();
+                        break;
+                    case R.id.input_password:
+                        validatePassword();
+                        break;
+                }
+            }
+        }
 }

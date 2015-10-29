@@ -26,6 +26,13 @@ public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     String username;
     String email;
+
+   static PrimaryDrawerItem itemSchedule ;
+   static PrimaryDrawerItem itemNavigation;
+   static PrimaryDrawerItem itemNotes ;
+   static PrimaryDrawerItem itemEducation ;
+   static PrimaryDrawerItem itemNews ;
+   static SecondaryDrawerItem itemSettings;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,19 +83,19 @@ public class MainActivity extends AppCompatActivity {
 
     void initDrawer(){
 
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_schedule);
-        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_navigation);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_notes);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_schedule);
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withBadge("3");
-        SecondaryDrawerItem item6 = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings);
+         itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_schedule).withSelectedIcon(R.drawable.ic_schedule_select);
+         itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_navigation).withSelectedIcon(R.drawable.ic_navigation_select);
+         itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_notes).withSelectedIcon(R.drawable.ic_notes_select);
+         itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withBadge("12").withSelectedIcon(R.drawable.ic_news_select);
+         itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
+         itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings).withSelectedIcon(R.drawable.ic_settings_select);
 
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.drawer_header)
+                .withHeaderBackground(R.drawable.background)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(username).withEmail(email).withIcon(getResources().getDrawable(R.drawable.ic_account))
+                        new ProfileDrawerItem().withName(username).withEmail(email).withIcon(getResources().getDrawable(R.drawable.ic_account_circle_white_48dp))
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -103,17 +110,17 @@ public class MainActivity extends AppCompatActivity {
                 .withToolbar(toolbar)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        item1,
+                        itemSchedule,
 
-                        item2,
+                        itemNavigation,
 
-                        item3,
+                        itemNotes,
 
-                        item4,
+                        itemNews,
 
-                        item5,
+                        itemEducation,
 
-                        item6,
+                        itemSettings,
                         new SecondaryDrawerItem()
 
 
@@ -121,7 +128,28 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                       return true;
+                        switch (position) {
+                            case 1:
+                                Toast.makeText(getApplicationContext(),"SCHEDULE", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 2:
+                                Toast.makeText(getApplicationContext(),"NAVIGATION", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 3:
+                                Toast.makeText(getApplicationContext(),"NOTES", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 4:
+                                Toast.makeText(getApplicationContext(),"NEWS", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 5:
+                                Toast.makeText(getApplicationContext(),"EDUCATION", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 6:
+                                Toast.makeText(getApplicationContext(),"SETTINGS", Toast.LENGTH_SHORT).show();
+                                break;
+
+                        }
+                        return false;
                     }
                 })
                 .build();

@@ -15,6 +15,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
@@ -129,6 +130,7 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
             public void onAnimationEnd(Animation animation) {
 
                 buttons.setVisibility(View.GONE);
+                Toast.makeText(FirstStartActivity.this,"vovik0134 123",Toast.LENGTH_LONG).show();
             }
 
         });
