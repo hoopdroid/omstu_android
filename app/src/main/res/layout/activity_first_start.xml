@@ -27,7 +27,7 @@
         android:layout_height="300dp"
         android:id="@+id/icon"
         android:layout_gravity="center"
-        android:background="@mipmap/ic_launcher"
+        android:background="@drawable/logo"
         android:layout_below="@+id/view"
         android:layout_centerHorizontal="true" />
 

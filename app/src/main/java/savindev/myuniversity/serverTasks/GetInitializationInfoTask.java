@@ -1,6 +1,10 @@
 package savindev.myuniversity.serverTasks;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,6 +23,9 @@ import java.util.Date;
 
 import savindev.myuniversity.Initialization;
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
+
+
 
 /**
  * Запрос на сервер о сборе инициализирующей информации по выбранному ВУЗу
@@ -32,6 +39,8 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
     final private int TIMEOUT_MILLISEC = 5000;
     private Date lastModifiedDate;
+
+
 
     public GetInitializationInfoTask(Context context) {
         super();
@@ -112,25 +121,92 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     private void parseReply(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-        Initialization init = null;
+       Initialization init = null;
         JSONObject obj = null;
         obj = new JSONObject(reply);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
                 init = Initialization.fromJson(content);
+                parsetoSqlite(init);
                 break;
             case "ERROR":   //Неопознанная ошибка
-                    Log.i("myuniversity", "Ошибка ERROR от сервера, запрос GetInitializationInfoTask, текст:"
-                            + obj.get("CONTENT"));
+                Log.i("myuniversity", "Ошибка ERROR от сервера, запрос GetInitializationInfoTask, текст:"
+                        + obj.get("CONTENT"));
                 break;
             case "WARNING": //Определенная сервером ошибка
                 Log.i("myuniversity", "Ошибка WARNING от сервера, запрос GetInitializationInfoTask, текст:"
                         + obj.get("CONTENT"));
                 break;
         }
-        int i = init.DEPARTMENTS.get(1).ID_CLASSROOM; //Пример получения объекта (а вообще тут точку остановки для просмотра всего объекта удобно ставить)
+
+
+
+
+
     }
+
+
+    void parsetoSqlite(Initialization init){
+
+        SQLiteDatabase sqliteDatabase;
+        DBHelper helper = new DBHelper(context);
+        sqliteDatabase = helper.getWritableDatabase();
+
+        //PARSE UNIVERSITY INFO TO SQLITE
+
+            ContentValues uninfoRow = new ContentValues();
+            uninfoRow .put(DBHelper.UniversityInfoHelper.COL_FULLNAME, init.UNIVERSITY_FULLNAME);
+            uninfoRow .put(DBHelper.UniversityInfoHelper.COL_SHORTNAME, init.UNIVERSITY_SHORTNAME);
+            uninfoRow .put(DBHelper.UniversityInfoHelper.COL_DAYS_IN_WEEK, init.DAYS_IN_WEEK);
+            sqliteDatabase.insert(DBHelper.UniversityInfoHelper.TABLE_NAME, null, uninfoRow);
+
+        //PARSE TEACHERS TO SQLITE
+           ContentValues teacherRow = new ContentValues();
+            for(int index = 0 ; index < init.TEACHERS.size(); ++index) {
+                teacherRow.put(DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
+                teacherRow.put(DBHelper.TeachersHelper.COL_ID_DEPARTMENT, init.TEACHERS.get(index).ID_DEPARTMENT);
+                teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_LASTNAME, init.TEACHERS.get(index).TEACHER_LASTNAME);
+                teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_FIRSTNAME, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
+                teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
+                teacherRow.put(DBHelper.TeachersHelper.COL_IS_DELETED, init.TEACHERS.get(index).IS_DELETED);
+                Log.d("TEACHERS_INFO", teacherRow.toString());
+                sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);
+            }
+
+
+        //PARSE SEMESTRES TO SQLITE
+             ContentValues semestresRow = new ContentValues();
+             for(int index = 0 ; index < init.SEMESTERS.size();++index) {
+               semestresRow.put(DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
+               semestresRow.put(DBHelper.SemestersHelper.COL_BEGIN_DATE,init.SEMESTERS.get(index).BEGIN_DT);
+                 semestresRow.put(DBHelper.SemestersHelper.COL_END_DATE, init.SEMESTERS.get(index).END_DT);
+                 semestresRow.put(DBHelper.SemestersHelper.COL_IS_DELETED ,init.SEMESTERS.get(index).IS_DELETED);
+                 Log.d("SEMESTRES_INFO", semestresRow.toString());
+                sqliteDatabase.insert(DBHelper.SemestersHelper.TABLE_NAME, null, semestresRow);
+        }
+
+        //PARSE PAIRS TO SQLITE
+        ContentValues pairsRow = new ContentValues();
+        for(int index = 0 ; index < init.PAIRS.size();++index) {
+            pairsRow.put(DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
+            pairsRow.put(DBHelper.PairsHelper.COL_PAIR_NUMBER ,init.PAIRS.get(index).PAIR_NUMBER);
+            pairsRow.put(DBHelper.PairsHelper.COL_BEGIN_TIME,init.PAIRS.get(index).PAIR_BEGIN_TIME);
+            pairsRow.put(DBHelper.PairsHelper.COL_END_TIME, init.PAIRS.get(index).PAIR_END_TIME);
+            pairsRow.put(DBHelper.PairsHelper.COL_IS_DELETED,init.PAIRS.get(index).IS_DELETED);
+            Log.d("PAIRS_INFO", pairsRow.toString());
+            sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
+        }
+
+        //TODO ADD GROUPS,DEPARTMENTS,FACULTIES
+
+
+
+
+
+        }
+
+
 
 
     @Override

@@ -18,6 +18,7 @@ public class Initialization {
     public final String UNIVERSITY_SHORTNAME;
     public final int DAYS_IN_WEEK;
     public final ArrayList<SEMESTER> SEMESTERS;
+    public final ArrayList<PAIR> PAIRS;
     public final ArrayList<FACULTY> FACULTIES;
     public final ArrayList<DEPARTMENT> DEPARTMENTS;
     public final ArrayList<GROUP> GROUPS;
@@ -26,7 +27,7 @@ public class Initialization {
     public Initialization(String UNIVERSITY_FULLNAME, String UNIVERSITY_SHORTNAME,
                           int DAYS_IN_WEEK, JSONArray SEMESTERS,
                           JSONArray FACULTIES, JSONArray DEPARTMENTS,
-                          JSONArray GROUPS, JSONArray TEACHERS) {
+                          JSONArray GROUPS, JSONArray TEACHERS,JSONArray Pairs) {
         this.UNIVERSITY_FULLNAME = UNIVERSITY_FULLNAME;
         this.UNIVERSITY_SHORTNAME = UNIVERSITY_SHORTNAME;
         this.DAYS_IN_WEEK = DAYS_IN_WEEK;
@@ -35,6 +36,7 @@ public class Initialization {
         this.DEPARTMENTS = DEPARTMENT.fromJson(DEPARTMENTS);
         this.GROUPS = GROUP.fromJson(GROUPS);
         this.TEACHERS = TEACHER.fromJson(TEACHERS);
+        this.PAIRS = PAIR.fromJson(Pairs);
     }
 
     public static Initialization fromJson(final JSONObject object) {
@@ -43,6 +45,7 @@ public class Initialization {
         JSONArray DEPARTMENTS = null;
         JSONArray GROUPS = null;
         JSONArray TEACHERS = null;
+        JSONArray PAIRS = null;
         String UNIVERSITY_FULLNAME = "";
         String UNIVERSITY_SHORTNAME = "";
         int DAYS_IN_WEEK = 0;
@@ -52,7 +55,7 @@ public class Initialization {
             DEPARTMENTS = object.getJSONArray("DEPARTMENTS");
             GROUPS = object.getJSONArray("GROUPS");
             TEACHERS = object.getJSONArray("TEACHERS");
-
+            PAIRS = object.getJSONArray("PAIRS");
             UNIVERSITY_FULLNAME = object.getString("UNIVERSITY_FULLNAME");
             UNIVERSITY_SHORTNAME = object.getString("UNIVERSITY_SHORTNAME");
             DAYS_IN_WEEK = object.getInt("DAYS_IN_WEEK");
@@ -61,7 +64,7 @@ public class Initialization {
         }
 
         return new Initialization(UNIVERSITY_FULLNAME, UNIVERSITY_SHORTNAME,
-                DAYS_IN_WEEK, SEMESTERS, FACULTIES, DEPARTMENTS, GROUPS, TEACHERS);
+                DAYS_IN_WEEK, SEMESTERS, FACULTIES, DEPARTMENTS, GROUPS, TEACHERS,PAIRS);
     }
 
     public static class SEMESTER { //Классы для парсинга: семестры

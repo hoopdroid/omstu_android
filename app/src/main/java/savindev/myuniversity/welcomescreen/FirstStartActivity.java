@@ -6,9 +6,12 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -19,6 +22,7 @@ import android.widget.Toast;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 
 public class FirstStartActivity extends AppCompatActivity implements View.OnClickListener {
@@ -43,14 +47,8 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         GetInitializationInfoTask giit = new GetInitializationInfoTask(getApplicationContext());
         giit.execute();
-        SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        if(settings.contains("Email")) {
 
 
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
 
         setContentView(R.layout.activity_first_start);
        // toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -67,6 +65,10 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
 
          btnSignin.setOnClickListener(this);
          btnSkip.setOnClickListener(this);
+
+
+
+
 
     }
 

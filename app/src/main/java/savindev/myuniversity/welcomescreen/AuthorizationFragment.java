@@ -2,7 +2,9 @@ package savindev.myuniversity.welcomescreen;
 
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
@@ -53,7 +55,17 @@ public class AuthorizationFragment extends Fragment {
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                settings.edit().putBoolean("isFirstStart", false);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean("isFirstStart", false);
+                editor.putString("Email",inputEmail.getText().toString());
+                editor.commit();
+
                 submitForm();
+
+
             }
         });
 

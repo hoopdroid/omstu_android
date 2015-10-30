@@ -1,5 +1,7 @@
 package savindev.myuniversity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,6 +24,8 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import savindev.myuniversity.welcomescreen.FirstStartActivity;
+
 public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     String username;
@@ -36,6 +40,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        if(settings.getBoolean("isFirstStart",true)==true) {
+
+
+            Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -57,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 .setDescriptionColor(Color.WHITE)
                 .setSubtitle("Здравствуйте!")
                 .setSubtitleColor(Color.WHITE)
-                .setBackgroundColor(getResources().getColor(R.color.accent))
+                .setBackgroundColor(getResources().getColor(R.color.primary))
                 .setButtonText("Okay!")
                 .setOnButtonPressedListener(new OnButtonClickListener() {
                     @Override
@@ -93,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.background)
+                .withHeaderBackground(R.drawable.drawer_header)
                 .addProfiles(
                         new ProfileDrawerItem().withName(username).withEmail(email).withIcon(getResources().getDrawable(R.drawable.ic_account_circle_white_48dp))
                 )
