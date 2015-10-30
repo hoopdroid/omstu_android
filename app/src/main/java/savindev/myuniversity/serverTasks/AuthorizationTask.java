@@ -29,7 +29,7 @@ import savindev.myuniversity.R;
 public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     private Context context;
     static final private int TIMEOUT_MILLISEC = 5000;
-    private boolean current = false;
+    private int errorCode = 0;
 
     public AuthorizationTask(Context context) {
         super();
@@ -60,7 +60,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             e.printStackTrace();
             return false;
         }
-        if (salt.isEmpty()) { //Если соль пуста, дальше работать нет смысла. Выдать ошибку
+        if (salt == null || salt.isEmpty()) { //Если соль пуста, дальше работать нет смысла. Выдать ошибку
             return false;
 
         } else { //Иначе - второй запрос на сервер
@@ -76,7 +76,6 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         try {
             return parseContent(result);
         } catch (JSONException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -90,7 +89,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
             String line;
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);
@@ -132,7 +131,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         return "";
     }
 
-        private String parseSalt(String result) throws JSONException {
+    private String parseSalt(String result) throws JSONException {
         JSONObject obj = null;
         obj = new JSONObject(result);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
@@ -140,8 +139,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 return obj.getJSONObject("CONTENT").getString("SALT");
             case "ERROR":   //Неопознанная ошибка
                 if (obj.getJSONObject("CONTENT").get("ERROR_CODE").toString().equals("E0001")) {
-                    Toast.makeText(context, "Не существует такого логина. Зарегистрируйтесь", Toast.LENGTH_LONG).show(); //Вывод сообщения об ошибке
-                    current = true;
+                    errorCode = 1;
                 } else {
                     Log.i("myuniversity", "Ошибка ERROR от сервера, запрос AuthorizationTask.getSalt, текст:"
                             + obj.get("CONTENT"));
@@ -168,11 +166,10 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 int groupId = content.getInt("ID_GROUP");
                 //Это все рапихать по sqlite, предварительно получить по id группы саму группу
                 //saveSettings();
-            return true;
+                return true;
             case "ERROR":   //Неопознанная ошибка
                 if (obj.getJSONObject("CONTENT").get("ERROR_CODE").toString().equals("E0001")) {
-                    Toast.makeText(context, "Неверный логин или пароль", Toast.LENGTH_LONG).show(); //Вывод сообщения об ошибке. Предложить зарегистрироваться или восстановить пароль
-                    current = true;
+                    errorCode = 2;
                 } else {
                     Log.i("myuniversity", "Ошибка ERROR от сервера, запрос AuthorizationTask.getSalt, текст:"
                             + obj.get("CONTENT"));
@@ -188,20 +185,18 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean data) { //Предупреждение, если список пустой
-        if (!data && !current) {
-            Toast.makeText(context, "Не удалось авторизоваться" + '\n'
-                    + "Возможно, сервер недоступен", Toast.LENGTH_LONG).show();
+        if (!data) {
+            switch (errorCode) {
+                case 1:
+                    Toast.makeText(context, "Не существует такого логина. Зарегистрируйтесь", Toast.LENGTH_LONG).show(); //Вывод сообщения об ошибке
+                    break;
+                case 2:
+                    Toast.makeText(context, "Неверный пароль", Toast.LENGTH_LONG).show(); //Вывод сообщения об ошибке. Предложить восстановить пароль
+                    break;
+                default:
+                    Toast.makeText(context, "Сервер недоступен", Toast.LENGTH_LONG).show();
+                    break;
+            }
         }
-//        else {
-//            if (item != null) {
-//                item.setActionView(R.layout.actionbar_finish); //В случае успешной загрузки показать галочку на месте progressbar, через секунду скрыть
-//                new CountDownTimer(1000, 1000) {
-//                    public void onTick(long millisUntilFinished) {}
-//                    public void onFinish() {
-//                        item.setVisible(false);
-//                    }
-//                }.start();
-//            }
-//        }
     }
 }

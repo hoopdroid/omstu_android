@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 
 public class FirstStartActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,6 +41,8 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GetInitializationInfoTask giit = new GetInitializationInfoTask(getApplicationContext());
+        giit.execute();
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         if(settings.contains("Email")) {
 
