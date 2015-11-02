@@ -45,6 +45,7 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         GetInitializationInfoTask giit = new GetInitializationInfoTask(getApplicationContext());
         giit.execute();
 

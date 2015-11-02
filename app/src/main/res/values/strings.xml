@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">Мой университет</string>
-    
+    <string name="app_name">ОмГУПС</string>
+
 
     <string name="activity_registration">Вход в систему</string>
+    <string name="title_activity_settings">Настройки</string>
 
     <string name="action_settings">Settings</string>
     <string name="hint_name">Имя</string>
@@ -34,7 +35,7 @@
     <string name="uri">http://178.74.102.58:1342/MyUniversity/api/v1.0/</string>
     <string name="university">OMGUPS</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 

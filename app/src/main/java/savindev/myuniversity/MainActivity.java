@@ -1,5 +1,8 @@
 package savindev.myuniversity;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,9 +30,13 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class MainActivity extends AppCompatActivity {
-    Toolbar toolbar;
+   static Toolbar toolbar;
     String username;
     String email;
+
+
+    WelcomeFragment welcomeFragment;
+    NewsFragment newsFragment;
 
    static PrimaryDrawerItem itemSchedule ;
    static PrimaryDrawerItem itemNavigation;
@@ -50,43 +57,18 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
+
+
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        welcomeFragment = new WelcomeFragment();
+        newsFragment = new NewsFragment();
+
         getUserSettings();
         initDrawer();
-
-
-        final MaterialListView mListView = (MaterialListView) findViewById(R.id.material_listview);
-
-
-         Card welcome_card = new Card.Builder(this)
-                .setTag("WELCOME_CARD")
-                .setDismissible()
-                .withProvider(WelcomeCardProvider.class)
-                .setTitle("Добро пожаловать в систему!")
-                .setTitleColor(Color.WHITE)
-                .setDescription("Проведите пальцем справа-налево")
-                .setDescriptionColor(Color.WHITE)
-                .setSubtitle("Здравствуйте!")
-                .setSubtitleColor(Color.WHITE)
-                .setBackgroundColor(getResources().getColor(R.color.primary))
-                .setButtonText("Okay!")
-                .setOnButtonPressedListener(new OnButtonClickListener() {
-                    @Override
-                    public void onButtonClicked(final View view, final Card card) {
-                        Toast.makeText(getApplicationContext(), "Welcome!", Toast.LENGTH_SHORT).show();
-                        mListView.animate();
-                        mListView.clearAll();
-                    }
-                })
-                .endConfig()
-                .build();
-
-
-        mListView.add(welcome_card);
-
     }
 
 
@@ -142,24 +124,28 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        FragmentManager fragmentManager = getFragmentManager();
+                        FragmentTransaction fragmentTransaction;
+
                         switch (position) {
                             case 1:
-                                Toast.makeText(getApplicationContext(),"SCHEDULE", Toast.LENGTH_SHORT).show();
+                                addfragment(R.string.drawer_schedule,welcomeFragment);
                                 break;
                             case 2:
-                                Toast.makeText(getApplicationContext(),"NAVIGATION", Toast.LENGTH_SHORT).show();
+
                                 break;
                             case 3:
-                                Toast.makeText(getApplicationContext(),"NOTES", Toast.LENGTH_SHORT).show();
+
                                 break;
                             case 4:
-                                Toast.makeText(getApplicationContext(),"NEWS", Toast.LENGTH_SHORT).show();
+                                addfragment(R.string.drawer_news,newsFragment);
                                 break;
                             case 5:
-                                Toast.makeText(getApplicationContext(),"EDUCATION", Toast.LENGTH_SHORT).show();
+
                                 break;
                             case 6:
-                                Toast.makeText(getApplicationContext(),"SETTINGS", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+                                startActivity(intent);
                                 break;
 
                         }
@@ -167,5 +153,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build();
+    }
+
+    void addfragment(int title,Fragment fragment){
+
+        toolbar.setTitle(title);
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction;
+        fragmentTransaction=fragmentManager
+                .beginTransaction();
+        fragmentTransaction.replace(R.id.content_main,fragment);
+        fragmentTransaction.commit();
+        Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+
     }
 }
