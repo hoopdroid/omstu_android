@@ -28,39 +28,12 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         groupsList = (ListView)findViewById(R.id.groupsList);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-
-
-        SQLiteDatabase sqliteDatabase;   DBHelper helper = new DBHelper(this);
-
-        sqliteDatabase = helper.getWritableDatabase();
-
-
-
-        ArrayList groups = new ArrayList();
-        Cursor cursor = sqliteDatabase.rawQuery("SELECT teacher_lastname FROM Teachers",null);
-        if (cursor .moveToFirst()) {
-
-            while (cursor.isAfterLast() == false) {
-                String name = cursor.getString(cursor.getColumnIndex("teacher_lastname"));
-                groups.add(name);
-                cursor.moveToNext();
-            }
-        }
-
+        DBHelper dbHelper;
+        dbHelper=new DBHelper(this);
 
 
         // используем адаптер данных
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this,	android.R.layout.simple_list_item_1, groups);
+        ArrayAdapter arrayAdapter = new ArrayAdapter(this,	android.R.layout.simple_list_item_1,dbHelper.getAllGroups(this));
 
         groupsList.setAdapter(arrayAdapter);
     }

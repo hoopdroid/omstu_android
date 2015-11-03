@@ -30,11 +30,10 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class MainActivity extends AppCompatActivity {
-   static Toolbar toolbar;
+
+    static Toolbar toolbar;
     String username;
     String email;
-
-
     WelcomeFragment welcomeFragment;
     NewsFragment newsFragment;
 
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         if(settings.getBoolean("isFirstStart",true)==true) {
-
 
             Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
             startActivity(intent);
@@ -132,16 +130,16 @@ public class MainActivity extends AppCompatActivity {
                                 addfragment(R.string.drawer_schedule,welcomeFragment);
                                 break;
                             case 2:
-
+                                addfragment(R.string.drawer_navigator,welcomeFragment);
                                 break;
                             case 3:
-
+                                addfragment(R.string.drawer_notes,welcomeFragment);
                                 break;
                             case 4:
                                 addfragment(R.string.drawer_news,newsFragment);
                                 break;
                             case 5:
-
+                                addfragment(R.string.drawer_education,welcomeFragment);
                                 break;
                             case 6:
                                 Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);

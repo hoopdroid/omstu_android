@@ -162,39 +162,46 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             sqliteDatabase.insert(DBHelper.UniversityInfoHelper.TABLE_NAME, null, uninfoRow);
 
         //PARSE TEACHERS TO SQLITE
-           ContentValues teacherRow = new ContentValues();
-            for(int index = 0 ; index < init.TEACHERS.size(); ++index) {
+        ContentValues teacherRow = new ContentValues();
+            for(int index = 0 ; index < init.TEACHERS.size(); index++) {
                 teacherRow.put(DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
                 teacherRow.put(DBHelper.TeachersHelper.COL_ID_DEPARTMENT, init.TEACHERS.get(index).ID_DEPARTMENT);
                 teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_LASTNAME, init.TEACHERS.get(index).TEACHER_LASTNAME);
                 teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_FIRSTNAME, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
                 teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
 
-                Log.d("TEACHERS_INFO", teacherRow.toString());
-                sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);
+                Log.d("TEACHERS_SIZE ", teacherRow.toString());
+                sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME,null,teacherRow);
+                teacherRow.clear();
             }
+        Cursor  cursor = sqliteDatabase.rawQuery("select * from Teachers",null);
 
+        cursor .moveToFirst();
 
+        while (!cursor.isAfterLast()) {
+            Log.d("SQLITE TEACHERS",cursor.getString(3));
+            cursor.moveToNext();
+        }
         //PARSE SEMESTRES TO SQLITE
              ContentValues semestresRow = new ContentValues();
-             for(int index = 0 ; index < init.SEMESTERS.size();++index) {
+             for(int index = 0 ; index < init.SEMESTERS.size();index++) {
                semestresRow.put(DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
                semestresRow.put(DBHelper.SemestersHelper.COL_BEGIN_DATE,init.SEMESTERS.get(index).BEGIN_DT);
                  semestresRow.put(DBHelper.SemestersHelper.COL_END_DATE, init.SEMESTERS.get(index).END_DT);
 
-                 Log.d("SEMESTRES_INFO", semestresRow.toString());
+              //   Log.d("SEMESTRES_INFO", semestresRow.toString());
                 sqliteDatabase.insert(DBHelper.SemestersHelper.TABLE_NAME, null, semestresRow);
         }
 
         //PARSE PAIRS TO SQLITE
         ContentValues pairsRow = new ContentValues();
-        for(int index = 0 ; index < init.PAIRS.size();++index) {
+        for(int index = 0 ; index < init.PAIRS.size();index++) {
             pairsRow.put(DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
             pairsRow.put(DBHelper.PairsHelper.COL_PAIR_NUMBER ,init.PAIRS.get(index).PAIR_NUMBER);
             pairsRow.put(DBHelper.PairsHelper.COL_BEGIN_TIME,init.PAIRS.get(index).PAIR_BEGIN_TIME);
             pairsRow.put(DBHelper.PairsHelper.COL_END_TIME, init.PAIRS.get(index).PAIR_END_TIME);
 
-            Log.d("PAIRS_INFO", pairsRow.toString());
+         //   Log.d("PAIRS_INFO", pairsRow.toString());
             sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
         }
 
@@ -202,25 +209,26 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
 
         //PARSE GROUPS TO SQLITE
         ContentValues groupsRow = new ContentValues();
-        for(int index = 0 ; index < init.GROUPS.size();++index) {
+        for(int index = 0 ; index < init.GROUPS.size();index++) {
             groupsRow.put(DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
             groupsRow.put(DBHelper.GroupsHelper.COL_GROUP_NAME, init.GROUPS.get(index).GROUP_NAME);
             groupsRow.put(DBHelper.GroupsHelper.COL_ID_FACULTY, init.GROUPS.get(index).ID_FACULTY);
 
-            Log.d("GROUPS_INFO", groupsRow.toString());
+         //   Log.d("GROUPS_INFO", groupsRow.toString());
             sqliteDatabase.insert(DBHelper.GroupsHelper.TABLE_NAME, null, groupsRow);
+
         }
 
         //PARSE DEPARTMENTS TO SQLITE
         ContentValues departmentsRow = new ContentValues();
-        for(int index = 0 ; index < init.DEPARTMENTS.size();++index) {
+        for(int index = 0 ; index < init.DEPARTMENTS.size();index++) {
             departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
             departmentsRow.put(DBHelper.DepartmentsHelper.COL_FACULTY_ID, init.DEPARTMENTS.get(index).ID_FACULTY);
             departmentsRow.put(DBHelper.DepartmentsHelper.COL_CLASSROOM_ID, init.DEPARTMENTS.get(index).ID_CLASSROOM);
             departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_FULLNAME, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
             departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_SHORTNAME, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
 
-            Log.d("GROUPS_INFO", departmentsRow.toString());
+         //   Log.d("GROUPS_INFO", departmentsRow.toString());
             sqliteDatabase.insert(DBHelper.DepartmentsHelper.TABLE_NAME, null, departmentsRow);
         }
 

@@ -271,17 +271,20 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public static ArrayList getAllGroups(SQLiteDatabase db) {
+    public static ArrayList getAllGroups(Context context) {
+        SQLiteDatabase db;
+        DBHelper dbHelper = new DBHelper(context);
+        db=dbHelper.getWritableDatabase();
         ArrayList groups = new ArrayList();
-        Cursor  cursor = db.rawQuery("SELECT name_group FROM Groups",null);
-        if (cursor .moveToFirst()) {
+        Cursor cursor = db.rawQuery("SELECT * FROM Groups",null);
+        cursor.moveToFirst();
 
             while (cursor.isAfterLast() == false) {
-                String name = cursor.getString(3);
+                String name = cursor.getString(2);
                 groups.add(name);
                 cursor.moveToNext();
             }
-        }
+
         return  groups;
     }
 
