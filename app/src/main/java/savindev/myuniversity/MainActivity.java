@@ -6,17 +6,14 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
-import com.dexafree.materialList.card.Card;
-import com.dexafree.materialList.card.OnButtonClickListener;
-import com.dexafree.materialList.card.provider.WelcomeCardProvider;
-import com.dexafree.materialList.view.MaterialListView;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -27,6 +24,8 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import savindev.myuniversity.schedule.DailyScheduleFragment;
+import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     String email;
     WelcomeFragment welcomeFragment;
     NewsFragment newsFragment;
+    SettingsFragment settingsFragment;
+    DailyScheduleFragment dailyScheduleFragment;
 
    static PrimaryDrawerItem itemSchedule ;
    static PrimaryDrawerItem itemNavigation;
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
         welcomeFragment = new WelcomeFragment();
         newsFragment = new NewsFragment();
+        settingsFragment = new SettingsFragment();
+        dailyScheduleFragment = new DailyScheduleFragment();
 
         getUserSettings();
         initDrawer();
@@ -127,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
                         switch (position) {
                             case 1:
-                                addfragment(R.string.drawer_schedule,welcomeFragment);
+                                addfragment(R.string.drawer_schedule,dailyScheduleFragment);
                                 break;
                             case 2:
                                 addfragment(R.string.drawer_navigator,welcomeFragment);
@@ -142,8 +145,7 @@ public class MainActivity extends AppCompatActivity {
                                 addfragment(R.string.drawer_education,welcomeFragment);
                                 break;
                             case 6:
-                                Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
-                                startActivity(intent);
+                                addfragment(R.string.drawer_settings,settingsFragment);
                                 break;
 
                         }
@@ -164,5 +166,16 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
         Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
 
+    }
+
+    //Проверка на подключение к интернету
+    public static boolean isNetworkConnected(Context c) {
+        ConnectivityManager cm = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni == null) {
+            // There are no active networks.
+            return false;
+        } else
+            return true;
     }
 }

@@ -1,7 +1,9 @@
 package savindev.myuniversity.serverTasks;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -15,15 +17,17 @@ import java.util.Date;
 import savindev.myuniversity.R;
 
 public class GetScheduleTask extends AsyncTask<String, Void, Integer> {
-	Context context;
-	final int TIMEOUT_MILLISEC = 5000;
-	Date lastModifiedDate;
-	static InputStream is = null;
-	String takenJson = "";
+	private Context context;
+	private final static int TIMEOUT_MILLISEC = 5000;
+	private Date lastModifiedDate;
+	private static InputStream is = null;
+	private String takenJson = "";
+	private SwipeRefreshLayout mSwipeRefreshLayout;
 
-	public GetScheduleTask(Context context) {
+	public GetScheduleTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
 		super();
 		this.context = context;
+		this.mSwipeRefreshLayout = mSwipeRefreshLayout;
 	}
 
 
@@ -92,6 +96,12 @@ public class GetScheduleTask extends AsyncTask<String, Void, Integer> {
 
 	@Override
 	protected void onPostExecute(Integer data) {
+		if (mSwipeRefreshLayout != null) { //Если вызывалось из фрагмента расписания
+			mSwipeRefreshLayout.setRefreshing(false); //Завершить показывать прогресс
+			if (data > 0) { //Имеется новое содержимое, обновить данные
+				context.sendBroadcast(new Intent("FINISH_UPDATE_DAILY")); //Отправить запрос на обновление
+			}
+		}
 		if (data == -1)
 			Toast.makeText(context, "Не удалось получить расписание" + '\n'
 					+ "Проверьте соединение с сервером", Toast.LENGTH_LONG).show();
