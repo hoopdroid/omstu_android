@@ -99,7 +99,7 @@ public class GetScheduleTask extends AsyncTask<String, Void, Integer> {
 		if (mSwipeRefreshLayout != null) { //Если вызывалось из фрагмента расписания
 			mSwipeRefreshLayout.setRefreshing(false); //Завершить показывать прогресс
 			if (data > 0) { //Имеется новое содержимое, обновить данные
-				context.sendBroadcast(new Intent("FINISH_UPDATE_DAILY")); //Отправить запрос на обновление
+				context.sendBroadcast(new Intent("FINISH_UPDATE")); //Отправить запрос на обновление
 			}
 		}
 		if (data == -1)

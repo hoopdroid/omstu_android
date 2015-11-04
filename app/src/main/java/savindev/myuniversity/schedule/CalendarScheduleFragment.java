@@ -1,10 +1,15 @@
 package savindev.myuniversity.schedule;
 
-import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,15 +25,23 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -41,29 +54,31 @@ import savindev.myuniversity.serverTasks.GetScheduleTask;
 import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
-public class DailyScheduleFragment extends DialogFragment
-        implements OnClickListener, OnScrollListener, SwipeRefreshLayout.OnRefreshListener {
-    /**
-     * Класс, отображающий расписание на определенный срок в виде списка предметов с параметрами
-     */
-    private ScheduleAdapter adapter;
-    private String[] data;
-    private GregorianCalendar calendar;
-    private LoadMoreTask lmt;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ListView scheduleList;
+public class CalendarScheduleFragment extends Fragment implements OnClickListener, OnScrollListener,
+        SwipeRefreshLayout.OnRefreshListener {
+
+    SharedPreferences sPref;
+    ListView pairs;
+    String[] data;
+    LoadMoreTask lmt;
+    ScheduleAdapter adapter;
+    GridView grid;
+    GregorianCalendar calendar;
+    SwipeRefreshLayout mSwipeRefreshLayout;
     private GetInitializationInfoTask giit;
     private boolean isGroup;
     private int currentID;
-
+    LinearLayout filtersLayout, detailsLayout;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        setRetainInstance(true);
+        sPref = getActivity().getSharedPreferences("groups", Context.MODE_PRIVATE);
         adapter = new ScheduleAdapter(new ArrayList<SheduleModel>());
-        View view = null;
         calendar = new GregorianCalendar();
-
+        View view = null;
+        setRetainInstance(true);
+        filtersLayout = (LinearLayout) view.findViewById(R.id.filtersLayout);
+        detailsLayout = (LinearLayout) view.findViewById(R.id.detailll);
 
         if (false) //Если данные существуют:
         //TODO при появлении расписания в базе сделать нормальную проверку. Сначала проверять на наличие расписания для основной группы при авторизации. Если нет - для любой
@@ -71,14 +86,15 @@ public class DailyScheduleFragment extends DialogFragment
 //            isGroup;
 //            currentID;
 
-            view = inflater.inflate(R.layout.fragment_daily_schedule, null);
-            scheduleList = (ListView) view.findViewById(R.id.schedule);
-            scheduleList.setAdapter(adapter);
+            //заполнение основной сетки ифнормацией в соответствии с настройками
+            grid = (GridView) view.findViewById(R.id.calendarSchedule);
+            grid.setAdapter(adapter);
             lmt = new LoadMoreTask(isGroup, currentID);
-            lmt.execute(14); //Вывод данных на ближайшие 14 дней
-            scheduleList.setOnScrollListener(this);
+            lmt.execute(14);
+            grid.setOnScrollListener(this);
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
             mSwipeRefreshLayout.setOnRefreshListener(this);
+
         } else {
             view = inflater.inflate(R.layout.fragment_null_schedule, null); //Если данные не существуют, вывести информацию
             Button login = (Button) view.findViewById(R.id.log_id);
@@ -90,19 +106,15 @@ public class DailyScheduleFragment extends DialogFragment
         }
 
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("FINISH_UPDATE"));
-
         setHasOptionsMenu(true);
 
         return view;
     }
 
-
     @Override
     public void onRefresh() {
-        GetScheduleTask gst = null;
         // начинаем показывать прогресс
-        mSwipeRefreshLayout.setRefreshing(true);
-        gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
+        GetScheduleTask gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
         //TODO получить id текущей группы или преподавателя, а также информацию о том, группа это или преподаватель
         String currentSchedule = null; //в формате idGroup=id или idTeacher=id
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
@@ -117,13 +129,11 @@ public class DailyScheduleFragment extends DialogFragment
         }
     };
 
-
     @Override
     public void onClick(View v) {
-        Intent intent;
         switch (v.getId()) {
             case R.id.log_id:
-                intent = new Intent(getActivity(), FirstStartActivity.class);
+                Intent intent = new Intent(getActivity(), FirstStartActivity.class);
                 startActivity(intent);
                 break;
             case R.id.set_id:
@@ -159,6 +169,7 @@ public class DailyScheduleFragment extends DialogFragment
         }
     }
 
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.daily_schedule, menu);
         String group = null;
@@ -182,27 +193,43 @@ public class DailyScheduleFragment extends DialogFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.cs_filters:
+                if (filtersLayout.getVisibility() == View.GONE) {
+                    filtersLayout.setVisibility(View.VISIBLE);
+                    getActivity().getSharedPreferences("omgupsSettings", Context.MODE_PRIVATE).edit().putBoolean("filter_visible", false).apply();
+                } else {
+                    filtersLayout.setVisibility(View.GONE);
+                    getActivity().getSharedPreferences("omgupsSettings", Context.MODE_PRIVATE).edit().putBoolean("filter_visible", true).apply();
+                }
+                break;
+            case R.id.cs_detail:
+                if (detailsLayout.getVisibility() == View.GONE) {
+                    detailsLayout.setVisibility(View.VISIBLE);
+                    getActivity().getSharedPreferences("omgupsSettings", Context.MODE_PRIVATE).edit().putBoolean("detail_visible", false).apply();
+                } else {
+                    detailsLayout.setVisibility(View.GONE);
+                    getActivity().getSharedPreferences("omgupsSettings", Context.MODE_PRIVATE).edit().putBoolean("detail_visible", true).apply();
+                }
+                break;
             case 100:
-                break; //Для вывода подменю
+                break;
             case 16908332:
                 break; //Для вывода бокового меню
             default:
-                //Отобразить новую выбранную группу
 //                Editor ed = sPref.edit();
 //                ed.putString("set", data[item.getItemId() - 101]).apply();
 //                FragmentTransaction ft = getFragmentManager().beginTransaction();
-//                ft.replace(R.id.container, new DailyScheduleFragment()).commit();
+//                ft.replace(R.id.container, new CalendarScheduleFragment()).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
     }
 
-
-    //При пролистывании вниз
     @Override
     public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
         boolean loadMore = firstVisible + visibleCount >= totalCount;
@@ -210,20 +237,14 @@ public class DailyScheduleFragment extends DialogFragment
         if (loadMore && lmt.getStatus() == AsyncTask.Status.FINISHED) {
             calendar.add(Calendar.DAY_OF_YEAR, 1);
             lmt = new LoadMoreTask(isGroup, currentID);
-            lmt.execute(totalCount);
+            lmt.execute(7);
         }
     }
 
+
     static class ViewHolder {
         //список
-        public TextView n;
-        public TextView time;
-        public TextView name;
-        public TextView teacher;
-        public TextView auditory;
-        public TextView tipe;
-        public TextView date;
-        public LinearLayout pairContainer;
+        public TextView day;
     }
 
     public class ScheduleAdapter extends BaseAdapter {
@@ -263,53 +284,49 @@ public class DailyScheduleFragment extends DialogFragment
         // пункт списка
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+
+
             ViewHolder holder;
             // Очищает сущетсвующий шаблон, если параметр задан
             // Работает только если базовый шаблон для всех классов один и тот же
             View rowView = convertView;
             if (rowView == null) {
                 LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(getActivity().LAYOUT_INFLATER_SERVICE);
-                rowView = inflater.inflate(R.layout.schedule_line, null, true);
+                rowView = inflater.inflate(R.layout.one_calendar_pair, null, true);
                 holder = new ViewHolder();
-                holder.n = (TextView) rowView.findViewById(R.id.pairNumber);
-                holder.time = (TextView) rowView.findViewById(R.id.pairTime);
-                holder.name = (TextView) rowView.findViewById(R.id.pairName);
-                holder.teacher = (TextView) rowView.findViewById(R.id.teacher);
-                holder.auditory = (TextView) rowView.findViewById(R.id.auditory);
-                holder.tipe = (TextView) rowView.findViewById(R.id.pairType);
-                holder.date = (TextView) rowView.findViewById(R.id.date);
-                holder.pairContainer = (LinearLayout) rowView.findViewById(R.id.pairContainer);
+                holder.day = (TextView) rowView.findViewById(R.id.tv);
                 rowView.setTag(holder);
             } else {
                 holder = (ViewHolder) rowView.getTag();
             }
-
-            holder.n.setText(list.get(position).getN());
-            holder.time.setText(list.get(position).getTime());
-            holder.name.setText(list.get(position).getName());
-            holder.teacher.setText(list.get(position).getTeacher());
-            holder.auditory.setText(list.get(position).getAuditory());
-            holder.tipe.setText(list.get(position).getTipe());
-            holder.date.setText(list.get(position).getDate());
-
-
-            if (list.get(position).getDate().isEmpty()) {
-                holder.date.setVisibility(View.GONE);
-            } else {
-                holder.date.setVisibility(View.VISIBLE);
+            int conumns = 3; //TODO брать из инит.инфо, формировать как число учебных дней в неделю + 2 (колонка на день недели, колонка на пару)
+            if (position % conumns == 0) { //если остаток 0, то это день недели
+                holder.day.setText(list.get(position).getN());
+                holder.day.setBackgroundColor(Color.WHITE);
+            } else if (position % conumns == conumns - 1) { //если остаток conumns-1, то это число
+                holder.day.setText(list.get(position).getDate());
+                holder.day.setBackgroundColor(Color.WHITE);
+            } else { //в остальных случаях это пара, требуется заполнять
+                if (list.get(position) == null) { //если нуль, оставить ячейку пустой
+                    holder.day.setVisibility(View.INVISIBLE);
+                } else {
+                    holder.day.setText(list.get(position).getName()); //добавлять текст, только если указано в настройках
+                    holder.day.setVisibility(View.VISIBLE);
+                    holder.day.setBackgroundColor(Color.GREEN);
+                }
             }
-
             return rowView;
         }
+
 
         public void add(ArrayList<SheduleModel> data) {
             this.list.addAll(data);
         }
-
     }
 
     //Реализует подгрузку данных при достижении конца списка
     public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<SheduleModel>> {
+        String mDate;
         boolean isGroup;
         int id;
 
@@ -325,17 +342,17 @@ public class DailyScheduleFragment extends DialogFragment
 
         @Override
         protected void onPostExecute(ArrayList<SheduleModel> data) {
-            if (data == null || data.isEmpty()) {
+            if (data.isEmpty()) {
                 Toast.makeText(getActivity(), "Данные закончились", Toast.LENGTH_SHORT).show();
                 return;
             }
-            //Обновить адаптер и вернуть на последнюю просмотренную позицию
             adapter.add(data);
             adapter.notifyDataSetChanged();
-            int index = scheduleList.getFirstVisiblePosition();
-            int top = (scheduleList.getChildAt(0) == null) ? 0 : scheduleList.getChildAt(0).getTop();
-            scheduleList.setSelectionFromTop(index, top);
+            int index = grid.getFirstVisiblePosition();
+            int top = (grid.getChildAt(0) == null) ? 0 : grid.getChildAt(0).getTop();
+            grid.setSelectionFromTop(index, top);
         }
     }
+
 
 }
