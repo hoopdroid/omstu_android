@@ -1,4 +1,4 @@
-package savindev.myuniversity;
+package savindev.myuniversity.serverTasks;
 
 import org.json.JSONArray;
 import org.json.JSONException;
