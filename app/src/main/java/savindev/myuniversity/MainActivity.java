@@ -1,9 +1,11 @@
 package savindev.myuniversity;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -72,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
 
    private void getUserSettings(){
        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+
+       username = settings.getString("UserName","no user");
        email = settings.getString("Email","no email");
     }
 
@@ -94,11 +98,34 @@ public class MainActivity extends AppCompatActivity {
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("Вы хотите сменить пользователя?")
+                                .setMessage("Смена аккаунта")
+                                .setIcon(R.drawable.drawer_header)
+                                .setCancelable(false)
+                                .setPositiveButton("Да",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                Intent i = new Intent(MainActivity.this,FirstStartActivity.class);
+                                                startActivity(i);
+                                                finish();
+                                            }
+                                        }).setNegativeButton("Нет",
+                                         new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+
+                                        dialog.cancel();
+                                             }
+                                                 });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+
                         return false;
                     }
                 })
                 .build();
-//create the drawer and remember the `Drawer` result object
+
         Drawer result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)

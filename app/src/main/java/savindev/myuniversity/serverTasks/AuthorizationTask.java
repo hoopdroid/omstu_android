@@ -1,6 +1,7 @@
 package savindev.myuniversity.serverTasks;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -165,6 +166,13 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 String middlename = content.getString("USER_MIDDLENAME");
                 int groupId = content.getInt("ID_GROUP");
                 //Это все рапихать по sqlite, предварительно получить по id группы саму группу
+
+                SharedPreferences settings = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString("UserName",lastname + " " + firstname +" "+ groupId);
+                editor.commit();
+
+
                 //saveSettings();
                 return true;
             case "ERROR":   //Неопознанная ошибка
