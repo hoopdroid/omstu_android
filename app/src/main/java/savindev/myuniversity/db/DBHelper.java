@@ -271,24 +271,65 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public static ArrayList getAllGroups(Context context) {
-        SQLiteDatabase db;
-        DBHelper dbHelper = new DBHelper(context);
-        db=dbHelper.getWritableDatabase();
-        ArrayList groups = new ArrayList();
-        Cursor cursor = db.rawQuery("SELECT * FROM Groups",null);
-        cursor.moveToFirst();
+    public  ArrayList getGroups(Context context) {
 
-            while (cursor.isAfterLast() == false) {
-                String name = cursor.getString(2);
-                groups.add(name);
-                cursor.moveToNext();
-            }
+        String table = GroupsHelper.TABLE_NAME;
+        String selection = GroupsHelper.COL_GROUP_NAME;
 
-        return  groups;
+        return getList(context,table,selection);
     }
 
 
+    //Запрос к БД на получение данных
+    public  ArrayList getDepartments(Context context){
+
+        String table = DepartmentsHelper.TABLE_NAME;
+        String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
+
+        return getList(context,table,selection);
+
+    }
+
+    //Запрос к БД на получение данных
+    public  ArrayList getFaculties(Context context){
+
+        String table = FacultiesHelper.TABLE_NAME;
+        String selection = FacultiesHelper.COL_FACULTY_SHORTNAME;
+
+        return getList(context,table,selection);
+
+    }
+
+
+    //Запрос к БД на получение данных
+    public  ArrayList getTeachers(Context context){
+
+        String table = TeachersHelper.TABLE_NAME;
+        String selection =  TeachersHelper.COL_TEACHER_LASTNAME;
+
+        return getList(context,table,selection);
+
+    }
+
+    private ArrayList getList(Context context,String table,String selection) {
+
+        SQLiteDatabase db;
+        DBHelper dbHelper = new DBHelper(context);
+        db = dbHelper.getWritableDatabase();
+        ArrayList list = new ArrayList();
+        Cursor cursor = db.rawQuery("SELECT " + selection + " FROM "+table, null);
+
+        cursor.moveToFirst();
+
+        while (cursor.isAfterLast() == false) {
+            String name = cursor.getString(0);
+            list.add(name);
+            cursor.moveToNext();
+
+        }
+
+        return list;
+    }
 
 
 }

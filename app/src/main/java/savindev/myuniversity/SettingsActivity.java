@@ -33,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         // используем адаптер данных
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this,	android.R.layout.simple_list_item_1,dbHelper.getAllGroups(this));
+        ArrayAdapter arrayAdapter = new ArrayAdapter(this,	android.R.layout.simple_list_item_1,dbHelper.getGroups(this));
 
         groupsList.setAdapter(arrayAdapter);
     }

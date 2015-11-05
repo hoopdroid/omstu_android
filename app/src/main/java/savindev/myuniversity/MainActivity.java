@@ -13,6 +13,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
@@ -65,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
+
+
         welcomeFragment = new WelcomeFragment();
         newsFragment = new NewsFragment();
         settingsFragment = new SettingsFragment();
@@ -72,6 +76,13 @@ public class MainActivity extends AppCompatActivity {
 
         getUserSettings();
         initDrawer();
+
+        DBHelper dbHelper = new DBHelper(this);
+        Log.d("Departments_request",dbHelper.getDepartments(this).toString()) ;
+        Log.d("Groups_request",dbHelper.getGroups(this).toString()) ;
+        Log.d("Faculties_request",dbHelper.getFaculties(this).toString()) ;
+        Log.d("Teachers_request",dbHelper.getTeachers(this).toString()) ;
+
     }
 
 

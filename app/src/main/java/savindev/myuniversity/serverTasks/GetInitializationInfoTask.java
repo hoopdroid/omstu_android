@@ -168,18 +168,10 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_FIRSTNAME, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
                 teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
 
-                Log.d("TEACHERS_SIZE ", teacherRow.toString());
                 sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME,null,teacherRow);
                 teacherRow.clear();
             }
-        Cursor  cursor = sqliteDatabase.rawQuery("select * from Teachers",null);
 
-        cursor .moveToFirst();
-
-        while (!cursor.isAfterLast()) {
-            Log.d("SQLITE TEACHERS",cursor.getString(3));
-            cursor.moveToNext();
-        }
         //PARSE SEMESTRES TO SQLITE
              ContentValues semestresRow = new ContentValues();
              for(int index = 0 ; index < init.SEMESTERS.size();index++) {
@@ -187,7 +179,6 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                semestresRow.put(DBHelper.SemestersHelper.COL_BEGIN_DATE,init.SEMESTERS.get(index).BEGIN_DT);
                  semestresRow.put(DBHelper.SemestersHelper.COL_END_DATE, init.SEMESTERS.get(index).END_DT);
 
-              //   Log.d("SEMESTRES_INFO", semestresRow.toString());
                 sqliteDatabase.insert(DBHelper.SemestersHelper.TABLE_NAME, null, semestresRow);
         }
 
@@ -199,7 +190,6 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             pairsRow.put(DBHelper.PairsHelper.COL_BEGIN_TIME,init.PAIRS.get(index).PAIR_BEGIN_TIME);
             pairsRow.put(DBHelper.PairsHelper.COL_END_TIME, init.PAIRS.get(index).PAIR_END_TIME);
 
-         //   Log.d("PAIRS_INFO", pairsRow.toString());
             sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
         }
 
@@ -212,7 +202,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             groupsRow.put(DBHelper.GroupsHelper.COL_GROUP_NAME, init.GROUPS.get(index).GROUP_NAME);
             groupsRow.put(DBHelper.GroupsHelper.COL_ID_FACULTY, init.GROUPS.get(index).ID_FACULTY);
 
-         //   Log.d("GROUPS_INFO", groupsRow.toString());
+
             sqliteDatabase.insert(DBHelper.GroupsHelper.TABLE_NAME, null, groupsRow);
 
         }
@@ -226,10 +216,19 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_FULLNAME, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
             departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_SHORTNAME, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
 
-         //   Log.d("GROUPS_INFO", departmentsRow.toString());
             sqliteDatabase.insert(DBHelper.DepartmentsHelper.TABLE_NAME, null, departmentsRow);
         }
 
+
+        //PARSE FACULTIES TO SQLITE
+        ContentValues facultiesRow = new ContentValues();
+        for(int index = 0 ; index < init.FACULTIES.size();index++) {
+            facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
+            facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_FULLNAME, init.FACULTIES.get(index).FACULTY_FULLNAME);
+            facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_SHORTNAME, init.FACULTIES.get(index).FACULTY_SHORTNAME);
+
+            sqliteDatabase.insert(DBHelper.FacultiesHelper.TABLE_NAME, null, facultiesRow);
+        }
 
 
 
