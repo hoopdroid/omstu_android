@@ -187,7 +187,8 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 SharedPreferences settings = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = settings.edit();
 
-                editor.putString("UserName",lastname + " " + firstname +" "+ getUserGroup(groupId,context));
+                editor.putString("UserName",lastname + " " + firstname);
+                editor.putInt("UserGroup",groupId);
                 editor.commit();
 
 
@@ -230,15 +231,4 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         }
     }
 
-    private String getUserGroup(int id,Context context){
-        String groupName="";
-
-        DBHelper dbHelper = new DBHelper(context);
-        SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
-        String find = "SELECT * FROM  "+ DBHelper.GroupsHelper.TABLE_NAME + " WHERE "+ DBHelper.GroupsHelper.COL_ID_GROUP +" = " +id ;
-        Cursor cursor = sqLiteDatabase.rawQuery(find,null);
-        cursor.moveToFirst();
-        groupName=cursor.getString(2);
-        return groupName;
-    }
 }

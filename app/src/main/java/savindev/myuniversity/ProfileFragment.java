@@ -61,7 +61,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent i = new Intent(getActivity(), FirstStartActivity.class);
                                 startActivity(i);
-                                DBHelper.removeAllFromDatabase(getActivity());
                                 getActivity().finish();
                             }
                         }).setNegativeButton("Нет",

@@ -39,18 +39,17 @@ public class WelcomeFragment extends Fragment {
                 .setTag("WELCOME_CARD")
                 .setDismissible()
                 .withProvider(WelcomeCardProvider.class)
-                .setTitle("Добро пожаловать в систему!")
+                .setTitle("Данный раздел в разработке!")
                 .setTitleColor(Color.WHITE)
-                .setDescription("Проведите пальцем справа-налево")
+                .setDescription("Мы уже работаем над этим")
                 .setDescriptionColor(Color.WHITE)
-                .setSubtitle("Здравствуйте!")
                 .setSubtitleColor(Color.WHITE)
                 .setBackgroundColor(getResources().getColor(R.color.primary))
-                .setButtonText("Okay!")
+                .setButtonText("Закрыть")
                 .setOnButtonPressedListener(new OnButtonClickListener() {
                     @Override
                     public void onButtonClicked(final View view, final Card card) {
-                        Toast.makeText(getActivity(), "Welcome!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "УПС!", Toast.LENGTH_SHORT).show();
                         mListView.animate();
                         mListView.clearAll();
                     }

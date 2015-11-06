@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -86,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
    private void getUserSettings(){
        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
 
-       username = settings.getString("UserName","no user");
+       username = settings.getString("UserName","no user")+" "+getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
+
        email = settings.getString("Email","no email");
     }
 
@@ -192,5 +195,28 @@ public class MainActivity extends AppCompatActivity {
             return false;
         } else
             return true;
+    }
+
+
+
+    private String getUserGroup(int id,Context context){
+        String groupName="";
+
+        DBHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
+        String find = "SELECT * FROM  "+ DBHelper.GroupsHelper.TABLE_NAME + " WHERE "+ DBHelper.GroupsHelper.COL_ID_GROUP +" = " +id ;
+        Cursor cursor = sqLiteDatabase.rawQuery(find,null);
+
+
+        cursor.moveToFirst();
+
+        while (cursor.isAfterLast() == false) {
+
+            groupName=cursor.getString(cursor.getColumnIndex(DBHelper.GroupsHelper.COL_GROUP_NAME));
+            cursor.moveToNext();
+
+        }
+        cursor.close();
+        return groupName;
     }
 }
