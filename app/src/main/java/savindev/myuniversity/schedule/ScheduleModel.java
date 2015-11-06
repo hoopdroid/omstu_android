@@ -1,6 +1,6 @@
 package savindev.myuniversity.schedule;
 
-public class SheduleModel {
+public class ScheduleModel {
 
 	private String n;
 	private String time;
@@ -12,7 +12,7 @@ public class SheduleModel {
 	private boolean isCancelled;
 
 
-	public SheduleModel(String n, String time, String name, String teacher, String auditory, String tipe, String date, boolean isCancelled) {
+	public ScheduleModel(String n, String time, String name, String teacher, String auditory, String tipe, String date, boolean isCancelled) {
 		this.n = n;
 		this.time = time;
 		this.name = name;

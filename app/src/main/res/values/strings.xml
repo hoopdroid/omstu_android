@@ -26,6 +26,8 @@
     <string name="drawer_news">Новости</string>
     <string name="drawer_settings">Настройки</string>
 
+    <string name="profile_text">Мой Профиль</string>
+
 
     <string-array name="views_array">
         <item>Расписание</item>

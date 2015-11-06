@@ -2,6 +2,7 @@ package savindev.myuniversity.serverTasks;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -24,7 +25,6 @@ import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 
 
-
 /**
  * Запрос на сервер о сборе инициализирующей информации по выбранному ВУЗу
  * В качестве параметров передается акроним вуза и дата последнего обновления
@@ -36,8 +36,7 @@ import savindev.myuniversity.db.DBHelper;
 public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
     final private int TIMEOUT_MILLISEC = 5000;
-    private Date lastModifiedDate;
-
+    int errorCode = 0;
 
 
     public GetInitializationInfoTask(Context context) {
@@ -54,25 +53,8 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         //Возвращать false, если изменений нет
-        String refreshDate = null;
-        //Получить дату последнего обновления из sqlite
-        //Если такой даты не хранится, записать "20000101000000"
-//        sPref = context.getSharedPreferences("item_list", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor ed = sPref.edit();
-//        dateStr = new String(sPref.getString("DATE", ""));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault());
-        Date date = null;
-        try {
-            date = (Date)formatter.parse(refreshDate); //хранящаяся дата
-        } catch (Exception e1) {
-            e1.printStackTrace();
-            refreshDate = "20000101000000";
-            try {
-                date = (Date)formatter.parse(refreshDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
+        SharedPreferences settings = context.getSharedPreferences("UserInfo", 0);
+        String refreshDate = settings.getString("init_last_refresh", "20000101000000"); //дата последнего обновления
         String uri = context.getResources().getString(R.string.uri) + "getInitializationInfo?universityAcronym=" +
                 context.getResources().getString(R.string.university) + "&lastRefresh=" +
                 refreshDate;
@@ -83,20 +65,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
-            String lastModified = urlConnection.getHeaderField("Last-modified");
-            //Сверка полученной и хранящейся даты: если полученная меньше, данных нет
-            //Если полученная дата больше, записать новые данные и новую дату
-//            lastModifiedDate = (Date)formatter.parse(lastModified); //Дата с сервера
-//            if (!refreshDate.equals("")) {
-//                if (lastModifiedDate.getTime() == (date.getTime())) {
-//                    Log.d("11", "equ");
-//                    current = true;
-//                    //Если даты совпадают, изменений не требуется
-//                    return false;
-//                }
-//            }
-//            ed.putString("DATE",lastModified).apply(); //Если не совпадают, занести новую дату
-//          В sqlite
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -109,7 +78,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 return false;
             }
             parseReply(reply);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -119,14 +88,37 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     private void parseReply(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-       Initialization init = null;
+        Initialization init = null;
         JSONObject obj = null;
         obj = new JSONObject(reply);
-        switch (obj.get("STATE").toString()) {//определение типа полученного результата
+        sw:    switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
+                //Сверка полученной и хранящейся даты: если полученная меньше, данных нет
+                //Если полученная дата больше, записать новые данные и новую дату
+
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault());
+                SharedPreferences settings = context.getSharedPreferences("UserInfo", 0);
+                String modified = obj.getString("LAST_REFRESH");
+                String date = settings.getString("init_last_refresh", ""); // Старая записанная дата обновления
+                if (!(date.equals(""))) { //Если хранящаяся дата не пуста
+                    Date lastModifiedDate = null; //Полученная от сервера дата
+                    Date oldModifiedDate = null;
+                    try {
+                        lastModifiedDate = (Date)formatter.parse(modified); //Дата с сервера
+                        oldModifiedDate = (Date)formatter.parse(date); //Дата с файла
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if (lastModifiedDate.getTime() == (oldModifiedDate.getTime())) {
+                        errorCode = 1; //1 - изменения не требуются
+                        break sw;
+                    }
+                }
+                settings.edit().putString("init_last_refresh", modified).apply(); //Если не совпадают, занести новую дату
                 JSONObject content = obj.getJSONObject("CONTENT");
                 init = Initialization.fromJson(content);
                 parsetoSqlite(init);
+                Log.d("DOWNLOADING DATA", "SUCCESS");
                 break;
             case "ERROR":   //Неопознанная ошибка
                 Log.i("myuniversity", "Ошибка ERROR от сервера, запрос GetInitializationInfoTask, текст:"
@@ -139,13 +131,13 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
         }
 
 
-
-
-
     }
 
 
-    void parsetoSqlite(Initialization init){
+    void parsetoSqlite(Initialization init) {
+
+        //TODO ADD ISDELETED CHECKING
+
 
         SQLiteDatabase sqliteDatabase;
         DBHelper helper = new DBHelper(context);
@@ -153,88 +145,93 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
 
         //PARSE UNIVERSITY INFO TO SQLITE
 
-            ContentValues uninfoRow = new ContentValues();
-            uninfoRow .put(DBHelper.UniversityInfoHelper.COL_FULLNAME, init.UNIVERSITY_FULLNAME);
-            uninfoRow .put(DBHelper.UniversityInfoHelper.COL_SHORTNAME, init.UNIVERSITY_SHORTNAME);
-            uninfoRow .put(DBHelper.UniversityInfoHelper.COL_DAYS_IN_WEEK, init.DAYS_IN_WEEK);
-            sqliteDatabase.insert(DBHelper.UniversityInfoHelper.TABLE_NAME, null, uninfoRow);
+        ContentValues uninfoRow = new ContentValues();
+        uninfoRow.put(DBHelper.UniversityInfoHelper.COL_FULLNAME, init.UNIVERSITY_FULLNAME);
+        uninfoRow.put(DBHelper.UniversityInfoHelper.COL_SHORTNAME, init.UNIVERSITY_SHORTNAME);
+        uninfoRow.put(DBHelper.UniversityInfoHelper.COL_DAYS_IN_WEEK, init.DAYS_IN_WEEK);
+        sqliteDatabase.insert(DBHelper.UniversityInfoHelper.TABLE_NAME, null, uninfoRow);
 
         //PARSE TEACHERS TO SQLITE
         ContentValues teacherRow = new ContentValues();
-            for(int index = 0 ; index < init.TEACHERS.size(); index++) {
-                teacherRow.put(DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
-                teacherRow.put(DBHelper.TeachersHelper.COL_ID_DEPARTMENT, init.TEACHERS.get(index).ID_DEPARTMENT);
-                teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_LASTNAME, init.TEACHERS.get(index).TEACHER_LASTNAME);
-                teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_FIRSTNAME, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
-                teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
+        for (int index = 0; index < init.TEACHERS.size(); index++) {
+            if(!init.TEACHERS.get(index).IS_DELETED){
+            teacherRow.put(DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
+            teacherRow.put(DBHelper.TeachersHelper.COL_ID_DEPARTMENT, init.TEACHERS.get(index).ID_DEPARTMENT);
+            teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_LASTNAME, init.TEACHERS.get(index).TEACHER_LASTNAME);
+            teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_FIRSTNAME, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
+            teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
+            sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);}
 
-                sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME,null,teacherRow);
-                teacherRow.clear();
-            }
+            //При внесении данных проверять на IS_DELETED все, где этот параметр имеется.
+            // При true найти такую строчку и удалить из базы, при false внести эту строчку в базу
+            //ВОПРОС : в этом классе мы данные получаем в первый раз,поэтому удалять нечего
+
+
+        }
 
         //PARSE SEMESTRES TO SQLITE
-             ContentValues semestresRow = new ContentValues();
-             for(int index = 0 ; index < init.SEMESTERS.size();index++) {
-               semestresRow.put(DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
-               semestresRow.put(DBHelper.SemestersHelper.COL_BEGIN_DATE,init.SEMESTERS.get(index).BEGIN_DT);
-                 semestresRow.put(DBHelper.SemestersHelper.COL_END_DATE, init.SEMESTERS.get(index).END_DT);
-
+        ContentValues semestresRow = new ContentValues();
+        for (int index = 0; index < init.SEMESTERS.size(); index++) {
+            if(!init.SEMESTERS.get(index).IS_DELETED) {
+                semestresRow.put(DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
+                semestresRow.put(DBHelper.SemestersHelper.COL_BEGIN_DATE, init.SEMESTERS.get(index).BEGIN_DT);
+                semestresRow.put(DBHelper.SemestersHelper.COL_END_DATE, init.SEMESTERS.get(index).END_DT);
                 sqliteDatabase.insert(DBHelper.SemestersHelper.TABLE_NAME, null, semestresRow);
+            }
         }
 
         //PARSE PAIRS TO SQLITE
         ContentValues pairsRow = new ContentValues();
-        for(int index = 0 ; index < init.PAIRS.size();index++) {
-            pairsRow.put(DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
-            pairsRow.put(DBHelper.PairsHelper.COL_PAIR_NUMBER ,init.PAIRS.get(index).PAIR_NUMBER);
-            pairsRow.put(DBHelper.PairsHelper.COL_BEGIN_TIME,init.PAIRS.get(index).PAIR_BEGIN_TIME);
-            pairsRow.put(DBHelper.PairsHelper.COL_END_TIME, init.PAIRS.get(index).PAIR_END_TIME);
-
-            sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
+        for (int index = 0; index < init.PAIRS.size(); index++) {
+            if(!init.PAIRS.get(index).IS_DELETED) {
+                pairsRow.put(DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
+                pairsRow.put(DBHelper.PairsHelper.COL_PAIR_NUMBER, init.PAIRS.get(index).PAIR_NUMBER);
+                pairsRow.put(DBHelper.PairsHelper.COL_BEGIN_TIME, init.PAIRS.get(index).PAIR_BEGIN_TIME);
+                pairsRow.put(DBHelper.PairsHelper.COL_END_TIME, init.PAIRS.get(index).PAIR_END_TIME);
+                sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
+            }
         }
 
         //TODO ADD GROUPS,DEPARTMENTS,FACULTIES
 
         //PARSE GROUPS TO SQLITE
         ContentValues groupsRow = new ContentValues();
-        for(int index = 0 ; index < init.GROUPS.size();index++) {
-            groupsRow.put(DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
-            groupsRow.put(DBHelper.GroupsHelper.COL_GROUP_NAME, init.GROUPS.get(index).GROUP_NAME);
-            groupsRow.put(DBHelper.GroupsHelper.COL_ID_FACULTY, init.GROUPS.get(index).ID_FACULTY);
-
-
-            sqliteDatabase.insert(DBHelper.GroupsHelper.TABLE_NAME, null, groupsRow);
+        for (int index = 0; index < init.GROUPS.size(); index++) {
+            if(!init.GROUPS.get(index).IS_DELETED) {
+                groupsRow.put(DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
+                groupsRow.put(DBHelper.GroupsHelper.COL_GROUP_NAME, init.GROUPS.get(index).GROUP_NAME);
+                groupsRow.put(DBHelper.GroupsHelper.COL_ID_FACULTY, init.GROUPS.get(index).ID_FACULTY);
+                sqliteDatabase.insert(DBHelper.GroupsHelper.TABLE_NAME, null, groupsRow);
+            }
 
         }
 
         //PARSE DEPARTMENTS TO SQLITE
         ContentValues departmentsRow = new ContentValues();
-        for(int index = 0 ; index < init.DEPARTMENTS.size();index++) {
-            departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
-            departmentsRow.put(DBHelper.DepartmentsHelper.COL_FACULTY_ID, init.DEPARTMENTS.get(index).ID_FACULTY);
-            departmentsRow.put(DBHelper.DepartmentsHelper.COL_CLASSROOM_ID, init.DEPARTMENTS.get(index).ID_CLASSROOM);
-            departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_FULLNAME, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
-            departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_SHORTNAME, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
-
-            sqliteDatabase.insert(DBHelper.DepartmentsHelper.TABLE_NAME, null, departmentsRow);
+        for (int index = 0; index < init.DEPARTMENTS.size(); index++) {
+            if(!init.DEPARTMENTS.get(index).IS_DELETED) {
+                departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
+                departmentsRow.put(DBHelper.DepartmentsHelper.COL_FACULTY_ID, init.DEPARTMENTS.get(index).ID_FACULTY);
+                departmentsRow.put(DBHelper.DepartmentsHelper.COL_CLASSROOM_ID, init.DEPARTMENTS.get(index).ID_CLASSROOM);
+                departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_FULLNAME, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
+                departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_SHORTNAME, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
+                sqliteDatabase.insert(DBHelper.DepartmentsHelper.TABLE_NAME, null, departmentsRow);
+            }
         }
-
 
         //PARSE FACULTIES TO SQLITE
         ContentValues facultiesRow = new ContentValues();
         for(int index = 0 ; index < init.FACULTIES.size();index++) {
-            facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
-            facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_FULLNAME, init.FACULTIES.get(index).FACULTY_FULLNAME);
-            facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_SHORTNAME, init.FACULTIES.get(index).FACULTY_SHORTNAME);
-
-            sqliteDatabase.insert(DBHelper.FacultiesHelper.TABLE_NAME, null, facultiesRow);
+            if(!init.FACULTIES.get(index).IS_DELETED) {
+                facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
+                facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_FULLNAME, init.FACULTIES.get(index).FACULTY_FULLNAME);
+                facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_SHORTNAME, init.FACULTIES.get(index).FACULTY_SHORTNAME);
+                sqliteDatabase.insert(DBHelper.FacultiesHelper.TABLE_NAME, null, facultiesRow);
+            }
         }
 
 
-
     }
-
-
 
 
     @Override

@@ -60,7 +60,7 @@ public class DailyScheduleFragment extends DialogFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setRetainInstance(true);
-        adapter = new ScheduleAdapter(new ArrayList<SheduleModel>());
+        adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
         View view = null;
         calendar = new GregorianCalendar();
 
@@ -103,8 +103,8 @@ public class DailyScheduleFragment extends DialogFragment
         // начинаем показывать прогресс
         mSwipeRefreshLayout.setRefreshing(true);
         gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
-        //TODO получить id текущей группы или преподавателя, а также информацию о том, группа это или преподаватель
-        String currentSchedule = null; //в формате idGroup=id или idTeacher=id
+        //TODO адекватно заполнить эту штуку
+        GroupsModel currentSchedule = new GroupsModel(null, 1, true, "20000101000000");
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -229,11 +229,11 @@ public class DailyScheduleFragment extends DialogFragment
     public class ScheduleAdapter extends BaseAdapter {
         //Адаптер для заполнения списка расписания
 
-        ArrayList<SheduleModel> list;
+        ArrayList<ScheduleModel> list;
         ArrayList<String> namesArray;
 
 
-        ScheduleAdapter(ArrayList<SheduleModel> list) {
+        ScheduleAdapter(ArrayList<ScheduleModel> list) {
             this.list = list;
             Set<String> name = null;
 
@@ -302,14 +302,14 @@ public class DailyScheduleFragment extends DialogFragment
             return rowView;
         }
 
-        public void add(ArrayList<SheduleModel> data) {
+        public void add(ArrayList<ScheduleModel> data) {
             this.list.addAll(data);
         }
 
     }
 
     //Реализует подгрузку данных при достижении конца списка
-    public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<SheduleModel>> {
+    public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleModel>> {
         boolean isGroup;
         int id;
 
@@ -319,12 +319,12 @@ public class DailyScheduleFragment extends DialogFragment
         }
 
         @Override
-        protected ArrayList<SheduleModel> doInBackground(Integer... params) {
+        protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
             return null;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<SheduleModel> data) {
+        protected void onPostExecute(ArrayList<ScheduleModel> data) {
             if (data == null || data.isEmpty()) {
                 Toast.makeText(getActivity(), "Данные закончились", Toast.LENGTH_SHORT).show();
                 return;

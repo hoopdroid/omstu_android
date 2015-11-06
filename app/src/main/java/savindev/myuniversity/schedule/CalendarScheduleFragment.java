@@ -1,14 +1,11 @@
 package savindev.myuniversity.schedule;
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,16 +29,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +64,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         sPref = getActivity().getSharedPreferences("groups", Context.MODE_PRIVATE);
-        adapter = new ScheduleAdapter(new ArrayList<SheduleModel>());
+        adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
         calendar = new GregorianCalendar();
         View view = null;
         setRetainInstance(true);
@@ -115,8 +106,8 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     public void onRefresh() {
         // начинаем показывать прогресс
         GetScheduleTask gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
-        //TODO получить id текущей группы или преподавателя, а также информацию о том, группа это или преподаватель
-        String currentSchedule = null; //в формате idGroup=id или idTeacher=id
+        //TODO адекватно заполнить эту штуку
+        GroupsModel currentSchedule = new GroupsModel(null, 1, true, "20000101000000");
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -250,11 +241,11 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     public class ScheduleAdapter extends BaseAdapter {
         //Адаптер для заполнения списка расписания
 
-        ArrayList<SheduleModel> list;
+        ArrayList<ScheduleModel> list;
         ArrayList<String> namesArray;
 
 
-        ScheduleAdapter(ArrayList<SheduleModel> list) {
+        ScheduleAdapter(ArrayList<ScheduleModel> list) {
             this.list = list;
             Set<String> name = null;
 
@@ -319,13 +310,13 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
         }
 
 
-        public void add(ArrayList<SheduleModel> data) {
+        public void add(ArrayList<ScheduleModel> data) {
             this.list.addAll(data);
         }
     }
 
     //Реализует подгрузку данных при достижении конца списка
-    public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<SheduleModel>> {
+    public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleModel>> {
         String mDate;
         boolean isGroup;
         int id;
@@ -336,12 +327,12 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
         }
 
         @Override
-        protected ArrayList<SheduleModel> doInBackground(Integer... params) {
+        protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
             return null;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<SheduleModel> data) {
+        protected void onPostExecute(ArrayList<ScheduleModel> data) {
             if (data.isEmpty()) {
                 Toast.makeText(getActivity(), "Данные закончились", Toast.LENGTH_SHORT).show();
                 return;

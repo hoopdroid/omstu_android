@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     NewsFragment newsFragment;
     SettingsFragment settingsFragment;
     DailyScheduleFragment dailyScheduleFragment;
+    ProfileFragment profileFragment;
 
    static PrimaryDrawerItem itemSchedule ;
    static PrimaryDrawerItem itemNavigation;
@@ -60,28 +61,24 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-
-
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-
 
         welcomeFragment = new WelcomeFragment();
         newsFragment = new NewsFragment();
         settingsFragment = new SettingsFragment();
         dailyScheduleFragment = new DailyScheduleFragment();
+        profileFragment = new ProfileFragment();
 
         getUserSettings();
         initDrawer();
 
         DBHelper dbHelper = new DBHelper(this);
-        Log.d("Departments_request",dbHelper.getDepartments(this).toString()) ;
-        Log.d("Groups_request",dbHelper.getGroups(this).toString()) ;
-        Log.d("Faculties_request",dbHelper.getFaculties(this).toString()) ;
-        Log.d("Teachers_request",dbHelper.getTeachers(this).toString()) ;
+
+        dbHelper.isInitializationInfoThere(this);
+
+;
 
     }
 
@@ -113,27 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
 
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setTitle("Вы хотите сменить пользователя?")
-                                .setMessage("Смена аккаунта")
-                                .setIcon(R.drawable.drawer_header)
-                                .setCancelable(false)
-                                .setPositiveButton("Да",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                Intent i = new Intent(MainActivity.this,FirstStartActivity.class);
-                                                startActivity(i);
-                                                finish();
-                                            }
-                                        }).setNegativeButton("Нет",
-                                         new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-
-                                        dialog.cancel();
-                                             }
-                                                 });
-                        AlertDialog alert = builder.create();
-                        alert.show();
+                        addfragment(R.string.profile_text,profileFragment);
 
                         return false;
                     }

@@ -46,30 +46,26 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        //todo set checking daata
         GetInitializationInfoTask giit = new GetInitializationInfoTask(getApplicationContext());
         giit.execute();
 
 
 
         setContentView(R.layout.activity_first_start);
-       // toolbar = (Toolbar) findViewById(R.id.toolbar);
-      //  setSupportActionBar(toolbar);
-
-
+        // toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //  setSupportActionBar(toolbar);
 
         buttons = (LinearLayout)findViewById(R.id.buttonsLayout);
         icon = (ImageView)findViewById(R.id.icon);
-            buttons.animate();
+        buttons.animate();
 
-         btnSignin = (Button)findViewById(R.id.btnSignin);
-         btnSkip = (Button)findViewById(R.id.btnSkip);
+        btnSignin = (Button)findViewById(R.id.btnSignin);
+        btnSkip = (Button)findViewById(R.id.btnSkip);
 
-         btnSignin.setOnClickListener(this);
-         btnSkip.setOnClickListener(this);
-
-
-
-
+        btnSignin.setOnClickListener(this);
+        btnSkip.setOnClickListener(this);
 
     }
 
@@ -92,9 +88,7 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
 
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
-
         }
-
     }
 
 
@@ -104,9 +98,6 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
                 PropertyValuesHolder.ofFloat("scaleY", 0.5f));
         scaleDown.setDuration(500);
         scaleDown.start();
-
-
-
     }
 
     public void SlideToDown() {
@@ -140,4 +131,4 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
             }
 
         });
-}}
+    }}

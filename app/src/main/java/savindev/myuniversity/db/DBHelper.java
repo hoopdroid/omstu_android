@@ -331,5 +331,62 @@ public class DBHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    //TODO возвращает, имеются ли данные в БД  по наличию всех нужных таблиц. содержимое - хоть 1 строчка
+    public static boolean isInitializationInfoThere(Context context){
+
+
+        SQLiteDatabase db;
+        ArrayList tables = new ArrayList();
+        DBHelper dbHelper = new DBHelper(context);
+        db = dbHelper.getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+        c.moveToFirst();
+        if (c.moveToNext()) {
+            while ( !c.isAfterLast() ) {
+                tables.add(c.getString(0));
+                c.moveToNext();
+            }
+        }
+
+        boolean hasTables = false;
+
+
+        for (int i = 0 ;i<tables.size();i++) {
+
+            Cursor cursor = db.rawQuery("SELECT * FROM " + tables.get(i), null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                hasTables = true;
+                cursor.close();
+
+
+            }
+
+
+        }
+
+        return hasTables;
+
+
+    }
+
+
+    /**
+     * Remove all user data
+     */
+    public static void removeAllFromDatabase(Context context)
+    {
+
+        DBHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(TeachersHelper.TABLE_NAME, null, null);
+        db.delete(GroupsHelper.TABLE_NAME,null,null);
+        db.delete(DepartmentsHelper.TABLE_NAME,null,null);
+        db.delete(FacultiesHelper.TABLE_NAME,null,null);
+        db.delete(UniversityInfoHelper.TABLE_NAME,null,null);
+        db.delete(PairsHelper.TABLE_NAME,null,null);
+        db.delete(SemestersHelper.TABLE_NAME,null,null);
+
+    }
 
 }

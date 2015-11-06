@@ -2,6 +2,8 @@ package savindev.myuniversity.serverTasks;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -16,8 +18,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.schedule.GroupsModel;
 
 /**
  * Запрос на сервер об авторизации пользователя. Происходит только по запросу пользователя
@@ -45,6 +51,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     @Override
     protected Boolean doInBackground(String... params) {
         //Возвращать false при провале авторизации
+
 
         //Первый запрос
         String uri = context.getResources().getString(R.string.uri) + "getSalt?universityAcronym=" +
@@ -83,7 +90,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
 
     private String query(String uri) { //Запрос к серверу. по uri возвращает ответ
         URL url;
-        String takenJson;
+        String reply;
         try {
             url = new URL(uri);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -95,16 +102,16 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);
             }
-            takenJson = buffer.toString();
+            reply = buffer.toString();
             urlConnection.disconnect();
-            if (takenJson.isEmpty()) { //Если после всех операций все равно пустой
+            if (reply.isEmpty()) { //Если после всех операций все равно пустой
                 return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        return takenJson;
+        return reply;
     }
 
     private static final String md5(final String s) {
@@ -166,14 +173,29 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 String middlename = content.getString("USER_MIDDLENAME");
                 int groupId = content.getInt("ID_GROUP");
                 //Это все рапихать по sqlite, предварительно получить по id группы саму группу
+                //saveSettings();
+
+                //Записать эту группу в лист активных расписаний как основную
+                //Получить список id не-основных активных расписаний
+                //Проверить, если ли среди них id группы авторизовавшегося - основной
+                //Для записи в таблицу: id = id, name = (взять из локальной базы по id), isGroup=true (пока преподы не предусмотрены), lastrefresh = 20000101000000
+                //Если нет, провести следующие действия:
+                //Получить расписание для этой группы, если ранее оно не было получено
+//                GetScheduleTask gst = new GetScheduleTask(context, null);
+//                gst.execute(тут параметры основной группы);
 
                 SharedPreferences settings = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putString("UserName",lastname + " " + firstname +" "+ groupId);
+
+                editor.putString("UserName",lastname + " " + firstname +" "+ getUserGroup(groupId,context));
                 editor.commit();
 
 
-                //saveSettings();
+                //После выполнения вышеописанных процедур удалить следующий код:
+                GetScheduleTask gst = new GetScheduleTask(context, null);
+                gst.execute(new GroupsModel(null, id, true, "20000101000000"));
+
+
                 return true;
             case "ERROR":   //Неопознанная ошибка
                 if (obj.getJSONObject("CONTENT").get("ERROR_CODE").toString().equals("E0001")) {
@@ -206,5 +228,17 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                     break;
             }
         }
+    }
+
+    private String getUserGroup(int id,Context context){
+        String groupName="";
+
+        DBHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
+        String find = "SELECT * FROM  "+ DBHelper.GroupsHelper.TABLE_NAME + " WHERE "+ DBHelper.GroupsHelper.COL_ID_GROUP +" = " +id ;
+        Cursor cursor = sqLiteDatabase.rawQuery(find,null);
+        cursor.moveToFirst();
+        groupName=cursor.getString(2);
+        return groupName;
     }
 }

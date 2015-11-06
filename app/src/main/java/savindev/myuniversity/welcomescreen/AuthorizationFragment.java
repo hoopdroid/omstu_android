@@ -48,7 +48,7 @@ public class AuthorizationFragment extends Fragment {
         inputPassword = (EditText) view.findViewById(R.id.input_password);
         btnSignIn = (Button) view.findViewById(R.id.btn_signin);
 
-       // TODO change vovik0134 to vovik0134@gmail.com inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
+        // TODO change vovik0134 to vovik0134@gmail.com inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
         //inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
 
@@ -73,26 +73,15 @@ public class AuthorizationFragment extends Fragment {
     }
 
 
-//      Сам уберешь. Сохранение настроек уношу во второй поток, при успешной авторизации
-//    private void saveSettings() {
-//        SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", 0);
-//        SharedPreferences.Editor editor = settings.edit();
-//
-//        editor.putString("Password", inputPassword.getText().toString());
-//        editor.putString("Email", inputEmail.getText().toString());
-//        editor.commit();
-//    }
-
-
     private void submitForm() {
 
 
-       // if (!validateEmail()) {
-          // return;
-     // }
+        // if (!validateEmail()) {
+        // return;
+        // }
 
-       if (!validatePassword()) {
-           return;
+        if (!validatePassword()) {
+            return;
         }
         String[] autorization = {inputEmail.getText().toString(), inputPassword.getText().toString()};
         AuthorizationTask at = new AuthorizationTask(getActivity().getApplicationContext());
@@ -106,8 +95,6 @@ public class AuthorizationFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        saveSettings();
-
 
     }
 
@@ -149,30 +136,30 @@ public class AuthorizationFragment extends Fragment {
     }
 
 
-        public class MyTextWatcher implements TextWatcher {
+    public class MyTextWatcher implements TextWatcher {
 
-            private View view;
+        private View view;
 
-            private MyTextWatcher(View view) {
-                this.view = view;
-            }
+        private MyTextWatcher(View view) {
+            this.view = view;
+        }
 
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
-            public void afterTextChanged(Editable editable) {
-                switch (view.getId()) {
+        public void afterTextChanged(Editable editable) {
+            switch (view.getId()) {
 
-                    case R.id.input_email:
-                        validateEmail();
-                        break;
-                    case R.id.input_password:
-                        validatePassword();
-                        break;
-                }
+                case R.id.input_email:
+                    validateEmail();
+                    break;
+                case R.id.input_password:
+                    validatePassword();
+                    break;
             }
         }
+    }
 }
