@@ -29,13 +29,15 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import java.util.ArrayList;
+
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class MainActivity extends AppCompatActivity {
-
+//TODO DELETE PREFERENCES USER DATA after LOGOUT
     static Toolbar toolbar;
     String username;
     String email;
@@ -78,7 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
         DBHelper dbHelper = new DBHelper(this);
 
-        dbHelper.isInitializationInfoThere(this);
+       boolean b = dbHelper.isInitializationInfoThere(this);
+        ArrayList d = dbHelper.getDepartments(getApplicationContext());
+        int a = 3;
 
 ;
 
@@ -148,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
                         switch (position) {
                             case 1:
-                                addfragment(R.string.drawer_schedule,dailyScheduleFragment);
+                                addfragment(R.string.drawer_schedule,new DailyScheduleFragment());
                                 break;
                             case 2:
                                 addfragment(R.string.drawer_navigator,welcomeFragment);

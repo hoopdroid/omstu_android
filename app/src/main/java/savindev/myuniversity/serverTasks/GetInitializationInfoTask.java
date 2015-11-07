@@ -162,6 +162,8 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
             sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);}
 
+            //TODO ELSE DELETE THIS ROW
+
             //При внесении данных проверять на IS_DELETED все, где этот параметр имеется.
             // При true найти такую строчку и удалить из базы, при false внести эту строчку в базу
             //ВОПРОС : в этом классе мы данные получаем в первый раз,поэтому удалять нечего

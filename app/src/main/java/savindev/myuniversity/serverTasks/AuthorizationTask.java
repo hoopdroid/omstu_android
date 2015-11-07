@@ -173,8 +173,8 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 String middlename = content.getString("USER_MIDDLENAME");
                 int groupId = content.getInt("ID_GROUP");
                 //Это все рапихать по sqlite, предварительно получить по id группы саму группу
-                //saveSettings();
 
+                //savesettings();
                 //Записать эту группу в лист активных расписаний как основную
                 //Получить список id не-основных активных расписаний
                 //Проверить, если ли среди них id группы авторизовавшегося - основной
@@ -187,6 +187,8 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 SharedPreferences settings = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = settings.edit();
 
+
+                //TODO Add all user info in Preferences
                 editor.putString("UserName",lastname + " " + firstname);
                 editor.putInt("UserGroup",groupId);
                 editor.commit();
@@ -231,4 +233,8 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         }
     }
 
+
+    private void saveSettings(){
+        //TODO ADD
+    }
 }

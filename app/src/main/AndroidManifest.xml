@@ -24,10 +24,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.Common"></activity>
-        <activity
             android:name=".settings.GroupsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.Common"/>

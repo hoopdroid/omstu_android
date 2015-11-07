@@ -9,8 +9,11 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-//TODO ADD GROUPS,FACULTIES,DEPARTMENTS
-//TODO CHANGE PAIRS TIME VOVA
+//TODO При get-запросах к локальной БД проверять искомые данные на наличие перед выполнением запроса.
+// При отсутствии - выводить сообщение об ошибке с предложением скачать данные с сервера.
+// Проверять по имени таблице в базе
+// Если невозможно - прописать в контракте методов об ошибке, буду отлавливать у себя
+
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "university.db";
     private static final int DB_VERSION = 1;
@@ -103,7 +106,6 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String COL_TEACHER_FIRSTNAME = "teacher_firstname";
         public static final String COL_TEACHER_MIDDLENAME = "teacher_middlename";
         public static final String COL_TEACHER_GENDER = "gender";
-
 
 
         public void create(SQLiteDatabase db) {
@@ -334,7 +336,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //TODO возвращает, имеются ли данные в БД  по наличию всех нужных таблиц. содержимое - хоть 1 строчка
     public static boolean isInitializationInfoThere(Context context){
 
-
+    //TODO проверять только таблицы из initializationInfo
         SQLiteDatabase db;
         ArrayList tables = new ArrayList();
         DBHelper dbHelper = new DBHelper(context);
@@ -343,6 +345,7 @@ public class DBHelper extends SQLiteOpenHelper {
         c.moveToFirst();
         if (c.moveToNext()) {
             while ( !c.isAfterLast() ) {
+                // tables.equals("android_metadata")
                 tables.add(c.getString(0));
                 c.moveToNext();
             }
