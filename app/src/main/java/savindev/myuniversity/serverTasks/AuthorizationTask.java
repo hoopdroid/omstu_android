@@ -91,9 +91,10 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     private String query(String uri) { //Запрос к серверу. по uri возвращает ответ
         URL url;
         String reply;
+        HttpURLConnection urlConnection = null;
         try {
             url = new URL(uri);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
@@ -103,13 +104,14 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 buffer.append(line);
             }
             reply = buffer.toString();
-            urlConnection.disconnect();
             if (reply.isEmpty()) { //Если после всех операций все равно пустой
                 return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            urlConnection.disconnect();
         }
         return reply;
     }

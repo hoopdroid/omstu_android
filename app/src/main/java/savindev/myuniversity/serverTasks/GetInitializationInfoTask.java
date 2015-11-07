@@ -59,9 +59,10 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 context.getResources().getString(R.string.university) + "&lastRefresh=" +
                 refreshDate;
         URL url;
+        HttpURLConnection urlConnection = null;
         try {
             url = new URL(uri);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
@@ -81,6 +82,9 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+        finally {
+            urlConnection.disconnect();
         }
 
         return true;
@@ -165,6 +169,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             //При внесении данных проверять на IS_DELETED все, где этот параметр имеется.
             // При true найти такую строчку и удалить из базы, при false внести эту строчку в базу
             //ВОПРОС : в этом классе мы данные получаем в первый раз,поэтому удалять нечего
+            //Ответ: мы в этот класс с таким же успехом можем попасть и при обновлении данных.
 
 
         }
