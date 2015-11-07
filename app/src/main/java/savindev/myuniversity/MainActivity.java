@@ -41,18 +41,7 @@ public class MainActivity extends AppCompatActivity {
     static Toolbar toolbar;
     String username;
     String email;
-    WelcomeFragment welcomeFragment;
-    NewsFragment newsFragment;
-    SettingsFragment settingsFragment;
-    DailyScheduleFragment dailyScheduleFragment;
-    ProfileFragment profileFragment;
 
-   static PrimaryDrawerItem itemSchedule ;
-   static PrimaryDrawerItem itemNavigation;
-   static PrimaryDrawerItem itemNotes ;
-   static PrimaryDrawerItem itemEducation ;
-   static PrimaryDrawerItem itemNews ;
-   static SecondaryDrawerItem itemSettings;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,22 +58,12 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        welcomeFragment = new WelcomeFragment();
-        newsFragment = new NewsFragment();
-        settingsFragment = new SettingsFragment();
-        dailyScheduleFragment = new DailyScheduleFragment();
-        profileFragment = new ProfileFragment();
 
         getUserSettings();
         initDrawer();
 
         DBHelper dbHelper = new DBHelper(this);
 
-       boolean b = dbHelper.isInitializationInfoThere(this);
-        ArrayList d = dbHelper.getDepartments(getApplicationContext());
-        int a = 3;
-
-;
 
     }
 
@@ -99,12 +78,12 @@ public class MainActivity extends AppCompatActivity {
 
     void initDrawer(){
 
-         itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_schedule).withSelectedIcon(R.drawable.ic_schedule_select);
-         itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_navigation).withSelectedIcon(R.drawable.ic_navigation_select);
-         itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_notes).withSelectedIcon(R.drawable.ic_notes_select);
-         itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withBadge("12").withSelectedIcon(R.drawable.ic_news_select);
-         itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
-         itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings).withSelectedIcon(R.drawable.ic_settings_select);
+        PrimaryDrawerItem itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_schedule).withSelectedIcon(R.drawable.ic_schedule_select);
+        PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_navigation).withSelectedIcon(R.drawable.ic_navigation_select);
+        PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_notes).withSelectedIcon(R.drawable.ic_notes_select);
+        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withBadge("12").withSelectedIcon(R.drawable.ic_news_select);
+        PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
+        SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings).withSelectedIcon(R.drawable.ic_settings_select);
 
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -117,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
 
-                        addfragment(R.string.profile_text,profileFragment);
+                        addfragment(R.string.profile_text,new ProfileFragment());
 
                         return false;
                     }
@@ -152,22 +131,24 @@ public class MainActivity extends AppCompatActivity {
 
                         switch (position) {
                             case 1:
+
                                 addfragment(R.string.drawer_schedule,new DailyScheduleFragment());
+
                                 break;
                             case 2:
-                                addfragment(R.string.drawer_navigator,welcomeFragment);
+                                addfragment(R.string.drawer_navigator,new WelcomeFragment());
                                 break;
                             case 3:
-                                addfragment(R.string.drawer_notes,welcomeFragment);
+                                addfragment(R.string.drawer_notes,new WelcomeFragment());
                                 break;
                             case 4:
-                                addfragment(R.string.drawer_news,newsFragment);
+                                addfragment(R.string.drawer_news,new NewsFragment());
                                 break;
                             case 5:
-                                addfragment(R.string.drawer_education,welcomeFragment);
+                                addfragment(R.string.drawer_education,new WelcomeFragment());
                                 break;
                             case 6:
-                                addfragment(R.string.drawer_settings,settingsFragment);
+                                addfragment(R.string.drawer_settings,new SettingsFragment());
                                 break;
 
                         }

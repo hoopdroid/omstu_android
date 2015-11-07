@@ -2,60 +2,102 @@ package savindev.myuniversity.schedule;
 
 public class ScheduleModel {
 
-	private String n;
-	private String time;
-	private String name;
-	private String teacher;
-	private String auditory;
-	private String tipe;
-	private String date;
-	private boolean isCancelled;
+
+    private int idSchedule; //Напрямую из объекта в базе
+    private int idPair;//Напрямую из объекта в базе
+    private int idGroup;//Напрямую из объекта в базе
+    private int idTeacher;//Напрямую из объекта в базе
+    private int idClassroom;//Напрямую из объекта в базе
+    private int subgroup;//Напрямую из объекта в базе
+	private String n;  //Номер пары можно получить по ее id из базы PAIRS
+	private String startTime; //Начало пары, из той же таблички
+    private String endTime; //Конец пары, из той же таблички
+	private String name; //Напрямую из объекта (DISCIPLINE_NAME)
+	private String teacher; //Из соответствующей таблички по id
+    private String group; //Из соответствующей таблички по id
+	private String classroom; //В формате корпус + "-" аудитория
+	private String tipe;//Напрямую из объекта в базе
+	private boolean isCancelled; //Напрямую из объекта в базе
 
 
-	public ScheduleModel(String n, String time, String name, String teacher, String auditory, String tipe, String date, boolean isCancelled) {
-		this.n = n;
-		this.time = time;
-		this.name = name;
-		this.teacher = teacher;
-		this.auditory = auditory;
-		this.tipe = tipe;
-		this.name = name;
-		this.date = date;
-		this.isCancelled = isCancelled;
-	}
+    public ScheduleModel(int idSchedule, int idPair, int idGroup, int idTeacher, int idClassroom,
+                         int subgroup, String n, String startTime, String endTime, String name, String teacher,
+                         String group, String classroom, String tipe, boolean isCancelled) {
+        this.idSchedule = idSchedule;
+        this.idPair = idPair;
+        this.idGroup = idGroup;
+        this.idTeacher = idTeacher;
+        this.idClassroom = idClassroom;
+        this.subgroup = subgroup;
+        this.n = n;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.name = name;
+        this.teacher = teacher;
+        this.group = group;
+        this.classroom = classroom;
+        this.tipe = tipe;
+        this.isCancelled = isCancelled;
+    }
 
-	public String getN() {
-		return n;
-	}
-	public String getTime() {
-		return time;
-	}
-	public String getName() {
-		return name;
-	}
-	public String getTeacher() {
-		return teacher;
-	}
-	public String getAuditory() {
-		return auditory;
-	}
-	public String getTipe() {
-		return tipe;
-	}
-	public String getDate() {
-		return date;
-	}	
-	public boolean isCancelled() {
-		return isCancelled;
-	}	
-	public void setN(String n) {
-		this.n = n;
-	}	
-	public void setDate(String date) {
-		this.date = date;
-	}
-	public void setTeacher(String teacher) {
-		this.teacher = teacher;
-	}
+    public boolean isCancelled() {
+        return isCancelled;
+    }
+
+    public String getTipe() {
+        return tipe;
+    }
+
+    public String getClassroom() {
+        return classroom;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public String getTeacher() {
+        return teacher;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public String getN() {
+        return n;
+    }
+
+    public int getSubgroup() {
+        return subgroup;
+    }
+
+    public int getIdClassroom() {
+        return idClassroom;
+    }
+
+    public int getIdTeacher() {
+        return idTeacher;
+    }
+
+    public int getIdGroup() {
+        return idGroup;
+    }
+
+    public int getIdPair() {
+        return idPair;
+    }
+
+    public int getIdSchedule() {
+        return idSchedule;
+    }
 }
 

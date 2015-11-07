@@ -295,7 +295,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 holder.day.setText(list.get(position).getN());
                 holder.day.setBackgroundColor(Color.WHITE);
             } else if (position % conumns == conumns - 1) { //если остаток conumns-1, то это число
-                holder.day.setText(list.get(position).getDate());
+               // holder.day.setText(list.get(position).getDate());
                 holder.day.setBackgroundColor(Color.WHITE);
             } else { //в остальных случаях это пара, требуется заполнять
                 if (list.get(position) == null) { //если нуль, оставить ячейку пустой

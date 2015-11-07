@@ -285,15 +285,15 @@ public class DailyScheduleFragment extends DialogFragment
             }
 
             holder.n.setText(list.get(position).getN());
-            holder.time.setText(list.get(position).getTime());
+            //holder.time.setText(list.get(position).getTime());
             holder.name.setText(list.get(position).getName());
             holder.teacher.setText(list.get(position).getTeacher());
-            holder.auditory.setText(list.get(position).getAuditory());
+            //holder.auditory.setText(list.get(position).getAuditory());
             holder.tipe.setText(list.get(position).getTipe());
-            holder.date.setText(list.get(position).getDate());
+           // holder.date.setText(list.get(position).getDate());
 
 
-            if (list.get(position).getDate().isEmpty()) {
+            if (list.get(position).getClassroom().isEmpty()) {
                 holder.date.setVisibility(View.GONE);
             } else {
                 holder.date.setVisibility(View.VISIBLE);

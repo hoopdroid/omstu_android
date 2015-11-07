@@ -283,7 +283,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     //Запрос к БД на получение данных
-    public  ArrayList getDepartments(Context context){
+    public static ArrayList getDepartments(Context context){
 
         String table = DepartmentsHelper.TABLE_NAME;
         String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
@@ -313,7 +313,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    private ArrayList getList(Context context,String table,String selection) {
+    private static ArrayList getList(Context context,String table,String selection) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
@@ -361,11 +361,7 @@ public class DBHelper extends SQLiteOpenHelper {
             if (cursor != null && cursor.getCount() > 0) {
                 hasTables = true;
                 cursor.close();
-
-
             }
-
-
         }
 
         return hasTables;
@@ -379,7 +375,6 @@ public class DBHelper extends SQLiteOpenHelper {
      */
     public static void removeAllFromDatabase(Context context)
     {
-
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TeachersHelper.TABLE_NAME, null, null);
@@ -389,7 +384,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.delete(UniversityInfoHelper.TABLE_NAME,null,null);
         db.delete(PairsHelper.TABLE_NAME,null,null);
         db.delete(SemestersHelper.TABLE_NAME,null,null);
-
     }
 
 }

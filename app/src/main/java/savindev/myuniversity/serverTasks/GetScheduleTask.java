@@ -7,12 +7,16 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
@@ -26,7 +30,6 @@ import savindev.myuniversity.schedule.GroupsModel;
 public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 	private Context context;
 	private final static int TIMEOUT_MILLISEC = 5000;
-	private Date lastModifiedDate;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 
 	public GetScheduleTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
@@ -38,54 +41,46 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
 	@Override
 	protected Integer doInBackground(GroupsModel... params) {
-//		String dateStr = params[0].getLastRefresh();
-//		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault());
-//		Date date = null;
-//		try {
-//			date = (Date)formatter.parse(dateStr);
-//		} catch (ParseException e1) {
-//			e1.printStackTrace();
-//			dateStr = "20000101000000";
-//			try {
-//				date = (Date)formatter.parse(dateStr);
-//			} catch (ParseException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		StringBuilder builder = new StringBuilder('?');
-////		for (String p : params) {
-////			if (p.charAt(0) == 'g') {
-////				builder.append("idGroup=" + p.replace("g", "") + "&");
-////			}
-////			if (p.charAt(0) == 't') {
-////				builder.append("idTeacher=" + p.replace("t", "") + "&");
-////			}
-////		}
-//		String parameters = builder.toString().replaceFirst("&$", "");
-//		String uri = context.getResources().getString(R.string.uri) + "getSchedule" + parameters;
+
+        JSONArray json = new JSONArray(); //Составление json для отправки в post
+        for (int i = 0; i < params.length; i++) {
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("id", params[i].getId());
+                obj.put("isGroup", params[i].isGroup());
+                obj.put("lastRefresh", params[i].getLastRefresh());
+                json.put(obj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
 		String uri = context.getResources().getString(R.string.uri) + "getSchedule?idGroup=197";
 		URL url;
+		HttpURLConnection urlConnection = null;
 		try {
 			url = new URL(uri);
-			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
-			InputStream inputStream = urlConnection.getInputStream();
-			StringBuffer buffer = new StringBuffer();
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
 
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				buffer.append(line);
-			}
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
 			String reply = buffer.toString();
-			urlConnection.disconnect();
+
 			if (reply.isEmpty()) { //Если ответ пустой
 				return -1;
 			}
 			replyParse(reply);
 		} catch (Exception e) {
+            e.printStackTrace();
 			return -1;
+		} finally {
+			urlConnection.disconnect();
 		}
 
 		return 1;

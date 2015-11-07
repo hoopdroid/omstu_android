@@ -16,7 +16,7 @@ public class Schedule { //Класс для парсинга основных р
     public final int ID_TEACHER;
     public final String DISCIPLINE_NAME;
     public final String DISCIPLINE_TYPE;
-    public final String SCHEDULE_FIRS_DATE;
+    public final String SCHEDULE_FIRST_DATE;
     public final int SCHEDULE_INTERVAL;
     public final int ID_CLASSROOM;
     public final int SUBGROUP_NUMBER;
@@ -33,7 +33,7 @@ public class Schedule { //Класс для парсинга основных р
         this.ID_TEACHER = ID_TEACHER;
         this.DISCIPLINE_NAME = DISCIPLINE_NAME;
         this.DISCIPLINE_TYPE = DISCIPLINE_TYPE;
-        this.SCHEDULE_FIRS_DATE = SCHEDULE_FIRS_DATE;
+        this.SCHEDULE_FIRST_DATE = SCHEDULE_FIRS_DATE;
         this.SCHEDULE_INTERVAL = SCHEDULE_INTERVAL;
         this.ID_CLASSROOM = ID_CLASSROOM;
         this.SUBGROUP_NUMBER = SUBGROUP_NUMBER;
