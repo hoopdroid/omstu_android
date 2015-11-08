@@ -37,7 +37,6 @@ import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class MainActivity extends AppCompatActivity {
-//TODO DELETE PREFERENCES USER DATA after LOGOUT
     static Toolbar toolbar;
     String username;
     String email;
@@ -47,33 +46,29 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        if(settings.getBoolean("isFirstStart",true)==true) {
-
+        if(settings.getBoolean("isFirstStart",true)) {
             Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
             startActivity(intent);
             finish();
         }
 
-        setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        else {
+
+            setContentView(R.layout.activity_main);
+            toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
 
 
-        getUserSettings();
-        initDrawer();
-
-        DBHelper dbHelper = DBHelper.getInstance(this);
-
-        dbHelper.getTeachersHelper().getTeachers(this,"АИСУ");
-
-
+            getUserSettings();
+            initDrawer();
+        }
     }
 
 
    private void getUserSettings(){
        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
 
-       username = settings.getString("UserName","no user")+" "+getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
+       username = settings.getString("UserFirstName","")+  " " +settings.getString("UserLastName","")+" "+getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
 
        email = settings.getString("Email","no email");
     }
@@ -186,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private String getUserGroup(int id,Context context){
+    public static String getUserGroup(int id,Context context){
         String groupName="";
 
         DBHelper dbHelper = new DBHelper(context);

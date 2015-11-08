@@ -1,9 +1,11 @@
 package savindev.myuniversity.db;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
@@ -39,6 +41,7 @@ public class DBHelper extends SQLiteOpenHelper {
         groupsHelper = new GroupsHelper();
         facultiesHelper = new FacultiesHelper();
         departmentsHelper = new DepartmentsHelper();
+        usedSchedulesHelper = new UsedSchedulesHelper();
 
     }
 
@@ -89,6 +92,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public DepartmentsHelper getDepartmentsHelper() {
         return departmentsHelper;
+    }
+
+    public UsedSchedulesHelper getUsedSchedulesHelper() {
+        return usedSchedulesHelper;
     }
 
 
@@ -161,9 +168,9 @@ public class DBHelper extends SQLiteOpenHelper {
             String table = TABLE_NAME;
             String selection =  COL_TEACHER_LASTNAME;
 
-            int id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,DepartmentsHelper.COL_DEPARTMENT_SHORTNAME,department,DepartmentsHelper.COL_DEPARTMENT_ID);
-            Log.d("IS IT WORK?",getList(context,table,selection,COL_ID_DEPARTMENT,id).toString());
-            return getList(context,table,selection,COL_ID_DEPARTMENT,id);
+         //   int id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,DepartmentsHelper.COL_DEPARTMENT_SHORTNAME,department);
+          //  Log.d("IS IT WORK?",getList(context,table,selection,COL_ID_DEPARTMENT,id).toString());
+            return null;
 
         }
 
@@ -196,7 +203,7 @@ public class DBHelper extends SQLiteOpenHelper {
             String table = TABLE_NAME;
             String selection =  COL_BEGIN_DATE;
 
-            return getList(context,table,selection,null,null);
+            return getList(context,table,selection,null,0);
 
         }
     }
@@ -254,10 +261,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public ArrayList getGroups(Context context,String faculty) {
 
-            String table = TABLE_NAME;
-            String selection = COL_GROUP_NAME;
 
-            return getList(context,table,selection,COL_ID_FACULTY,faculty);
+
+            String table = TABLE_NAME;
+            String selection = FacultiesHelper.COL_FACULTY_ID;
+
+            int faculty_id = getIdFromString(context,FacultiesHelper.TABLE_NAME,selection,FacultiesHelper.COL_FACULTY_SHORTNAME,faculty);
+
+
+
+            return getList(context,TABLE_NAME,COL_GROUP_NAME,COL_ID_FACULTY,faculty_id);
         }
 
 
@@ -337,10 +350,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void create(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
-                    COL_ID_SCHEDULE + " INTEGER PRIMARY KEY," +
+                    COL_ID_SCHEDULE + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     COL_NAME_SCHEDULE + " TEXT," +
                     COL_IS_GROUP + " INTEGER," +
-                    COL_IS_MAIN + " INTEGER" +
+                    COL_IS_MAIN + " INTEGER," +
+                    COL_LAST_REFRESH_DATE + " TEXT" +
                     ");");
 
         }
@@ -349,6 +363,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
+
+        public void setSchedule(Context context,int id,int groupid,String isGroup,String isMain,String lastRefresh){
+
+            SQLiteDatabase db;
+            DBHelper dbHelper = new DBHelper(context);
+            db = dbHelper.getWritableDatabase();
+            ContentValues scheduleRow = new ContentValues();
+            scheduleRow.put(COL_ID_SCHEDULE, id);
+            scheduleRow.put(COL_NAME_SCHEDULE, groupid);
+            scheduleRow.put(COL_IS_GROUP, isGroup);
+            scheduleRow.put(COL_IS_MAIN, isMain);
+            scheduleRow.put(COL_LAST_REFRESH_DATE,lastRefresh);
+            db.insert(TABLE_NAME, null, scheduleRow);
+
+        }
+
+        public void deleteSchedule(Context context,int id){
+            SQLiteDatabase db;
+            DBHelper dbHelper = new DBHelper(context);
+            db = dbHelper.getWritableDatabase();
+            delete_byID(db,TABLE_NAME,COL_ID_SCHEDULE,id);
+        }
 
 
 
@@ -369,7 +405,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String table = DepartmentsHelper.TABLE_NAME;
         String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
 
-        return getList(context,table,selection,null,null);
+        return getList(context,table,selection,null,0);
 
     }
 
@@ -379,41 +415,13 @@ public class DBHelper extends SQLiteOpenHelper {
         String table = FacultiesHelper.TABLE_NAME;
         String selection = FacultiesHelper.COL_FACULTY_SHORTNAME;
 
-        return getList(context,table,selection,null,null);
+        return getList(context,table,selection,null,0);
 
     }
 
 
 
 
-    private static ArrayList getList(Context context,String table,String selection,String findColumn,String valueColumn) {
-
-        SQLiteDatabase db;
-        DBHelper dbHelper = new DBHelper(context);
-        db = dbHelper.getWritableDatabase();
-        ArrayList list = new ArrayList();
-        Cursor cursor;
-        if(findColumn==null || valueColumn==null){
-             cursor = db.rawQuery("SELECT " + selection + " FROM "+table, null);
-        }
-        else{
-             cursor = db.rawQuery("SELECT " + selection + " FROM "+table + " WHERE "+ findColumn +" = " +valueColumn , null);
-        }
-
-
-        cursor.moveToFirst();
-
-        while (cursor.isAfterLast() == false) {
-            String name = cursor.getString(0);
-            list.add(name);
-            Log.d("LIST",name);
-            cursor.moveToNext();
-
-
-        }
-
-        return list;
-    }
 
     private static ArrayList getList(Context context,String table,String selection,String findColumn,int valueColumn) {
 
@@ -422,27 +430,55 @@ public class DBHelper extends SQLiteOpenHelper {
         db = dbHelper.getWritableDatabase();
         ArrayList list = new ArrayList();
         Cursor cursor;
-        if(findColumn==null || valueColumn==0){
-            cursor = db.rawQuery("SELECT " + selection + " FROM "+table, null);
-        }
-        else{
+        try {
             cursor = db.rawQuery("SELECT " + selection + " FROM "+table + " WHERE "+ findColumn +" = " +valueColumn , null);
-        }
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast()) {
+                String name = cursor.getString(cursor.getColumnIndex(selection));
+                list.add(name);
+                Log.d("LIST",name);
+                cursor.moveToNext();
 
 
-        cursor.moveToFirst();
+            }
 
-        while (cursor.isAfterLast() == false) {
-            String name = cursor.getString(0);
-            list.add(name);
-            Log.d("LIST",name);
-            cursor.moveToNext();
-
-
+        } catch( SQLiteException e) {
+            Log.e("SQLITE EXCEPTION",e.toString(), e);
         }
 
         return list;
     }
+
+    private static ArrayList getList(Context context,String table,String selection) {
+
+        SQLiteDatabase db;
+        DBHelper dbHelper = new DBHelper(context);
+        db = dbHelper.getWritableDatabase();
+        ArrayList list = new ArrayList();
+        Cursor cursor;
+        try {
+            cursor = db.rawQuery("SELECT " + selection + " FROM "+table, null);
+            cursor.moveToFirst();
+
+            while (cursor.isAfterLast() == false) {
+                String name = cursor.getString(0);
+                list.add(name);
+                Log.d("LIST",name);
+                cursor.moveToNext();
+
+
+            }
+
+        } catch( SQLiteException e) {
+            Log.e("My App",e.toString(), e);
+        }
+
+        return list;
+    }
+
+
+
 
 
     public static boolean isInitializationInfoThere(Context context){
@@ -501,29 +537,27 @@ public class DBHelper extends SQLiteOpenHelper {
         return tables;
     }
 
-    private int getIdFromString(Context context,String tableName,String columnName,String valueColumn,String idColumn){
+    public static int getIdFromString(Context context,String tableName,String selection,String columnName,String valueColumn){
+
         int id=0;
+        DBHelper dbHelper = getInstance(context);
+        SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
 
-        DBHelper dbHelper = new DBHelper(context);
-        SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
-        String find = "SELECT * FROM  "+ tableName + " WHERE "+ columnName +" = " +valueColumn ;
-        Cursor cursor = sqLiteDatabase.rawQuery(find,null);
-
-        cursor.moveToFirst();
-
-        while (cursor.isAfterLast() == false) {
-
-            id=cursor.getInt(cursor.getColumnIndex(idColumn));
-            cursor.moveToNext();
-
+        try {
+        String selectQuery = "SELECT "+selection+" FROM "+tableName+" WHERE "+columnName+"=?";
+        Cursor c = sqLiteDatabase.rawQuery(selectQuery, new String[] { valueColumn });
+        if (c.moveToFirst()) {
+            id = c.getInt(c.getColumnIndex(selection));
         }
-        cursor.close();
+        c.close();
+        } catch( SQLiteException e) {
+            Log.e("DB EXCEPTION",e.toString(), e);
+        }
+
         return id;
     }
 
-    /**
-     * Remove all user data
-     */
+
     public static void removeAllFromDatabase(Context context)
     {
         DBHelper dbHelper = new DBHelper(context);

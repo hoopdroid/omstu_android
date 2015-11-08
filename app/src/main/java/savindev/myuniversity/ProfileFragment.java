@@ -2,6 +2,7 @@ package savindev.myuniversity;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -60,6 +61,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent i = new Intent(getActivity(), FirstStartActivity.class);
+                                deleteUserPreferences();
                                 startActivity(i);
                                 getActivity().finish();
                             }
@@ -72,6 +74,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void deleteUserPreferences(){
+        SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        settings.edit().clear().commit();
     }
 
     @Override
