@@ -62,7 +62,9 @@ public class MainActivity extends AppCompatActivity {
         getUserSettings();
         initDrawer();
 
-        DBHelper dbHelper = new DBHelper(this);
+        DBHelper dbHelper = DBHelper.getInstance(this);
+
+        dbHelper.getTeachersHelper().getTeachers(this,"АИСУ");
 
 
     }

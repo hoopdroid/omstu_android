@@ -27,6 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private GroupsHelper groupsHelper;
     private FacultiesHelper facultiesHelper;
     private DepartmentsHelper departmentsHelper;
+    private UsedSchedulesHelper usedSchedulesHelper;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -56,12 +57,41 @@ public class DBHelper extends SQLiteOpenHelper {
         groupsHelper.create(db);
         facultiesHelper.create(db);
         departmentsHelper.create(db);
+        usedSchedulesHelper.create(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
+
+
+
+    public TeachersHelper getTeachersHelper() {
+        return teachersHelper;
+    }
+
+    public UniversityInfoHelper getUniversityInfoHelper() {
+        return universityInfoHelper;
+    }
+
+    public SemestersHelper getSemestersHelper() {
+        return semestersHelper;
+    }
+
+    public GroupsHelper getGroupsHelper() {
+        return groupsHelper;
+    }
+
+    public PairsHelper getPairsHelper() {
+        return pairsHelper;
+    }
+
+    public DepartmentsHelper getDepartmentsHelper() {
+        return departmentsHelper;
+    }
+
+
 
     public class UniversityInfoHelper {
 
@@ -121,11 +151,19 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
+
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         }
 
-        public void getTeacher(Cursor cursor){
+        public  ArrayList getTeachers(Context context,String department){
+
+            String table = TABLE_NAME;
+            String selection =  COL_TEACHER_LASTNAME;
+
+            int id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,DepartmentsHelper.COL_DEPARTMENT_SHORTNAME,department,DepartmentsHelper.COL_DEPARTMENT_ID);
+            Log.d("IS IT WORK?",getList(context,table,selection,COL_ID_DEPARTMENT,id).toString());
+            return getList(context,table,selection,COL_ID_DEPARTMENT,id);
 
         }
 
@@ -153,10 +191,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public void getSemester(Cursor cursor){
+        public  ArrayList getSemesters(Context context){
+
+            String table = TABLE_NAME;
+            String selection =  COL_BEGIN_DATE;
+
+            return getList(context,table,selection,null,null);
 
         }
-
     }
 
 
@@ -209,6 +251,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
+
+        public ArrayList getGroups(Context context,String faculty) {
+
+            String table = TABLE_NAME;
+            String selection = COL_GROUP_NAME;
+
+            return getList(context,table,selection,COL_ID_FACULTY,faculty);
+        }
 
 
 
@@ -273,13 +323,44 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public  ArrayList getGroups(Context context) {
 
-        String table = GroupsHelper.TABLE_NAME;
-        String selection = GroupsHelper.COL_GROUP_NAME;
+    public class UsedSchedulesHelper {
 
-        return getList(context,table,selection);
+        public static final String TABLE_NAME = "UsedSchedules";
+        public static final String COL_ID_SCHEDULE= "id_schedule";
+        public static final String COL_NAME_SCHEDULE= "name_schedule";
+        public static final String COL_IS_GROUP= "is_group";
+        public static final String COL_IS_MAIN= "is_main";
+        public static final String COL_LAST_REFRESH_DATE= "last_refresh_date";
+
+
+
+        public void create(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_ID_SCHEDULE + " INTEGER PRIMARY KEY," +
+                    COL_NAME_SCHEDULE + " TEXT," +
+                    COL_IS_GROUP + " INTEGER," +
+                    COL_IS_MAIN + " INTEGER" +
+                    ");");
+
+        }
+
+        public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        }
+
+
+
+
+
     }
+
+
+
+
+
+
+
 
 
     //Запрос к БД на получение данных
@@ -288,7 +369,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String table = DepartmentsHelper.TABLE_NAME;
         String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
 
-        return getList(context,table,selection);
+        return getList(context,table,selection,null,null);
 
     }
 
@@ -298,58 +379,79 @@ public class DBHelper extends SQLiteOpenHelper {
         String table = FacultiesHelper.TABLE_NAME;
         String selection = FacultiesHelper.COL_FACULTY_SHORTNAME;
 
-        return getList(context,table,selection);
+        return getList(context,table,selection,null,null);
 
     }
 
 
-    //Запрос к БД на получение данных
-    public  ArrayList getTeachers(Context context){
 
-        String table = TeachersHelper.TABLE_NAME;
-        String selection =  TeachersHelper.COL_TEACHER_LASTNAME;
 
-        return getList(context,table,selection);
-
-    }
-
-    private static ArrayList getList(Context context,String table,String selection) {
+    private static ArrayList getList(Context context,String table,String selection,String findColumn,String valueColumn) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
         db = dbHelper.getWritableDatabase();
         ArrayList list = new ArrayList();
-        Cursor cursor = db.rawQuery("SELECT " + selection + " FROM "+table, null);
+        Cursor cursor;
+        if(findColumn==null || valueColumn==null){
+             cursor = db.rawQuery("SELECT " + selection + " FROM "+table, null);
+        }
+        else{
+             cursor = db.rawQuery("SELECT " + selection + " FROM "+table + " WHERE "+ findColumn +" = " +valueColumn , null);
+        }
+
 
         cursor.moveToFirst();
 
         while (cursor.isAfterLast() == false) {
             String name = cursor.getString(0);
             list.add(name);
+            Log.d("LIST",name);
             cursor.moveToNext();
+
 
         }
 
         return list;
     }
 
-    //TODO возвращает, имеются ли данные в БД  по наличию всех нужных таблиц. содержимое - хоть 1 строчка
-    public static boolean isInitializationInfoThere(Context context){
+    private static ArrayList getList(Context context,String table,String selection,String findColumn,int valueColumn) {
 
-    //TODO проверять только таблицы из initializationInfo
         SQLiteDatabase db;
-        ArrayList tables = new ArrayList();
         DBHelper dbHelper = new DBHelper(context);
         db = dbHelper.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-        c.moveToFirst();
-        if (c.moveToNext()) {
-            while ( !c.isAfterLast() ) {
-                // tables.equals("android_metadata")
-                tables.add(c.getString(0));
-                c.moveToNext();
-            }
+        ArrayList list = new ArrayList();
+        Cursor cursor;
+        if(findColumn==null || valueColumn==0){
+            cursor = db.rawQuery("SELECT " + selection + " FROM "+table, null);
         }
+        else{
+            cursor = db.rawQuery("SELECT " + selection + " FROM "+table + " WHERE "+ findColumn +" = " +valueColumn , null);
+        }
+
+
+        cursor.moveToFirst();
+
+        while (cursor.isAfterLast() == false) {
+            String name = cursor.getString(0);
+            list.add(name);
+            Log.d("LIST",name);
+            cursor.moveToNext();
+
+
+        }
+
+        return list;
+    }
+
+
+    public static boolean isInitializationInfoThere(Context context){
+
+        SQLiteDatabase db;
+        ArrayList tables = getAllDBTables(context) ;
+        DBHelper dbHelper = new DBHelper(context);
+        db = dbHelper.getWritableDatabase();
+
 
         boolean hasTables = false;
 
@@ -369,6 +471,55 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
+    public static boolean isTableExists(String table,Context context){
+        boolean isExists=false;
+        ArrayList tablesList = getAllDBTables(context);
+        for(int i = 0;i<tablesList.size();i++){
+            if(table.equals(tablesList.get(i))){
+                isExists = true;
+                break;}
+        }
+                return isExists;
+    }
+
+
+    public static ArrayList getAllDBTables(Context context){
+        SQLiteDatabase db;
+        ArrayList tables = new ArrayList();
+        DBHelper dbHelper = new DBHelper(context);
+        db = dbHelper.getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+        c.moveToFirst();
+        if (c.moveToNext()) {
+            while ( !c.isAfterLast() ) {
+                String table = c.getString(c.getColumnIndex("name"));
+                if(!table.equals("android_metadata"))
+                    tables.add(c.getString(c.getColumnIndex("name")));
+                c.moveToNext();
+            }
+        }
+        return tables;
+    }
+
+    private int getIdFromString(Context context,String tableName,String columnName,String valueColumn,String idColumn){
+        int id=0;
+
+        DBHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
+        String find = "SELECT * FROM  "+ tableName + " WHERE "+ columnName +" = " +valueColumn ;
+        Cursor cursor = sqLiteDatabase.rawQuery(find,null);
+
+        cursor.moveToFirst();
+
+        while (cursor.isAfterLast() == false) {
+
+            id=cursor.getInt(cursor.getColumnIndex(idColumn));
+            cursor.moveToNext();
+
+        }
+        cursor.close();
+        return id;
+    }
 
     /**
      * Remove all user data
@@ -380,10 +531,14 @@ public class DBHelper extends SQLiteOpenHelper {
         db.delete(TeachersHelper.TABLE_NAME, null, null);
         db.delete(GroupsHelper.TABLE_NAME,null,null);
         db.delete(DepartmentsHelper.TABLE_NAME,null,null);
-        db.delete(FacultiesHelper.TABLE_NAME,null,null);
+        db.delete(FacultiesHelper.TABLE_NAME, null, null);
         db.delete(UniversityInfoHelper.TABLE_NAME,null,null);
         db.delete(PairsHelper.TABLE_NAME,null,null);
         db.delete(SemestersHelper.TABLE_NAME,null,null);
     }
 
+
+    public static void delete_byID(SQLiteDatabase db,String table,String select,int id){
+        db.delete(table, select + "=" + id, null);
+    }
 }
