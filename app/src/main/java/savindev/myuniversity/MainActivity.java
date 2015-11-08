@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         DBHelper dbHelper = DBHelper.getInstance(this);
 
-        dbHelper.getTeachersHelper().getTeachers(this,"АИСУ");
+        dbHelper.getTeachersHelper().getTeachers(this,"АиСУ");
 
 
     }
