@@ -19,6 +19,7 @@ import android.widget.EditText;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.serverTasks.AuthorizationTask;
 
 
@@ -60,8 +61,9 @@ public class AuthorizationFragment extends Fragment {
                 settings.edit().putBoolean("isFirstStart", false);
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putBoolean("isFirstStart", false);
-                editor.putString("Email",inputEmail.getText().toString());
+                editor.putString("Email", inputEmail.getText().toString());
                 editor.commit();
+
 
                 submitForm();
 

@@ -27,36 +27,23 @@ import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 
 public class FirstStartActivity extends AppCompatActivity implements View.OnClickListener {
 
-
-
     private Toolbar toolbar;
-
     private Button btnSignin;
     private Button btnSkip;
     AuthorizationFragment authorizationFragment;
-
-
     LinearLayout buttons;
     ImageView icon;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        //todo set checking daata
-        GetInitializationInfoTask giit = new GetInitializationInfoTask(getApplicationContext());
-        giit.execute();
-
-
+        if(!DBHelper.isInitializationInfoThere(this)) {
+            GetInitializationInfoTask giit = new GetInitializationInfoTask(getApplicationContext());
+            giit.execute();
+        }
 
         setContentView(R.layout.activity_first_start);
-        // toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //  setSupportActionBar(toolbar);
-
         buttons = (LinearLayout)findViewById(R.id.buttonsLayout);
         icon = (ImageView)findViewById(R.id.icon);
         buttons.animate();
@@ -86,6 +73,11 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
 
         if(v==btnSkip){
 
+            SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+            settings.edit().putBoolean("isFirstStart", false);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("isFirstStart", false);
+            editor.commit();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
         }

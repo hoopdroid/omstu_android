@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.GroupsModel;
@@ -191,9 +192,15 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
 
 
                 //TODO Add all user info in Preferences
-                editor.putString("UserName",lastname + " " + firstname);
-                editor.putInt("UserGroup",groupId);
+                editor.putString("UserLastName",lastname);
+                editor.putString("UserFirstName", firstname);
+                editor.putString("UserMiddleName", middlename);
+                editor.putInt("UserGroup", groupId);
                 editor.commit();
+
+                DBHelper dbHelper = DBHelper.getInstance(context);
+                dbHelper.getUsedSchedulesHelper().setSchedule(context, 1,groupId,"group","true","20000101000000");
+
 
 
                 //После выполнения вышеописанных процедур удалить следующий код:
