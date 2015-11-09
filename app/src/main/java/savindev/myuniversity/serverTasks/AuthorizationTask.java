@@ -199,7 +199,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 editor.commit();
 
                 DBHelper dbHelper = DBHelper.getInstance(context);
-                dbHelper.getUsedSchedulesHelper().setSchedule(context, 1,groupId,"group","true","20000101000000");
+                dbHelper.getUsedSchedulesHelper().setSchedule(context,groupId,true,true,"20000101000000");
 
 
 
