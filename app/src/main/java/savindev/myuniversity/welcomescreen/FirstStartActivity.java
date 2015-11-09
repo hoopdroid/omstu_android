@@ -119,7 +119,7 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
             public void onAnimationEnd(Animation animation) {
 
                 buttons.setVisibility(View.GONE);
-                Toast.makeText(FirstStartActivity.this,"vovik0134 123",Toast.LENGTH_LONG).show();
+
             }
 
         });

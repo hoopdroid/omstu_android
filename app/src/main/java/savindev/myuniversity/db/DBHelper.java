@@ -10,18 +10,19 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-//TODO При get-запросах к локальной БД проверять искомые данные на наличие перед выполнением запроса.
+// TODO При get-запросах к локальной БД проверять искомые данные на наличие перед выполнением запроса.
 // При отсутствии - выводить сообщение об ошибке с предложением скачать данные с сервера.
 // Проверять по имени таблице в базе
 // Если невозможно - прописать в контракте методов об ошибке, буду отлавливать у себя
 
 public class DBHelper extends SQLiteOpenHelper {
+
     private static final String DB_NAME = "university.db";
     private static final int DB_VERSION = 1;
     private static final String TAG = "DBHelper";
     private static DBHelper instance = null;
-
     private UniversityInfoHelper universityInfoHelper;
     private TeachersHelper teachersHelper;
     private SemestersHelper semestersHelper;
@@ -165,13 +166,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public  ArrayList getTeachers(Context context,String department){
 
-            String table = TABLE_NAME;
-            String selection =  COL_TEACHER_LASTNAME;
-
-         //   int id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,DepartmentsHelper.COL_DEPARTMENT_SHORTNAME,department);
-          //  Log.d("IS IT WORK?",getList(context,table,selection,COL_ID_DEPARTMENT,id).toString());
-            return null;
-
+            String selection =  DepartmentsHelper.COL_DEPARTMENT_ID;
+            int department_id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,selection,DepartmentsHelper.COL_DEPARTMENT_SHORTNAME,department);
+            return getList(context,TABLE_NAME,COL_TEACHER_LASTNAME,COL_ID_DEPARTMENT,department_id);
         }
 
     }
@@ -386,9 +383,6 @@ public class DBHelper extends SQLiteOpenHelper {
             delete_byID(db,TABLE_NAME,COL_ID_SCHEDULE,id);
         }
 
-
-
-
     }
 
 
@@ -464,15 +458,14 @@ public class DBHelper extends SQLiteOpenHelper {
             while (cursor.isAfterLast() == false) {
                 String name = cursor.getString(0);
                 list.add(name);
-                Log.d("LIST",name);
                 cursor.moveToNext();
-
-
             }
 
         } catch( SQLiteException e) {
-            Log.e("My App",e.toString(), e);
+            Log.e("SQLITE DB EXCEPTION",e.toString(), e);
         }
+
+        Collections.sort(list);
 
         return list;
     }
@@ -557,7 +550,6 @@ public class DBHelper extends SQLiteOpenHelper {
         return id;
     }
 
-
     public static void removeAllFromDatabase(Context context)
     {
         DBHelper dbHelper = new DBHelper(context);
@@ -574,5 +566,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static void delete_byID(SQLiteDatabase db,String table,String select,int id){
         db.delete(table, select + "=" + id, null);
+    }
+
+    public static ArrayList sortList(ArrayList arrayList){
+        Collections.sort(arrayList);
+        return arrayList;
     }
 }

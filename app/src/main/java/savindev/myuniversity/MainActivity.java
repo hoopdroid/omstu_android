@@ -37,6 +37,7 @@ import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class MainActivity extends AppCompatActivity {
+
     static Toolbar toolbar;
     String username;
     String email;
@@ -54,14 +55,15 @@ public class MainActivity extends AppCompatActivity {
 
         else {
 
-
             setContentView(R.layout.activity_main);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
             getUserSettings();
             initDrawer();
-        }
+
+             }
+
     }
 
 
@@ -189,10 +191,9 @@ public class MainActivity extends AppCompatActivity {
         String find = "SELECT * FROM  "+ DBHelper.GroupsHelper.TABLE_NAME + " WHERE "+ DBHelper.GroupsHelper.COL_ID_GROUP +" = " +id ;
         Cursor cursor = sqLiteDatabase.rawQuery(find,null);
 
-
         cursor.moveToFirst();
 
-        while (cursor.isAfterLast() == false) {
+        while (!cursor.isAfterLast()) {
 
             groupName=cursor.getString(cursor.getColumnIndex(DBHelper.GroupsHelper.COL_GROUP_NAME));
             cursor.moveToNext();

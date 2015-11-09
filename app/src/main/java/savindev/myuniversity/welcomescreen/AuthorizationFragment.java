@@ -24,16 +24,14 @@ import savindev.myuniversity.serverTasks.AuthorizationTask;
 
 
 public class AuthorizationFragment extends Fragment {
+
     private EditText inputEmail, inputPassword;
     private TextInputLayout inputLayoutEmail, inputLayoutPassword;
-
     private Button btnSignIn;
-
 
     public AuthorizationFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
