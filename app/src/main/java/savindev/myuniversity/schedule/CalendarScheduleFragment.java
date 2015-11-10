@@ -132,7 +132,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 //TODO проверить наличие записей по IitializationInfo в БД, если нет - попытаться загрузить
                 if (false) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
-                        giit = new GetInitializationInfoTask(getActivity());
+                        giit = new GetInitializationInfoTask(getActivity(), null);
                         giit.execute();
                         try {
                             if (giit.get(7, TimeUnit.SECONDS)) {

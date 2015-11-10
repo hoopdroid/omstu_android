@@ -137,7 +137,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public class TeachersHelper {
+    public static class TeachersHelper {
 
         public static final String TABLE_NAME = "Teachers";
         public static final String COL_ID_TEACHER = "id_teacher";
@@ -166,7 +166,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public  ArrayList getTeachers(Context context,String department){
+        public static ArrayList getTeachers(Context context, String department){
 
             String selection =  DepartmentsHelper.COL_DEPARTMENT_ID;
             int department_id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,selection,DepartmentsHelper.COL_DEPARTMENT_SHORTNAME,department);
@@ -235,7 +235,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public class GroupsHelper {
+    public static class GroupsHelper {
 
         public static final String TABLE_NAME = "Groups";
         public static final String COL_ID_GROUP= "group_id";
@@ -258,7 +258,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public ArrayList getGroups(Context context,String faculty) {
+        public static ArrayList getGroups(Context context, String faculty) {
 
 
 
@@ -336,7 +336,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-    public class UsedSchedulesHelper {
+    public static class UsedSchedulesHelper {
 
         public static final String TABLE_NAME = "UsedSchedules";
         public static final String COL_ID_SCHEDULE= "id_schedule";
@@ -363,7 +363,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public void setSchedule(Context context,int groupid,boolean isGroup,boolean isMain,String lastRefresh){
+        public static void setSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh){
 
             int isGroupDB,isMainDB;
 
@@ -390,7 +390,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public void deleteSchedule(Context context,int id){
+        public static void deleteSchedule(Context context, int id){
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
@@ -435,7 +435,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public ArrayList<GroupsModel> getGroupsModelList(Context context) {
+        public static ArrayList<GroupsModel> getGroupsModelList(Context context) {
 
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
 
@@ -461,7 +461,7 @@ public class DBHelper extends SQLiteOpenHelper {
                             cursor.getInt(cursor.getColumnIndex(COL_ID_SCHEDULE)),
                             isGroup,
                             cursor.getString(cursor.getColumnIndex(COL_LAST_REFRESH_DATE))
-                            );
+                    );
                     groupsModelArrayList.add(groupsModel);
                     cursor.moveToNext();
                 }
@@ -485,7 +485,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     //Запрос к БД на получение данных
-    public  ArrayList getDepartments(Context context){
+    public static  ArrayList getDepartments(Context context){
 
         String table = DepartmentsHelper.TABLE_NAME;
         String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
@@ -495,7 +495,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     //Запрос к БД на получение данных
-    public  ArrayList getFaculties(Context context){
+    public static ArrayList getFaculties(Context context){
 
         String table = FacultiesHelper.TABLE_NAME;
         String selection = FacultiesHelper.COL_FACULTY_SHORTNAME;
@@ -601,7 +601,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 isExists = true;
                 break;}
         }
-                return isExists;
+        return isExists;
     }
 
 
@@ -630,12 +630,12 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
 
         try {
-        String selectQuery = "SELECT "+selection+" FROM "+tableName+" WHERE "+columnName+"=?";
-        Cursor c = sqLiteDatabase.rawQuery(selectQuery, new String[] { valueColumn });
-        if (c.moveToFirst()) {
-            id = c.getInt(c.getColumnIndex(selection));
-        }
-        c.close();
+            String selectQuery = "SELECT "+selection+" FROM "+tableName+" WHERE "+columnName+"=?";
+            Cursor c = sqLiteDatabase.rawQuery(selectQuery, new String[] { valueColumn });
+            if (c.moveToFirst()) {
+                id = c.getInt(c.getColumnIndex(selection));
+            }
+            c.close();
         } catch( SQLiteException e) {
             Log.e("DB EXCEPTION",e.toString(), e);
         }

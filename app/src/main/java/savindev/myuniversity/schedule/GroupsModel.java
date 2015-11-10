@@ -9,6 +9,7 @@ public class GroupsModel {
     private boolean isGroup;
     private String name;
     private String lastRefresh;
+    private boolean selected;
 
 
 
@@ -17,6 +18,12 @@ public class GroupsModel {
         this.id = id;
         this.isGroup = isGroup;
         this.lastRefresh = lastRefresh;
+    }
+
+    public GroupsModel(String name, int id, boolean isGroup) {
+        this.name = name;
+        this.id = id;
+        this.isGroup = isGroup;
     }
 
     public int getId() {
@@ -49,4 +56,14 @@ public class GroupsModel {
     public void setLastRefresh(String lastRefresh) {
         this.lastRefresh = lastRefresh;
     }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+
 }

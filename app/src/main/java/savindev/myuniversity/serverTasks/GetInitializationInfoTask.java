@@ -2,10 +2,11 @@ package savindev.myuniversity.serverTasks;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,11 +38,13 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
     final private int TIMEOUT_MILLISEC = 5000;
     int errorCode = 0;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
 
-    public GetInitializationInfoTask(Context context) {
+    public GetInitializationInfoTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
         super();
         this.context = context;
+        this.mSwipeRefreshLayout = mSwipeRefreshLayout;
     }
 
     @Override
@@ -140,9 +143,6 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     void parsetoSqlite(Initialization init) {
 
-
-
-
         SQLiteDatabase sqliteDatabase;
         DBHelper helper = new DBHelper(context);
         sqliteDatabase = helper.getWritableDatabase();
@@ -166,10 +166,6 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
             sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);}
             else{
-                //При внесении данных проверять на IS_DELETED все, где этот параметр имеется.
-                // При true найти такую строчку и удалить из базы, при false внести эту строчку в базу
-                //ВОПРОС : в этом классе мы данные получаем в первый раз,поэтому удалять нечего
-                //Ответ: мы в этот класс с таким же успехом можем попасть и при обновлении данных.
                 DBHelper.delete_byID(sqliteDatabase, DBHelper.TeachersHelper.TABLE_NAME, DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
             }
 
@@ -257,6 +253,13 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean data) { //Предупреждение, если список пустой
+        if (mSwipeRefreshLayout != null) { //Если вызывалось из фрагмента настроек групп
+            mSwipeRefreshLayout.setRefreshing(false); //Завершить показывать прогресс
+            if (data && errorCode != 1) { //Имеется новое содержимое, обновить данные
+                context.sendBroadcast(new Intent("FINISH_UPDATE")); //Отправить запрос на обновление
+            }
+        }
+
         if (!data) {
             Toast.makeText(context, "Сервер недоступен", Toast.LENGTH_LONG).show();
         }

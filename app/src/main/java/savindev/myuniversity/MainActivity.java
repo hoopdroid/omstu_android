@@ -1,11 +1,9 @@
 package savindev.myuniversity;
 
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -28,8 +26,6 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-
-import java.util.ArrayList;
 
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
@@ -75,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
            //ArrayList<GroupsModel> notmaingroup =  dbHelper.getUsedSchedulesHelper().getGroupsModelList(this);
 
 
-            Log.d("Departments",dbHelper.getFaculties(this).toString());
+            Log.d("Departments", dbHelper.getFaculties(this).toString());
             Log.d("Faculties",dbHelper.getDepartments(this).toString());
-
+            Log.d("TEACHERS",dbHelper.getTeachersHelper().getTeachers(this,"АИСУ").toString());
 
         }
 
@@ -145,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        FragmentManager fragmentManager = getFragmentManager();
-                        FragmentTransaction fragmentTransaction;
 
                         switch (position) {
                             case 1:

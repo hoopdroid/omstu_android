@@ -2,8 +2,6 @@ package savindev.myuniversity.serverTasks;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,10 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashSet;
 
-import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.GroupsModel;
@@ -38,6 +33,8 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     private Context context;
     static final private int TIMEOUT_MILLISEC = 5000;
     private int errorCode = 0;
+    private String[] params;
+    String passwordHash;
 
     public AuthorizationTask(Context context) {
         super();
@@ -52,6 +49,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     @Override
     protected Boolean doInBackground(String... params) {
         //Возвращать false при провале авторизации
+        this.params = params;
 
 
         //Первый запрос
@@ -73,9 +71,10 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             return false;
 
         } else { //Иначе - второй запрос на сервер
+            passwordHash = md5(params[1] + salt).toUpperCase();
             uri = context.getResources().getString(R.string.uri) + "authorization?universityAcronym=" +
                     context.getResources().getString(R.string.university) + "&login=" +
-                    params[0] + "&passwordHash=" + md5(params[1] + salt).toUpperCase();
+                    params[0] + "&passwordHash=" + passwordHash;
             result = query(uri);
             if (result == null) {
                 return false;
@@ -171,29 +170,27 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
                 int id = content.getInt("ID_USER");
-                String lastname = content.getString("USER_LASTNAME");
-                String firstname = content.getString("USER_FIRSTNAME");
-                String middlename = content.getString("USER_MIDDLENAME");
                 int groupId = content.getInt("ID_GROUP");
 
-                //Получить расписание для этой группы, если ранее оно не было получено
-//                GetScheduleTask gst = new GetScheduleTask(context, null);
-//                gst.execute(тут параметры основной группы);
-
+                //Сохранение данных о пользователе
                 SharedPreferences settings = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = settings.edit();
-
-
-                //TODO Add all user info in Preferences
-                editor.putString("UserLastName",lastname);
-                editor.putString("UserFirstName", firstname);
-                editor.putString("UserMiddleName", middlename);
+                editor.putString("UserLastName",content.getString("USER_LASTNAME"));
+                editor.putString("UserFirstName", content.getString("USER_FIRSTNAME"));
+                editor.putString("UserMiddleName", content.getString("USER_MIDDLENAME"));
                 editor.putInt("UserGroup", groupId);
+                editor.putString("email", params[0]);
+                editor.putString("password", passwordHash);
+                editor.putInt("UserId", groupId);
                 editor.commit();
-
                 DBHelper dbHelper = DBHelper.getInstance(context);
-                dbHelper.getUsedSchedulesHelper().setSchedule(context,groupId,true,true,"20000101000000");
+                dbHelper.getUsedSchedulesHelper().setSchedule(context, groupId, true, true, "20000101000000");
 
+                //Записать эту группу в лист активных расписаний как основную
+                //Получить список id не-основных активных расписаний
+                //Проверить, если ли среди них id группы авторизовавшегося - основной
+                //Для записи в таблицу: id = id, name = (взять из локальной базы по id), isGroup=true (пока преподы не предусмотрены), lastrefresh = 20000101000000
+                //Если нет, провести следующие действия:
 
 
                 //После выполнения вышеописанных процедур удалить следующий код:
@@ -235,8 +232,4 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         }
     }
 
-
-    private void saveSettings(){
-        //TODO ADD
-    }
 }
