@@ -485,12 +485,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     //Запрос к БД на получение данных
-    public static ArrayList getDepartments(Context context){
+    public  ArrayList getDepartments(Context context){
 
         String table = DepartmentsHelper.TABLE_NAME;
         String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
 
-        return getList(context,table,selection,null,0);
+        return getList(context,table,selection);
 
     }
 
@@ -500,7 +500,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String table = FacultiesHelper.TABLE_NAME;
         String selection = FacultiesHelper.COL_FACULTY_SHORTNAME;
 
-        return getList(context,table,selection,null,0);
+        return getList(context,table,selection);
 
     }
 
@@ -508,12 +508,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
 
-    private static ArrayList getList(Context context,String table,String selection,String findColumn,int valueColumn) {
+    private static ArrayList <String> getList(Context context,String table,String selection,String findColumn,int valueColumn) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
         db = dbHelper.getWritableDatabase();
-        ArrayList list = new ArrayList();
+        ArrayList<String> list = new ArrayList();
         Cursor cursor;
         try {
             cursor = db.rawQuery("SELECT " + selection + " FROM "+table + " WHERE "+ findColumn +" = " +valueColumn , null);
@@ -532,22 +532,24 @@ public class DBHelper extends SQLiteOpenHelper {
             Log.e("SQLITE EXCEPTION",e.toString(), e);
         }
 
+        Collections.sort(list);
+
         return list;
     }
 
-    private static ArrayList getList(Context context,String table,String selection) {
+    private static ArrayList <String> getList(Context context,String table,String selection) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
         db = dbHelper.getWritableDatabase();
-        ArrayList list = new ArrayList();
+        ArrayList <String> list = new ArrayList();
         Cursor cursor;
         try {
             cursor = db.rawQuery("SELECT " + selection + " FROM "+table, null);
             cursor.moveToFirst();
 
-            while (cursor.isAfterLast() == false) {
-                String name = cursor.getString(0);
+            while (!cursor.isAfterLast()) {
+                String name = cursor.getString(cursor.getColumnIndex(selection));
                 list.add(name);
                 cursor.moveToNext();
             }

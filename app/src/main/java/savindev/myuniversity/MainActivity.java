@@ -66,15 +66,20 @@ public class MainActivity extends AppCompatActivity {
             getUserSettings();
             initDrawer();
 
-          //  DBHelper dbHelper = DBHelper.getInstance(this);
+           DBHelper dbHelper = DBHelper.getInstance(this);
 
-           // dbHelper.getUsedSchedulesHelper().setSchedule(this, 140, true, false, "111111111");
+            dbHelper.getUsedSchedulesHelper().setSchedule(this, 140, true, false, "111111111");
 
           // GroupsModel maingroup =  dbHelper.getUsedSchedulesHelper().getMainGroupModel(this);
 
            //ArrayList<GroupsModel> notmaingroup =  dbHelper.getUsedSchedulesHelper().getGroupsModelList(this);
 
-             }
+
+            Log.d("Departments",dbHelper.getFaculties(this).toString());
+            Log.d("Faculties",dbHelper.getDepartments(this).toString());
+
+
+        }
 
 
 

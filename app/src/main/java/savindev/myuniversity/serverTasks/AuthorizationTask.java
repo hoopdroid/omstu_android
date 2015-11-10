@@ -175,14 +175,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 String firstname = content.getString("USER_FIRSTNAME");
                 String middlename = content.getString("USER_MIDDLENAME");
                 int groupId = content.getInt("ID_GROUP");
-                //Это все рапихать по sqlite, предварительно получить по id группы саму группу
 
-                //savesettings();
-                //Записать эту группу в лист активных расписаний как основную
-                //Получить список id не-основных активных расписаний
-                //Проверить, если ли среди них id группы авторизовавшегося - основной
-                //Для записи в таблицу: id = id, name = (взять из локальной базы по id), isGroup=true (пока преподы не предусмотрены), lastrefresh = 20000101000000
-                //Если нет, провести следующие действия:
                 //Получить расписание для этой группы, если ранее оно не было получено
 //                GetScheduleTask gst = new GetScheduleTask(context, null);
 //                gst.execute(тут параметры основной группы);
