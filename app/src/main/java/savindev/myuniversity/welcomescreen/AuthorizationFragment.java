@@ -10,6 +10,7 @@ import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,10 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.concurrent.TimeUnit;
+
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.serverTasks.AuthorizationTask;
 
 
@@ -56,16 +58,9 @@ public class AuthorizationFragment extends Fragment {
             public void onClick(View view) {
 
                 SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-                settings.edit().putBoolean("isFirstStart", false);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("isFirstStart", false);
-                editor.putString("Email", inputEmail.getText().toString());
-                editor.commit();
-
+                settings.edit().putBoolean("isFirstStart", false).apply();
 
                 submitForm();
-
-
             }
         });
 
@@ -86,8 +81,9 @@ public class AuthorizationFragment extends Fragment {
         String[] autorization = {inputEmail.getText().toString(), inputPassword.getText().toString()};
         AuthorizationTask at = new AuthorizationTask(getActivity().getApplicationContext());
         at.execute(autorization);
+        Log.d("11", "0");
         try {
-            if (at.get() == true) {
+            if (at.get(7, TimeUnit.SECONDS) == true) {
                 Intent i = new Intent(getActivity(), MainActivity.class);
                 startActivity(i);
                 getActivity().finish();
