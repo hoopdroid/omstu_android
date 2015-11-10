@@ -105,18 +105,19 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 
     private void parse() {
-        ArrayList<String> faculty = DBHelper.getFaculties(getActivity());
-        ArrayList<String> departments = DBHelper.getDepartments(getActivity());
+        DBHelper dbHelper = DBHelper.getInstance(getActivity());
+        ArrayList<String> faculty = dbHelper.getFacultiesHelper().getFaculties(getActivity());
+        ArrayList<String> departments = dbHelper.getDepartmentsHelper().getDepartments(getActivity());
         ArrayList<String> parents = new ArrayList<String>(); //Список родителей, состоит из факультетов и кафедр
         parents.addAll(faculty);
         parents.addAll(departments);
         //Создаем лист с группами
         ArrayList<ArrayList<GroupsModel>> models = new ArrayList<ArrayList<GroupsModel>>();
         for (int i = 0; i < faculty.size(); i++) {
-            models.add(DBHelper.GroupsHelper.getGroups(getActivity(), faculty.get(i)));
+            models.add(dbHelper.getGroupsHelper().getGroups(getActivity(), faculty.get(i)));
         }
         for (int i = 0; i < departments.size(); i++) {
-            models.add(DBHelper.TeachersHelper.getTeachers(getActivity(), departments.get(i)));
+            models.add(dbHelper.getTeachersHelper().getTeachers(getActivity(), departments.get(i)));
         }
 
 
