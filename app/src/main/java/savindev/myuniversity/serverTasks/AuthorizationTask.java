@@ -194,6 +194,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 //Получить расписание для этой группы, если ранее оно не было получено
 //                GetScheduleTask gst = new GetScheduleTask(context, null);
 //                gst.execute(тут параметры основной группы);
+
                 //После выполнения вышеописанных процедур удалить следующий код:
                 GetScheduleTask gst = new GetScheduleTask(context, null);
                 gst.execute(new GroupsModel(null, id, true, "20000101000000"));

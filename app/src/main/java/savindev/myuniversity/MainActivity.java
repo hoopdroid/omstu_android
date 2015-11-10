@@ -28,10 +28,12 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
+import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class MainActivity extends AppCompatActivity {
+
     static Toolbar toolbar;
     String username;
     String email;
@@ -41,10 +43,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+
         if(settings.getBoolean("isFirstStart",true)) {
+
             Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
             startActivity(intent);
             finish();
+
         }
 
         else {
@@ -53,14 +58,26 @@ public class MainActivity extends AppCompatActivity {
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
-
             getUserSettings();
             initDrawer();
-        }
+
+          //  DBHelper dbHelper = DBHelper.getInstance(this);
+
+           // dbHelper.getUsedSchedulesHelper().setSchedule(this, 140, true, false, "111111111");
+
+          // GroupsModel maingroup =  dbHelper.getUsedSchedulesHelper().getMainGroupModel(this);
+
+           //ArrayList<GroupsModel> notmaingroup =  dbHelper.getUsedSchedulesHelper().getGroupsModelList(this);
+
+             }
+
+
+
     }
 
 
    private void getUserSettings(){
+
        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
 
        username = settings.getString("UserFirstName","")+  " " +settings.getString("UserLastName","")+" "+getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
@@ -182,10 +199,9 @@ public class MainActivity extends AppCompatActivity {
         String find = "SELECT * FROM  "+ DBHelper.GroupsHelper.TABLE_NAME + " WHERE "+ DBHelper.GroupsHelper.COL_ID_GROUP +" = " +id ;
         Cursor cursor = sqLiteDatabase.rawQuery(find,null);
 
-
         cursor.moveToFirst();
 
-        while (cursor.isAfterLast() == false) {
+        while (!cursor.isAfterLast()) {
 
             groupName=cursor.getString(cursor.getColumnIndex(DBHelper.GroupsHelper.COL_GROUP_NAME));
             cursor.moveToNext();

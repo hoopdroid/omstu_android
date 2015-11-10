@@ -166,7 +166,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public static ArrayList<GroupsModel> getTeachers(Context context, String department){
+        public static ArrayList getTeachers(Context context, String department){
 
             String selection =  DepartmentsHelper.COL_DEPARTMENT_ID;
             int department_id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,selection,DepartmentsHelper.COL_DEPARTMENT_SHORTNAME,department);
@@ -258,7 +258,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public static ArrayList<GroupsModel> getGroups(Context context, String faculty) {
+        public static ArrayList getGroups(Context context, String faculty) {
 
 
 
@@ -363,7 +363,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public static void setSchedule(Context context,int groupid,boolean isGroup,boolean isMain,String lastRefresh){
+        public static void setSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh){
 
             int isGroupDB,isMainDB;
 
@@ -476,13 +476,21 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
+
+
+
+
+
+
+
+
     //Запрос к БД на получение данных
     public static ArrayList getDepartments(Context context){
 
         String table = DepartmentsHelper.TABLE_NAME;
         String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
 
-        return getList(context,table,selection);
+        return getList(context,table,selection,null,0);
 
     }
 
@@ -492,7 +500,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String table = FacultiesHelper.TABLE_NAME;
         String selection = FacultiesHelper.COL_FACULTY_SHORTNAME;
 
-        return getList(context,table,selection);
+        return getList(context,table,selection,null,0);
 
     }
 
@@ -514,6 +522,7 @@ public class DBHelper extends SQLiteOpenHelper {
             while (!cursor.isAfterLast()) {
                 String name = cursor.getString(cursor.getColumnIndex(selection));
                 list.add(name);
+                Log.d("LIST",name);
                 cursor.moveToNext();
 
 
