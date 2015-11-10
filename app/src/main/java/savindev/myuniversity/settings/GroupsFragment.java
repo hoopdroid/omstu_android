@@ -105,8 +105,6 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 
     private void parse() {
-        int faculcySize = 0;
-        int departmentSize = 0;
         ArrayList<String> faculty = DBHelper.getFaculties(getActivity());
         ArrayList<String> departments = DBHelper.getDepartments(getActivity());
         ArrayList<String> parents = new ArrayList<String>(); //Список родителей, состоит из факультетов и кафедр

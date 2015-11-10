@@ -169,7 +169,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public static ArrayList getTeachers(Context context, String department){
 
             String selection =  DepartmentsHelper.COL_DEPARTMENT_ID;
-            int department_id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,selection,DepartmentsHelper.COL_DEPARTMENT_SHORTNAME,department);
+            int department_id = getIdFromString(context,DepartmentsHelper.TABLE_NAME,selection,DepartmentsHelper.COL_DEPARTMENT_FULLNAME,department);
             return getList(context,TABLE_NAME,COL_TEACHER_LASTNAME,COL_ID_DEPARTMENT,department_id);
         }
 
@@ -490,7 +490,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String table = DepartmentsHelper.TABLE_NAME;
         String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
 
-        return getList(context,table,selection,null,0);
+        return getList(context,table,selection);
 
     }
 
@@ -500,7 +500,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String table = FacultiesHelper.TABLE_NAME;
         String selection = FacultiesHelper.COL_FACULTY_SHORTNAME;
 
-        return getList(context,table,selection,null,0);
+        return getList(context,table,selection);
 
     }
 
@@ -522,7 +522,6 @@ public class DBHelper extends SQLiteOpenHelper {
             while (!cursor.isAfterLast()) {
                 String name = cursor.getString(cursor.getColumnIndex(selection));
                 list.add(name);
-                Log.d("LIST",name);
                 cursor.moveToNext();
 
 
