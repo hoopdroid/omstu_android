@@ -14,23 +14,19 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.GroupsModel;
 
 public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 	private Context context;
 	private final static int TIMEOUT_MILLISEC = 5000;
 	private SwipeRefreshLayout mSwipeRefreshLayout;
+    GroupsModel[] params;
 
 	public GetScheduleTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
 		super();
@@ -41,7 +37,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
 	@Override
 	protected Integer doInBackground(GroupsModel... params) {
-
+        this.params = params;
         JSONArray json = new JSONArray(); //Составление json для отправки в post
         for (int i = 0; i < params.length; i++) {
             JSONObject obj = new JSONObject();
@@ -101,9 +97,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
 
 	private boolean replyParse(String reply) throws JSONException {
-		Log.d("11", reply);
-		//здесь разбор json и раскладка в sqlite
-		Initialization init = null;
+	//здесь разбор json и раскладка в sqlite
 		JSONObject obj = null;
 		obj = new JSONObject(reply);
 		switch (obj.get("STATE").toString()) {//определение типа полученного результата
@@ -113,6 +107,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 				ArrayList<Schedule> sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
 				ArrayList<ScheduleDates> scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
 //              parsetoSqlite(init);
+				addToScheduleList(lastResresh);
 				break;
 			case "ERROR":   //Неопознанная ошибка
 				Log.i("myuniversity", "Ошибка ERROR от сервера, запрос GetScheduleTask, текст:"
@@ -128,7 +123,11 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
 	private void parsetoSqlite(Schedule init){
 		//TODO Parse Schedule to SQlite
-
-
 	}
+
+    private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний
+        for (GroupsModel model : params) {
+            DBHelper.UsedSchedulesHelper.setSchedule(context, model.getId(), model.isGroup(), false, lastResresh);
+        }
+    }
 }

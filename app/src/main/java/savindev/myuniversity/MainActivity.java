@@ -1,11 +1,9 @@
 package savindev.myuniversity;
 
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -15,7 +13,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -28,8 +25,6 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-
-import java.util.ArrayList;
 
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
@@ -123,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        FragmentManager fragmentManager = getFragmentManager();
-                        FragmentTransaction fragmentTransaction;
 
                         switch (position) {
                             case 1:
@@ -182,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static String getUserGroup(int id,Context context){
-        String groupName="";
+        String groupName= "";
 
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
