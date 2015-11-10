@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
@@ -96,6 +97,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
+            urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
@@ -169,36 +171,35 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
-                int id = content.getInt("ID_USER");
                 int groupId = content.getInt("ID_GROUP");
 
                 //Сохранение данных о пользователе
                 SharedPreferences settings = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putString("UserLastName",content.getString("USER_LASTNAME"));
+                editor.putString("UserLastName", content.getString("USER_LASTNAME"));
                 editor.putString("UserFirstName", content.getString("USER_FIRSTNAME"));
                 editor.putString("UserMiddleName", content.getString("USER_MIDDLENAME"));
                 editor.putInt("UserGroup", groupId);
                 editor.putString("email", params[0]);
                 editor.putString("password", passwordHash);
-                editor.putInt("UserId", groupId);
-                editor.commit();
+                editor.putInt("UserId", content.getInt("ID_USER"));
+                editor.apply();
                 DBHelper dbHelper = DBHelper.getInstance(context);
-                dbHelper.getUsedSchedulesHelper().setSchedule(context, groupId, true, true, "20000101000000");
+                dbHelper.getUsedSchedulesHelper().setSchedule(context, groupId, true, true, "20000101000000"); //запись нового основного в таблицу
 
-                //Записать эту группу в лист активных расписаний как основную
-                //Получить список id не-основных активных расписаний
-                //Проверить, если ли среди них id группы авторизовавшегося - основной
-                //Для записи в таблицу: id = id, name = (взять из локальной базы по id), isGroup=true (пока преподы не предусмотрены), lastrefresh = 20000101000000
-                //Если нет, провести следующие действия:
-                //Получить расписание для этой группы, если ранее оно не было получено
-//                GetScheduleTask gst = new GetScheduleTask(context, null);
-//                gst.execute(тут параметры основной группы);
+                ArrayList<GroupsModel> models = dbHelper.getUsedSchedulesHelper().getGroupsModelList(context); //Получить список id не-основных активных расписаний
+                forbreak:
+                {
+                    for (GroupsModel model : models) { //Проверить, если ли среди них id группы авторизовавшегося - основной
+                        if (model.getId() == groupId) {
+                            break forbreak;
+                        }
+                    }
+                    //Получить расписание для этой группы, если ранее оно не было получено
 
-                //После выполнения вышеописанных процедур удалить следующий код:
-                GetScheduleTask gst = new GetScheduleTask(context, null);
-                gst.execute(new GroupsModel(null, id, true, "20000101000000"));
-
+                    GetScheduleTask gst = new GetScheduleTask(context, null);
+                    gst.execute(dbHelper.getUsedSchedulesHelper().getMainGroupModel(context));
+                }
 
                 return true;
             case "ERROR":   //Неопознанная ошибка

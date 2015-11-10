@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -37,6 +38,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
 	@Override
 	protected Integer doInBackground(GroupsModel... params) {
+
         this.params = params;
         JSONArray json = new JSONArray(); //Составление json для отправки в post
         for (int i = 0; i < params.length; i++) {
@@ -54,12 +56,23 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 		String uri = context.getResources().getString(R.string.uri) + "getSchedule?idGroup=197";
 		URL url;
 		HttpURLConnection urlConnection = null;
-		try {
+
+        try {
 			url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
+
+
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+            wr.writeBytes(json.toString());
+            wr.flush();
+            wr.close();
+            int responseCode = urlConnection.getResponseCode();
+            Log.d("11", Integer.toString(responseCode));
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
