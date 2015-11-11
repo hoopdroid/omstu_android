@@ -72,7 +72,6 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-
     public TeachersHelper getTeachersHelper() {
         return teachersHelper;
     }
@@ -106,7 +105,6 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-
     public class UniversityInfoHelper {
 
         public static final String TABLE_NAME = "UniversityInfo";
@@ -121,22 +119,22 @@ public class DBHelper extends SQLiteOpenHelper {
                     COL_SHORTNAME + " TEXT," +
                     COL_DAYS_IN_WEEK + " INTEGER" +
                     ");");
-            Log.d(TAG,"SUCCESFULL CREATE TABLE UNIVERSITYINFO");
+            Log.d(TAG, "SUCCESFULL CREATE TABLE UNIVERSITYINFO");
         }
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         }
 
-        public String getUniversityFullName(Cursor cursor){
+        public String getUniversityFullName(Cursor cursor) {
             return cursor.getString(cursor.getColumnIndex(COL_FULLNAME));
         }
 
-        public String getUniversityShortName(Cursor cursor){
+        public String getUniversityShortName(Cursor cursor) {
             return cursor.getString(cursor.getColumnIndex(COL_SHORTNAME));
         }
 
-        public int getUniversityDaysInWeek(Cursor cursor){
+        public int getUniversityDaysInWeek(Cursor cursor) {
             return cursor.getInt(cursor.getColumnIndex(COL_DAYS_IN_WEEK));
         }
     }
@@ -170,9 +168,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public  ArrayList<GroupsModel> getTeachers(Context context, String department){
+        public ArrayList<GroupsModel> getTeachers(Context context, String department) {
             String selection = DepartmentsHelper.COL_DEPARTMENT_ID;
-            int teacher_id = getIdFromString(context, DepartmentsHelper.TABLE_NAME, selection, DepartmentsHelper.COL_DEPARTMENT_SHORTNAME, department);
+            int teacher_id = getIdFromString(context, DepartmentsHelper.TABLE_NAME, selection, DepartmentsHelper.COL_DEPARTMENT_FULLNAME, department);
             ArrayList<String> teachersNameList = new ArrayList<>();
 
             SQLiteDatabase db;
@@ -180,24 +178,24 @@ public class DBHelper extends SQLiteOpenHelper {
             db = dbHelper.getWritableDatabase();
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT * FROM "+TABLE_NAME + " WHERE "+ COL_ID_DEPARTMENT +" = " +teacher_id+" ORDER BY "+COL_TEACHER_LASTNAME , null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID_DEPARTMENT + " = " + teacher_id + " ORDER BY " + COL_TEACHER_LASTNAME, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
 
-                    String lastname=cursor.getString(cursor.getColumnIndex(COL_TEACHER_LASTNAME));
-                    String firstname=cursor.getString(cursor.getColumnIndex(COL_TEACHER_FIRSTNAME)).substring(0,1)+".";
-                    String middlename=cursor.getString(cursor.getColumnIndex(COL_TEACHER_MIDDLENAME)).substring(0,1)+".";
+                    String lastname = cursor.getString(cursor.getColumnIndex(COL_TEACHER_LASTNAME));
+                    String firstname = cursor.getString(cursor.getColumnIndex(COL_TEACHER_FIRSTNAME)).substring(0, 1) + ".";
+                    String middlename = cursor.getString(cursor.getColumnIndex(COL_TEACHER_MIDDLENAME)).substring(0, 1) + ".";
 
                     //  list.add(cursor.getString(cursor.getColumnIndex(selection)));
-                    teachersNameList.add(lastname+" "+firstname+" "+middlename);
+                    teachersNameList.add(lastname + " " + firstname + " " + middlename);
 
                     cursor.moveToNext();
 
                 }
 
-            } catch( SQLiteException e) {
-                Log.e("SQLITE EXCEPTION",e.toString(), e);
+            } catch (SQLiteException e) {
+                Log.e("SQLITE EXCEPTION", e.toString(), e);
             }
 
             ArrayList teacherIdList = getList(context, TABLE_NAME, COL_ID_TEACHER, COL_ID_DEPARTMENT, teacher_id);
@@ -211,7 +209,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 );
                 groupsModelArrayList.add(groupsModel);
             }
-           return groupsModelArrayList;
+            return groupsModelArrayList;
         }
 
     }
@@ -222,7 +220,6 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String COL_ID_SEMESTER = "id_semester";
         public static final String COL_BEGIN_DATE = "begindate";
         public static final String COL_END_DATE = "enddate";
-
 
 
         public void create(SQLiteDatabase db) {
@@ -238,12 +235,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public  ArrayList getSemesters(Context context){
+        public ArrayList getSemesters(Context context) {
 
             String table = TABLE_NAME;
-            String selection =  COL_BEGIN_DATE;
+            String selection = COL_BEGIN_DATE;
 
-            return getList(context,table,selection,null,0);
+            return getList(context, table, selection, null, 0);
 
         }
     }
@@ -252,11 +249,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public class PairsHelper {
 
         public static final String TABLE_NAME = "Pairs";
-        public static final String COL_ID_PAIR= "pair_id";
-        public static final String COL_PAIR_NUMBER= "pair_number";
+        public static final String COL_ID_PAIR = "pair_id";
+        public static final String COL_PAIR_NUMBER = "pair_number";
         public static final String COL_BEGIN_TIME = "pair_begin_time";
         public static final String COL_END_TIME = "pair_end_time";
-
 
 
         public void create(SQLiteDatabase db) {
@@ -298,7 +294,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public  ArrayList<GroupsModel> getGroups(Context context, String faculty) {
+        public ArrayList<GroupsModel> getGroups(Context context, String faculty) {
 
 
             String selection = FacultiesHelper.COL_FACULTY_ID;
@@ -310,7 +306,7 @@ public class DBHelper extends SQLiteOpenHelper {
             for (int i = 0; i < groupNameList.size(); i++) {
                 GroupsModel groupsModel = new GroupsModel(
                         groupNameList.get(i),
-                       Integer.parseInt(groupIdList.get(i).toString()),
+                        Integer.parseInt(groupIdList.get(i).toString()),
                         true
                 );
                 groupsModelArrayList.add(groupsModel);
@@ -323,17 +319,12 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-
-
-
     public static class FacultiesHelper {
 
         public static final String TABLE_NAME = "Faculties";
         public static final String COL_FACULTY_ID = "faculty_id";
-        public static final String COL_FACULTY_FULLNAME= "faculty_fullname";
-        public static final String COL_FACULTY_SHORTNAME= "faculty_shortname";
-
-
+        public static final String COL_FACULTY_FULLNAME = "faculty_fullname";
+        public static final String COL_FACULTY_SHORTNAME = "faculty_shortname";
 
 
         public void create(SQLiteDatabase db) {
@@ -350,13 +341,12 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-
-        public ArrayList <String> getFaculties(Context context){
+        public ArrayList<String> getFaculties(Context context) {
 
             String table = FacultiesHelper.TABLE_NAME;
             String selection = FacultiesHelper.COL_FACULTY_SHORTNAME;
 
-            return getList(context,table,selection);
+            return getList(context, table, selection);
 
         }
 
@@ -369,10 +359,8 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String COL_DEPARTMENT_ID = "department_id";
         public static final String COL_FACULTY_ID = "faculty_id";
         public static final String COL_CLASSROOM_ID = "classroom_id";
-        public static final String COL_DEPARTMENT_FULLNAME= "department_fullname";
-        public static final String COL_DEPARTMENT_SHORTNAME= "department_shortname";
-
-
+        public static final String COL_DEPARTMENT_FULLNAME = "department_fullname";
+        public static final String COL_DEPARTMENT_SHORTNAME = "department_shortname";
 
 
         public void create(SQLiteDatabase db) {
@@ -391,12 +379,12 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         //Запрос к БД на получение данных
-        public  ArrayList <String> getDepartments(Context context){
+        public ArrayList<String> getDepartments(Context context) {
 
             String table = DepartmentsHelper.TABLE_NAME;
             String selection = DepartmentsHelper.COL_DEPARTMENT_FULLNAME;
 
-            return getList(context,table,selection);
+            return getList(context, table, selection);
 
         }
 
@@ -407,12 +395,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public static class UsedSchedulesHelper {
 
         public static final String TABLE_NAME = "UsedSchedules";
-        public static final String COL_ID_SCHEDULE= "id_schedule";
-        public static final String COL_NAME_SCHEDULE= "name_schedule";
-        public static final String COL_IS_GROUP= "is_group";
-        public static final String COL_IS_MAIN= "is_main";
-        public static final String COL_LAST_REFRESH_DATE= "last_refresh_date";
-
+        public static final String COL_ID_SCHEDULE = "id_schedule";
+        public static final String COL_NAME_SCHEDULE = "name_schedule";
+        public static final String COL_IS_GROUP = "is_group";
+        public static final String COL_IS_MAIN = "is_main";
+        public static final String COL_LAST_REFRESH_DATE = "last_refresh_date";
 
 
         public void create(SQLiteDatabase db) {
@@ -431,57 +418,57 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public static void setSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh){
+        public static void setSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh) {
 
-            int isGroupDB,isMainDB;
+            int isGroupDB, isMainDB;
 
             if (isGroup)
-                isGroupDB=1;
+                isGroupDB = 1;
             else
-                isGroupDB=0;
+                isGroupDB = 0;
 
-            if(isMain)
-                isMainDB=1;
+            if (isMain)
+                isMainDB = 1;
             else
-                isMainDB=0;
+                isMainDB = 0;
 
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
             ContentValues scheduleRow = new ContentValues();
             scheduleRow.put(COL_ID_SCHEDULE, groupid);
-            scheduleRow.put(COL_NAME_SCHEDULE, getUserGroup(groupid,context));
+            scheduleRow.put(COL_NAME_SCHEDULE, getUserGroup(groupid, context));
             scheduleRow.put(COL_IS_GROUP, isGroupDB);
             scheduleRow.put(COL_IS_MAIN, isMainDB);
-            scheduleRow.put(COL_LAST_REFRESH_DATE,lastRefresh);
+            scheduleRow.put(COL_LAST_REFRESH_DATE, lastRefresh);
             db.insert(TABLE_NAME, null, scheduleRow);
 
         }
 
-        public static void deleteSchedule(Context context, int id){
+        public static void deleteSchedule(Context context, int id) {
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
             delete_byID(db, TABLE_NAME, COL_ID_SCHEDULE, id);
         }
 
-        public GroupsModel getMainGroupModel(Context context) {
+        public static GroupsModel getMainGroupModel(Context context) {
 
-            GroupsModel groupsModelMain=null;
+            GroupsModel groupsModelMain = null;
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME +" WHERE is_main=1", null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE is_main=1", null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
 
                     boolean isGroup;
 
-                    if(cursor.getInt(cursor.getColumnIndex(COL_IS_GROUP))==1)
+                    if (cursor.getInt(cursor.getColumnIndex(COL_IS_GROUP)) == 1)
                         isGroup = true;
                     else
                         isGroup = false;
@@ -513,13 +500,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT * FROM "+TABLE_NAME+" WHERE is_main=0", null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE is_main=0", null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
 
                     boolean isGroup;
-                    if(cursor.getInt(cursor.getColumnIndex(COL_IS_GROUP))==1)
+                    if (cursor.getInt(cursor.getColumnIndex(COL_IS_GROUP)) == 1)
                         isGroup = true;
                     else
                         isGroup = false;
@@ -534,8 +521,8 @@ public class DBHelper extends SQLiteOpenHelper {
                     cursor.moveToNext();
                 }
 
-            } catch( SQLiteException e) {
-                Log.e("SQLITE DB EXCEPTION",e.toString(), e);
+            } catch (SQLiteException e) {
+                Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
 
             return groupsModelArrayList;
@@ -545,8 +532,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-
-    private static ArrayList getList(Context context,String table,String selection,String findColumn,int valueColumn) {
+    private static ArrayList getList(Context context, String table, String selection, String findColumn, int valueColumn) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
@@ -554,27 +540,27 @@ public class DBHelper extends SQLiteOpenHelper {
         ArrayList list = new ArrayList();
         Cursor cursor;
         try {
-            cursor = db.rawQuery("SELECT " + selection + " FROM "+table + " WHERE "+ findColumn +" = " +valueColumn+" ORDER BY "+selection , null);
+            cursor = db.rawQuery("SELECT " + selection + " FROM " + table + " WHERE " + findColumn + " = " + valueColumn + " ORDER BY " + selection, null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
 
-              //  list.add(cursor.getString(cursor.getColumnIndex(selection)));
+                //  list.add(cursor.getString(cursor.getColumnIndex(selection)));
                 list.add(cursor.getString(cursor.getColumnIndex(selection)))
-                       ;
+                ;
                 cursor.moveToNext();
 
             }
 
-        } catch( SQLiteException e) {
-            Log.e("SQLITE EXCEPTION",e.toString(), e);
+        } catch (SQLiteException e) {
+            Log.e("SQLITE EXCEPTION", e.toString(), e);
         }
 
 
         return list;
     }
 
-    private static ArrayList getList(Context context,String table,String selection) {
+    private static ArrayList getList(Context context, String table, String selection) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
@@ -582,7 +568,7 @@ public class DBHelper extends SQLiteOpenHelper {
         ArrayList list = new ArrayList();
         Cursor cursor;
         try {
-            cursor = db.rawQuery("SELECT " + selection + " FROM "+table+" ORDER BY "+selection, null);
+            cursor = db.rawQuery("SELECT " + selection + " FROM " + table + " ORDER BY " + selection, null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
@@ -591,21 +577,18 @@ public class DBHelper extends SQLiteOpenHelper {
                 cursor.moveToNext();
             }
 
-        } catch( SQLiteException e) {
-            Log.e("SQLITE DB EXCEPTION",e.toString(), e);
+        } catch (SQLiteException e) {
+            Log.e("SQLITE DB EXCEPTION", e.toString(), e);
         }
 
         return list;
     }
 
 
-
-
-
-    public static boolean isInitializationInfoThere(Context context){
+    public static boolean isInitializationInfoThere(Context context) {
 
         SQLiteDatabase db;
-        ArrayList tables = getAllDBTables(context) ;
+        ArrayList tables = getAllDBTables(context);
         DBHelper dbHelper = new DBHelper(context);
         db = dbHelper.getWritableDatabase();
 
@@ -613,7 +596,7 @@ public class DBHelper extends SQLiteOpenHelper {
         boolean hasTables = false;
 
 
-        for (int i = 0 ;i<tables.size();i++) {
+        for (int i = 0; i < tables.size(); i++) {
 
             Cursor cursor = db.rawQuery("SELECT * FROM " + tables.get(i), null);
 
@@ -628,19 +611,20 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public static boolean isTableExists(String table,Context context){
-        boolean isExists=false;
+    public static boolean isTableExists(String table, Context context) {
+        boolean isExists = false;
         ArrayList tablesList = getAllDBTables(context);
-        for(int i = 0;i<tablesList.size();i++){
-            if(table.equals(tablesList.get(i))){
+        for (int i = 0; i < tablesList.size(); i++) {
+            if (table.equals(tablesList.get(i))) {
                 isExists = true;
-                break;}
+                break;
+            }
         }
         return isExists;
     }
 
 
-    public static ArrayList getAllDBTables(Context context){
+    public static ArrayList getAllDBTables(Context context) {
         SQLiteDatabase db;
         ArrayList tables = new ArrayList();
         DBHelper dbHelper = new DBHelper(context);
@@ -648,9 +632,9 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
         c.moveToFirst();
         if (c.moveToNext()) {
-            while ( !c.isAfterLast() ) {
+            while (!c.isAfterLast()) {
                 String table = c.getString(c.getColumnIndex("name"));
-                if(!table.equals("android_metadata"))
+                if (!table.equals("android_metadata"))
                     tables.add(c.getString(c.getColumnIndex("name")));
                 c.moveToNext();
             }
@@ -658,64 +642,61 @@ public class DBHelper extends SQLiteOpenHelper {
         return tables;
     }
 
-    public static int getIdFromString(Context context,String tableName,String selection,String columnName,String valueColumn){
+    public static int getIdFromString(Context context, String tableName, String selection, String columnName, String valueColumn) {
 
-        int id=0;
+        int id = 0;
         DBHelper dbHelper = getInstance(context);
         SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
 
         try {
-            String selectQuery = "SELECT "+selection+" FROM "+tableName+" WHERE "+columnName+"=?";
-            Cursor c = sqLiteDatabase.rawQuery(selectQuery, new String[] { valueColumn });
+            String selectQuery = "SELECT " + selection + " FROM " + tableName + " WHERE " + columnName + "=?";
+            Cursor c = sqLiteDatabase.rawQuery(selectQuery, new String[]{valueColumn});
             if (c.moveToFirst()) {
                 id = c.getInt(c.getColumnIndex(selection));
             }
             c.close();
-        } catch( SQLiteException e) {
-            Log.e("DB EXCEPTION",e.toString(), e);
+        } catch (SQLiteException e) {
+            Log.e("DB EXCEPTION", e.toString(), e);
         }
 
         return id;
     }
 
-    public static void removeAllFromDatabase(Context context)
-    {
+    public static void removeAllFromDatabase(Context context) {
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TeachersHelper.TABLE_NAME, null, null);
-        db.delete(GroupsHelper.TABLE_NAME,null,null);
-        db.delete(DepartmentsHelper.TABLE_NAME,null,null);
+        db.delete(GroupsHelper.TABLE_NAME, null, null);
+        db.delete(DepartmentsHelper.TABLE_NAME, null, null);
         db.delete(FacultiesHelper.TABLE_NAME, null, null);
-        db.delete(UniversityInfoHelper.TABLE_NAME,null,null);
-        db.delete(PairsHelper.TABLE_NAME,null,null);
-        db.delete(SemestersHelper.TABLE_NAME,null,null);
+        db.delete(UniversityInfoHelper.TABLE_NAME, null, null);
+        db.delete(PairsHelper.TABLE_NAME, null, null);
+        db.delete(SemestersHelper.TABLE_NAME, null, null);
     }
 
 
-    public static void delete_byID(SQLiteDatabase db,String table,String select,int id){
+    public static void delete_byID(SQLiteDatabase db, String table, String select, int id) {
         db.delete(table, select + "=" + id, null);
     }
 
-    public static ArrayList sortList(ArrayList arrayList){
+    public static ArrayList sortList(ArrayList arrayList) {
         Collections.sort(arrayList);
         return arrayList;
     }
 
-    public static String getUserGroup(int id,Context context){
-        String groupName= "Group";
+    public static String getUserGroup(int id, Context context) {
+        String groupName = "Group";
 
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
-        String find = "SELECT * FROM  "+ DBHelper.GroupsHelper.TABLE_NAME + " WHERE "+ DBHelper.GroupsHelper.COL_ID_GROUP +" = " +id ;
-        Cursor cursor = sqLiteDatabase.rawQuery(find,null);
+        String find = "SELECT * FROM  " + DBHelper.GroupsHelper.TABLE_NAME + " WHERE " + DBHelper.GroupsHelper.COL_ID_GROUP + " = " + id;
+        Cursor cursor = sqLiteDatabase.rawQuery(find, null);
 
         cursor.moveToFirst();
 
         while (!cursor.isAfterLast()) {
-
-            groupName=cursor.getString(cursor.getColumnIndex(DBHelper.GroupsHelper.COL_GROUP_NAME));
+            groupName = cursor.getString(cursor.getColumnIndex(DBHelper.GroupsHelper.COL_GROUP_NAME));
             cursor.moveToNext();
-
         }
         cursor.close();
         return groupName;

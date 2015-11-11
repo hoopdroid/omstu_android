@@ -10,7 +10,6 @@ import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +80,6 @@ public class AuthorizationFragment extends Fragment {
         String[] autorization = {inputEmail.getText().toString(), inputPassword.getText().toString()};
         AuthorizationTask at = new AuthorizationTask(getActivity().getApplicationContext());
         at.execute(autorization);
-        Log.d("11", "0");
         try {
             if (at.get(7, TimeUnit.SECONDS) == true) {
                 Intent i = new Intent(getActivity(), MainActivity.class);

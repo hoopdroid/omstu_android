@@ -1,10 +1,12 @@
 package savindev.myuniversity.schedule;
 
 import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -26,8 +28,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +39,7 @@ import java.util.concurrent.TimeoutException;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
 import savindev.myuniversity.settings.GroupsActivity;
@@ -47,14 +51,15 @@ public class DailyScheduleFragment extends DialogFragment
      * Класс, отображающий расписание на определенный срок в виде списка предметов с параметрами
      */
     private ScheduleAdapter adapter;
-    private String[] data;
+    private ArrayList<GroupsModel> usedList;
     private GregorianCalendar calendar;
     private LoadMoreTask lmt;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView scheduleList;
     private GetInitializationInfoTask giit;
-    private boolean isGroup;
-    private int currentID;
+    private boolean isGroup = true;
+    private int currentID = 0;
+    private GroupsModel main;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,14 +68,25 @@ public class DailyScheduleFragment extends DialogFragment
         adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
         View view = null;
         calendar = new GregorianCalendar();
+        SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
+        main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
 
+        if (userInfo.contains("openGroup")) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
+            currentID = userInfo.getInt("openGroup", 0);
+            isGroup = userInfo.getBoolean("openIsGroup", true);
+        } else if (main != null) { //Проверка на наличие главной группы авторизованного
+            currentID = main.getId();
+            isGroup = main.isGroup();
+        } else {
+            if (usedList != null) { //Проверка на наличие хоть какой-нибудь группы
+                currentID = usedList.get(0).getId();
+                isGroup = usedList.get(0).isGroup();
+            }
+        }
 
-        if (false) //Если данные существуют:
-        //TODO при появлении расписания в базе сделать нормальную проверку. Сначала проверять на наличие расписания для основной группы при авторизации. Если нет - для любой
+        if (currentID != 0 ) //Если данные существуют:
         {
-//            isGroup;
-//            currentID;
-
             view = inflater.inflate(R.layout.fragment_daily_schedule, null);
             scheduleList = (ListView) view.findViewById(R.id.schedule);
             scheduleList.setAdapter(adapter);
@@ -99,12 +115,20 @@ public class DailyScheduleFragment extends DialogFragment
 
     @Override
     public void onRefresh() {
-        GetScheduleTask gst = null;
         // начинаем показывать прогресс
-        mSwipeRefreshLayout.setRefreshing(true);
-        gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
-        //TODO адекватно заполнить эту штуку
-        GroupsModel currentSchedule = new GroupsModel(null, 1, true, "20000101000000");
+        GetScheduleTask gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
+        GroupsModel currentSchedule = null;
+        if (main.getId() == currentID && main.isGroup() == isGroup) { //Проверка на совпадение с главной группкой
+            currentSchedule = main;
+        } else {
+            br:
+            for (GroupsModel model : usedList) {
+                if (model.getId() == currentID && model.isGroup() == isGroup) {
+                    currentSchedule = model;
+                    break br;
+                }
+            }
+        }
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -127,9 +151,7 @@ public class DailyScheduleFragment extends DialogFragment
                 startActivity(intent);
                 break;
             case R.id.set_id:
-                // переход к окну настройки
-                //TODO проверить наличие записей по IitializationInfo в БД, если нет - попытаться загрузить
-                if (false) {
+                if (!DBHelper.isInitializationInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
                         giit = new GetInitializationInfoTask(getActivity(), null);
                         giit.execute();
@@ -145,7 +167,8 @@ public class DailyScheduleFragment extends DialogFragment
                         Toast.makeText(getActivity(), "Не удалось получить списки" + '\n'
                                 + "Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
                     }
-                } else {
+                }
+                if (!DBHelper.isInitializationInfoThere(getActivity())) {
                     intent = new Intent(getActivity(), GroupsActivity.class);
                     startActivity(intent);
                 }
@@ -161,19 +184,24 @@ public class DailyScheduleFragment extends DialogFragment
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.daily_schedule, menu);
-        String group = null;
-        //TODO получить список используемых расписаний
+        String group = "Группа";
 
+        usedList.add(DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()));
         //Если имеются используемые расписания
-        if (false) {
-            Set<String> list = null; //Список используемых расписаний
-            data = list.toArray(new String[list.size()]);
-            Arrays.sort(data); //Получение списка групп для вывода и сортировка
-
-            SubMenu subMenuGroup = menu.addSubMenu(Menu.NONE, 100, 10, group);
+        if (usedList != null && !usedList.isEmpty() || main != null) {
+            usedList.remove(null);
+            Collections.sort(usedList, new Comparator<GroupsModel>() { //Отсортировать список по имени
+                @Override
+                public int compare(GroupsModel lhs, GroupsModel rhs) {
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+            usedList.add(0, main); //И добавить первым элементом главную запись
+            usedList.remove(null);
+            SubMenu subMenuGroup = menu.addSubMenu(Menu.NONE, 100, 10, (main == null ? "Группа" : main.getName()));
             subMenuGroup.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-            for (int i = 0; i < list.size(); i++) {
-                subMenuGroup.add(Menu.NONE, 101 + i, Menu.NONE, data[i]);
+            for (int i = 0; i < usedList.size(); i++) {
+                subMenuGroup.add(Menu.NONE, 101 + i, Menu.NONE, usedList.get(i).getName());
             }
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -188,10 +216,11 @@ public class DailyScheduleFragment extends DialogFragment
                 break; //Для вывода бокового меню
             default:
                 //Отобразить новую выбранную группу
-//                Editor ed = sPref.edit();
-//                ed.putString("set", data[item.getItemId() - 101]).apply();
-//                FragmentTransaction ft = getFragmentManager().beginTransaction();
-//                ft.replace(R.id.container, new DailyScheduleFragment()).commit();
+                SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE); //Записать новую выбранную группу в файл для его открытия
+                settings.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()); //Запись по id. потом по нему открывать расписание
+                settings.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.container, new DailyScheduleFragment()).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);

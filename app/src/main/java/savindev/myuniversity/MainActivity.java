@@ -13,7 +13,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -46,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        ArrayList<GroupsModel> list = DBHelper.UsedSchedulesHelper.getGroupsModelList(getApplicationContext());
 
         if(settings.getBoolean("isFirstStart",true)) {
 
@@ -53,9 +53,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
 
-        }
-
-        else {
+        } else {
 
             setContentView(R.layout.activity_main);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -204,5 +202,13 @@ public class MainActivity extends AppCompatActivity {
         }
         cursor.close();
         return groupName;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE); //Удалить активную группу
+        settings.edit().remove("openGroup");
+        settings.edit().remove("openIsGroup");
     }
 }

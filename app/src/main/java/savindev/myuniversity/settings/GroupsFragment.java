@@ -138,7 +138,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 for (GroupsModel model : addList) {
                     model.setLastRefresh("20000101000000"); //Установка даты последнего обновления - нет обновлений
                 }
-                gst.execute((GroupsModel[]) addList.toArray()); //Выполняем запрос на получение нужных расписаний
+                gst.execute(addList.toArray(new GroupsModel[addList.size()])); //Выполняем запрос на получение нужных расписаний
                 try {  //TODO сделать красивое отображение загрузки
                     if (gst.get() == -1) {
                         refreshItem.setVisible(false);
