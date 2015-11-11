@@ -34,7 +34,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     private Context context;
     static final private int TIMEOUT_MILLISEC = 5000;
     private int errorCode = 0;
-    private String[] params;
+    private String login;
     String passwordHash;
 
     public AuthorizationTask(Context context) {
@@ -50,13 +50,12 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     @Override
     protected Boolean doInBackground(String... params) {
         //Возвращать false при провале авторизации
-        this.params = params;
+        login = params[0];
 
 
         //Первый запрос
         String uri = context.getResources().getString(R.string.uri) + "getSalt?universityAcronym=" +
-                context.getResources().getString(R.string.university) + "&login=" +
-                params[0]; //Строка запроса на получение соли по логину. params[0] - логин
+                context.getResources().getString(R.string.university) + "&login=" + login; //Строка запроса на получение соли по логину
         String result = query(uri);
         if (result == null) {
             return false;
@@ -180,7 +179,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 editor.putString("UserFirstName", content.getString("USER_FIRSTNAME"));
                 editor.putString("UserMiddleName", content.getString("USER_MIDDLENAME"));
                 editor.putInt("UserGroup", groupId);
-                editor.putString("email", params[0]);
+                editor.putString("email", login);
                 editor.putString("password", passwordHash);
                 editor.putInt("UserId", content.getInt("ID_USER"));
                 editor.apply();
