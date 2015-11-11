@@ -81,7 +81,6 @@ public class NewsFragment extends Fragment {
         @Override
         public void onReceivedError(WebView view, int errorCode,
                                     String description, String failingUrl) {
-            // TODO Auto-generated method stub
             view.loadUrl("file:///android_asset/noconnection.html");
         }
 

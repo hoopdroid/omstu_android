@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -61,20 +60,10 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
+            urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
-
-
-            urlConnection.setRequestMethod("POST");
-            urlConnection.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
-            wr.writeBytes(json.toString());
-            wr.flush();
-            wr.close();
-            int responseCode = urlConnection.getResponseCode();
-            Log.d("11", Integer.toString(responseCode));
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
             String line;
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);

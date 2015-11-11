@@ -1,6 +1,7 @@
 package savindev.myuniversity.schedule;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,10 +29,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -40,6 +41,7 @@ import java.util.concurrent.TimeoutException;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
 import savindev.myuniversity.settings.GroupsActivity;
@@ -57,8 +59,10 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     GregorianCalendar calendar;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private GetInitializationInfoTask giit;
-    private boolean isGroup;
-    private int currentID;
+    private ArrayList<GroupsModel> usedList;
+    private boolean isGroup = true;
+    private int currentID = 0;
+    private GroupsModel main;
     LinearLayout filtersLayout, detailsLayout;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,12 +74,25 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
         setRetainInstance(true);
         filtersLayout = (LinearLayout) view.findViewById(R.id.filtersLayout);
         detailsLayout = (LinearLayout) view.findViewById(R.id.detailll);
+        SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
+        main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
 
-        if (false) //Если данные существуют:
-        //TODO при появлении расписания в базе сделать нормальную проверку. Сначала проверять на наличие расписания для основной группы при авторизации. Если нет - для любой
+        if (userInfo.contains("openGroup")) {
+            currentID = userInfo.getInt("openGroup", 0);
+            isGroup = userInfo.getBoolean("openIsGroup", true);
+        } else if (main != null) {
+            currentID = main.getId();
+            isGroup = main.isGroup();
+        } else {
+            if (usedList != null) {
+                currentID = usedList.get(0).getId();
+                isGroup = usedList.get(0).isGroup();
+            }
+        }
+
+        if (currentID != 0) //Если данные существуют:
         {
-//            isGroup;
-//            currentID;
 
             //заполнение основной сетки ифнормацией в соответствии с настройками
             grid = (GridView) view.findViewById(R.id.calendarSchedule);
@@ -106,8 +123,18 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     public void onRefresh() {
         // начинаем показывать прогресс
         GetScheduleTask gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
-        //TODO адекватно заполнить эту штуку
-        GroupsModel currentSchedule = new GroupsModel(null, 1, true, "20000101000000");
+        GroupsModel currentSchedule = null;
+        if (main.getId() == currentID && main.isGroup() == isGroup) { //Проверка на совпадение с главной группкой
+            currentSchedule = main;
+        } else {
+            br:
+            for (GroupsModel model : usedList) {
+                if (model.getId() == currentID && model.isGroup() == isGroup) {
+                    currentSchedule = model;
+                    break br;
+                }
+            }
+        }
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -129,8 +156,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 break;
             case R.id.set_id:
                 // переход к окну настройки
-                //TODO проверить наличие записей по IitializationInfo в БД, если нет - попытаться загрузить
-                if (false) {
+                if (!DBHelper.isInitializationInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
                         giit = new GetInitializationInfoTask(getActivity(), null);
                         giit.execute();
@@ -146,7 +172,8 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                         Toast.makeText(getActivity(), "Не удалось получить списки" + '\n'
                                 + "Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
                     }
-                } else {
+                }
+                if (!DBHelper.isInitializationInfoThere(getActivity())) {
                     intent = new Intent(getActivity(), GroupsActivity.class);
                     startActivity(intent);
                 }
@@ -160,22 +187,28 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
         }
     }
 
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.daily_schedule, menu);
-        String group = null;
-        //TODO получить список используемых расписаний
+        String group = "Группа";
+
+        usedList.add(DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()));
+        GroupsModel main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка
 
         //Если имеются используемые расписания
-        if (false) {
-            Set<String> list = null; //Список используемых расписаний
-            data = list.toArray(new String[list.size()]);
-            Arrays.sort(data); //Получение списка групп для вывода и сортировка
-
-            SubMenu subMenuGroup = menu.addSubMenu(Menu.NONE, 100, 10, group);
+        if (usedList != null && !usedList.isEmpty() || main != null) {
+            usedList.remove(null);
+            Collections.sort(usedList, new Comparator<GroupsModel>() { //Отсортировать список по имени
+                @Override
+                public int compare(GroupsModel lhs, GroupsModel rhs) {
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+            usedList.add(0, main); //И добавить первым элементом главную запись
+            usedList.remove(null);
+            SubMenu subMenuGroup = menu.addSubMenu(Menu.NONE, 100, 10, (main == null ? "Группа" : main.getName()));
             subMenuGroup.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-            for (int i = 0; i < list.size(); i++) {
-                subMenuGroup.add(Menu.NONE, 101 + i, Menu.NONE, data[i]);
+            for (int i = 0; i < usedList.size(); i++) {
+                subMenuGroup.add(Menu.NONE, 101 + i, Menu.NONE, usedList.get(i).getName());
             }
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -184,33 +217,17 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.cs_filters:
-                if (filtersLayout.getVisibility() == View.GONE) {
-                    filtersLayout.setVisibility(View.VISIBLE);
-                    getActivity().getSharedPreferences("omgupsSettings", Context.MODE_PRIVATE).edit().putBoolean("filter_visible", false).apply();
-                } else {
-                    filtersLayout.setVisibility(View.GONE);
-                    getActivity().getSharedPreferences("omgupsSettings", Context.MODE_PRIVATE).edit().putBoolean("filter_visible", true).apply();
-                }
-                break;
-            case R.id.cs_detail:
-                if (detailsLayout.getVisibility() == View.GONE) {
-                    detailsLayout.setVisibility(View.VISIBLE);
-                    getActivity().getSharedPreferences("omgupsSettings", Context.MODE_PRIVATE).edit().putBoolean("detail_visible", false).apply();
-                } else {
-                    detailsLayout.setVisibility(View.GONE);
-                    getActivity().getSharedPreferences("omgupsSettings", Context.MODE_PRIVATE).edit().putBoolean("detail_visible", true).apply();
-                }
-                break;
             case 100:
-                break;
+                break; //Для вывода подменю
             case 16908332:
                 break; //Для вывода бокового меню
             default:
-//                Editor ed = sPref.edit();
-//                ed.putString("set", data[item.getItemId() - 101]).apply();
-//                FragmentTransaction ft = getFragmentManager().beginTransaction();
-//                ft.replace(R.id.container, new CalendarScheduleFragment()).commit();
+                //Отобразить новую выбранную группу
+                SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE); //Записать новую выбранную группу в файл для его открытия
+                settings.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()); //Запись по id. потом по нему открывать расписание
+                settings.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.container, new DailyScheduleFragment()).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -295,7 +312,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 holder.day.setText(list.get(position).getN());
                 holder.day.setBackgroundColor(Color.WHITE);
             } else if (position % conumns == conumns - 1) { //если остаток conumns-1, то это число
-               // holder.day.setText(list.get(position).getDate());
+                // holder.day.setText(list.get(position).getDate());
                 holder.day.setBackgroundColor(Color.WHITE);
             } else { //в остальных случаях это пара, требуется заполнять
                 if (list.get(position) == null) { //если нуль, оставить ячейку пустой

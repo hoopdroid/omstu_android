@@ -15,7 +15,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
@@ -36,7 +35,7 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
 
         if(!DBHelper.isInitializationInfoThere(this)) {
-            GetInitializationInfoTask giit = new GetInitializationInfoTask(getApplicationContext(), null);
+            GetInitializationInfoTask giit = new GetInitializationInfoTask(getBaseContext(), null);
             giit.execute();
         }
 

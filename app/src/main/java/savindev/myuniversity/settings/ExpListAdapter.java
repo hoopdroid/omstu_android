@@ -3,6 +3,7 @@ package savindev.myuniversity.settings;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,8 +32,8 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
     private final Object mLock = new Object();
     private ArrayList<ArrayList<GroupsModel>> mOriginalValues;
     private ArrayList<String> mOriginalNames;
-    private ArrayList<GroupsModel> deleteList;
-    private ArrayList<GroupsModel> addList;
+    private ArrayList<GroupsModel> deleteList = new ArrayList<GroupsModel>();
+    private ArrayList<GroupsModel> addList = new ArrayList<GroupsModel>();
 
 
     public ExpListAdapter(Context context, ArrayList<String> names,
@@ -41,11 +42,21 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         mNames = names;
         mGroup = groups;
 
-        ArrayList<GroupsModel> oldList = DBHelper.UsedSchedulesHelper.getGroupsModelList(context); //Список старых групп
+        //Для выделения элементов, сохранных в расписании ранее
+        ArrayList<GroupsModel> oldListModel = DBHelper.UsedSchedulesHelper.getGroupsModelList(context); //Список старых групп
+        ArrayList<Integer> oldlistId = new ArrayList<>(); //Два листа для уникальности: требуется сравнить все поля по и id idGroup
+        ArrayList<Boolean> oldlist = new ArrayList<>();
+        for (GroupsModel model : oldListModel) {
+            oldlistId.add(model.getId());
+            oldlist.add(model.isGroup());
+        }
         for (int i = 0; i < mNames.size(); i++)
             for (int j = 0; j < mGroup.get(i).size(); j++) {
-                if (oldList.contains(mGroup.get(i).get(j))) {
-                    mGroup.get(i).get(j).setSelected(true);
+                for (int k = 0; k < oldListModel.size(); k++) {
+                    if (oldlistId.get(k) == mGroup.get(i).get(j).getId() && //Если есть совпадение - проверить по признаку isGroup
+                            oldlist.get(k) == mGroup.get(i).get(j).isGroup()) {
+                        mGroup.get(i).get(j).setSelected(true);
+                    }
                 }
             }
     }
@@ -118,38 +129,33 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
     @Override
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
-        View view = convertView;
-        final ViewHolder holder;
-        if (view == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.child_view, null);
-            GroupsModel g = mGroup.get(groupPosition).get(childPosition);
-            if (mGroup.get(groupPosition).get(childPosition).isSelected()) {
-                view.setBackgroundColor(Color.GREEN);
-            }
-            holder = new ViewHolder();
-            holder.textView = (TextView) view.findViewById(R.id.textChild);
-
-            view.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {
-                        if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {
-                            view.setBackgroundColor(Color.GREEN);
-                            mGroup.get(groupPosition).get(childPosition).setSelected(true);
-                            deleteGroup(mGroup.get(groupPosition).get(childPosition));
-                        } else {
-                            view.setBackgroundColor(Color.WHITE);
-                            mGroup.get(groupPosition).get(childPosition).setSelected(false);
-                            addGroup(mGroup.get(groupPosition).get(childPosition));
-                        }
-                    }
-                }
-            });
-            view.setTag(holder);
-        } else {
-             holder = (ViewHolder) view.getTag();
+        View view = null;
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view = inflater.inflate(R.layout.child_view, null);
+        GroupsModel g = mGroup.get(groupPosition).get(childPosition);
+        if (mGroup.get(groupPosition).get(childPosition).isSelected()) {
+            view.setBackgroundColor(Color.GREEN);
         }
+        final ViewHolder holder = new ViewHolder();
+        holder.textView = (TextView) view.findViewById(R.id.textChild);
+
+        view.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {
+                    view.setBackgroundColor(Color.GREEN);
+                    mGroup.get(groupPosition).get(childPosition).setSelected(true);
+                    addGroup(mGroup.get(groupPosition).get(childPosition));
+                    Log.d("11", "add " + mGroup.get(groupPosition).get(childPosition).getName());
+                } else {
+                    view.setBackgroundColor(Color.WHITE);
+                    mGroup.get(groupPosition).get(childPosition).setSelected(false);
+                    deleteGroup(mGroup.get(groupPosition).get(childPosition));
+                    Log.d("11", "add " + mGroup.get(groupPosition).get(childPosition).getName());
+                }
+            }
+        });
+        view.setTag(holder);
         holder.textView.setText(mGroup.get(groupPosition).get(childPosition).getName());
         return view;
     }
