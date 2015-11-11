@@ -83,8 +83,8 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
 
     public void ResizeIcon() {
         ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(icon,
-                PropertyValuesHolder.ofFloat("scaleX", 0.5f),
-                PropertyValuesHolder.ofFloat("scaleY", 0.5f));
+                PropertyValuesHolder.ofFloat("scaleX", 0.8f),
+                PropertyValuesHolder.ofFloat("scaleY", 0.8f));
         scaleDown.setDuration(500);
         scaleDown.start();
     }
