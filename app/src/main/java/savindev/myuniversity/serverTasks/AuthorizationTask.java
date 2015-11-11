@@ -184,6 +184,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 editor.putInt("UserId", content.getInt("ID_USER"));
                 editor.apply();
                 DBHelper dbHelper = DBHelper.getInstance(context);
+
                 dbHelper.getUsedSchedulesHelper().setSchedule(context, groupId, true, true, "20000101000000"); //запись нового основного в таблицу
 
                 ArrayList<GroupsModel> models = dbHelper.getUsedSchedulesHelper().getGroupsModelList(context); //Получить список id не-основных активных расписаний
@@ -199,6 +200,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                     GetScheduleTask gst = new GetScheduleTask(context, null);
                     gst.execute(dbHelper.getUsedSchedulesHelper().getMainGroupModel(context));
                 }
+
 
                 return true;
             case "ERROR":   //Неопознанная ошибка

@@ -13,6 +13,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,6 +26,8 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import java.util.ArrayList;
 
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
@@ -61,15 +64,7 @@ public class MainActivity extends AppCompatActivity {
             getUserSettings();
             initDrawer();
 
-          //  DBHelper dbHelper = DBHelper.getInstance(this);
-
-           // dbHelper.getUsedSchedulesHelper().setSchedule(this, 140, true, false, "111111111");
-
-          // GroupsModel maingroup =  dbHelper.getUsedSchedulesHelper().getMainGroupModel(this);
-
-           //ArrayList<GroupsModel> notmaingroup =  dbHelper.getUsedSchedulesHelper().getGroupsModelList(this);
-
-             }
+        }
 
 
 
