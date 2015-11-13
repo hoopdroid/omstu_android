@@ -69,7 +69,7 @@ public class SettingsFragment extends Fragment{
 						if (MainActivity.isNetworkConnected(getActivity())) {
 							refreshItem.setActionView(R.layout.actionbar_progress);
 							refreshItem.setVisible(true);
-							GetInitializationInfoTask giit = new GetInitializationInfoTask(getActivity(), null);
+							GetInitializationInfoTask giit = new GetInitializationInfoTask(getActivity().getBaseContext(), null);
 							giit.execute();
 							try {
 								if (giit.get(7, TimeUnit.SECONDS)) {

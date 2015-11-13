@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
        username = settings.getString("UserFirstName","")+  " " +settings.getString("UserLastName","")+" "+getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
 
-       email = settings.getString("Email","no email");
+       email = settings.getString("email","no email");
     }
 
     void initDrawer(){
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+// [CR] Нельзя так делать. ты работаешь с базой данных вне класса базы данных. утащи это дело в DBHelper
     public static String getUserGroup(int id,Context context){
         String groupName= "";
 

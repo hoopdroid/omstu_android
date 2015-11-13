@@ -124,6 +124,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
     }
 
     private void parsetoSqlite(Schedule init){
+        // [CR] вызовешь тут что-то кроме геттеров-сеттеров - покусаю
         //TODO Parse Schedule to SQlite
     }
 

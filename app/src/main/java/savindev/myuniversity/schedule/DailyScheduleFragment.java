@@ -116,7 +116,7 @@ public class DailyScheduleFragment extends DialogFragment
     @Override
     public void onRefresh() {
         // начинаем показывать прогресс
-        GetScheduleTask gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
+        GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
         GroupsModel currentSchedule = null;
         if (main.getId() == currentID && main.isGroup() == isGroup) { //Проверка на совпадение с главной группкой
             currentSchedule = main;
@@ -153,7 +153,7 @@ public class DailyScheduleFragment extends DialogFragment
             case R.id.set_id:
                 if (!DBHelper.isInitializationInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
-                        giit = new GetInitializationInfoTask(getActivity(), null);
+                        giit = new GetInitializationInfoTask(getActivity().getBaseContext(), null);
                         giit.execute();
                         try {
                             if (giit.get(7, TimeUnit.SECONDS)) {
