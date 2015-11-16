@@ -123,13 +123,23 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         return false;
     }
 
-    private void parsetoSqlite(Schedule init){
+    private void parsetoSqlite(Schedule init) {
+        // [CR] вызовешь тут что-то кроме геттеров-сеттеров - покусаю
         //TODO Parse Schedule to SQlite
     }
 
     private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний
         for (GroupsModel model : params) {
-            DBHelper.UsedSchedulesHelper.setSchedule(context, model.getId(), model.isGroup(), false, lastResresh);
+            if (DBHelper.UsedSchedulesHelper.getGroupsModelList(context).contains(model)) {
+                //Если уже имеется - обновить дату
+                //TODO обновить дату при появлении метода в БД
+            } else if (DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) {
+                //Если уже имеется - обновить дату
+                //TODO обновить дату при появлении метода в БД
+            } else {
+                //Не имеется, добавить
+                DBHelper.UsedSchedulesHelper.setSchedule(context, model.getId(), model.isGroup(), false, lastResresh);
+            }
         }
     }
 }

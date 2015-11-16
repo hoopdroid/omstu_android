@@ -64,7 +64,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        GetInitializationInfoTask giit = new GetInitializationInfoTask(getActivity(), mSwipeRefreshLayout);
+        GetInitializationInfoTask giit = new GetInitializationInfoTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
         giit.execute(); //Выполняем запрос на получение нужных расписаний
     }
 
@@ -105,7 +105,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 
     private void parse() {
-        DBHelper dbHelper = DBHelper.getInstance(getActivity());
+        DBHelper dbHelper = DBHelper.getInstance(getActivity().getBaseContext());
         ArrayList<String> faculty = dbHelper.getFacultiesHelper().getFaculties(getActivity());
         ArrayList<String> departments = dbHelper.getDepartmentsHelper().getDepartments(getActivity());
         ArrayList<String> parents = new ArrayList<String>(); //Список родителей, состоит из факультетов и кафедр
@@ -131,7 +131,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         if (!addList.isEmpty()) {
             //Запрос к базе
-            GetScheduleTask gst = new GetScheduleTask(getActivity(), null);
+            GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), null);
             if (MainActivity.isNetworkConnected(getActivity())) {
                 refreshItem.setActionView(R.layout.actionbar_progress); //Показать загрузку данных
                 refreshItem.setVisible(true);
@@ -165,16 +165,16 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         if (!deleteList.isEmpty()) { //Если есть группы для удаления - удалить
             for (GroupsModel model : deleteList) {
-                DBHelper.UsedSchedulesHelper.deleteSchedule(getActivity(), model.getId());
+                DBHelper.UsedSchedulesHelper.deleteSchedule(getActivity().getBaseContext(), model.getId());
             }
             //TODO удалять расписания из БД
         }
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDetach() {
         getActivity().unregisterReceiver(broadcastReceiver);
+        super.onDetach();
     }
 }
 

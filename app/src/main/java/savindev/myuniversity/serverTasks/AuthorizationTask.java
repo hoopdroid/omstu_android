@@ -17,6 +17,8 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;

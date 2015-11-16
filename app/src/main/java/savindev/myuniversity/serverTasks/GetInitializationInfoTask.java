@@ -143,6 +143,8 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     void parsetoSqlite(Initialization init) {
 
+        // [CR] убери всю эту жуть в класс БД. Вне этого класса вызывать только геттеры-сеттеры
+
         SQLiteDatabase sqliteDatabase;
         DBHelper helper = new DBHelper(context);
         sqliteDatabase = helper.getWritableDatabase();

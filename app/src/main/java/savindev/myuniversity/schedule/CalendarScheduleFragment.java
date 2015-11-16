@@ -122,7 +122,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     @Override
     public void onRefresh() {
         // начинаем показывать прогресс
-        GetScheduleTask gst = new GetScheduleTask(getActivity(), mSwipeRefreshLayout);
+        GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
         GroupsModel currentSchedule = null;
         if (main.getId() == currentID && main.isGroup() == isGroup) { //Проверка на совпадение с главной группкой
             currentSchedule = main;
@@ -158,7 +158,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 // переход к окну настройки
                 if (!DBHelper.isInitializationInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
-                        giit = new GetInitializationInfoTask(getActivity(), null);
+                        giit = new GetInitializationInfoTask(getActivity().getBaseContext(), null);
                         giit.execute();
                         try {
                             if (giit.get(7, TimeUnit.SECONDS)) {
@@ -227,7 +227,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 settings.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()); //Запись по id. потом по нему открывать расписание
                 settings.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new DailyScheduleFragment()).commit();
+                ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -358,7 +358,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
             adapter.notifyDataSetChanged();
             int index = grid.getFirstVisiblePosition();
             int top = (grid.getChildAt(0) == null) ? 0 : grid.getChildAt(0).getTop();
-            grid.setSelectionFromTop(index, top);
+//            grid.setSelectionFromTop(index, top);
         }
     }
 

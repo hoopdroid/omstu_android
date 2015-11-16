@@ -19,6 +19,12 @@ import savindev.myuniversity.schedule.GroupsModel;
 // Проверять по имени таблице в базе
 // Если невозможно - прописать в контракте методов об ошибке, буду отлавливать у себя
 
+
+// [CR] сделай статичными все классы-методы, где возможно
+// [CR] переведи геттеры на использование VIEW
+// [CR] не склеивай строки при формировании запросов. Используй bind-переменные
+// [CR] и засунь сюда все, что работает с базой данных. негоже им по всей программе расползаться
+
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "university.db";
@@ -105,7 +111,9 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-    public class UniversityInfoHelper {
+    public class UniversityInfoHelper { // [CR] либо класс сделать приватным, либо убрать геттеры для классов. правильнее - первое
+
+        // [CR] почему внутренние переменные публичные?
 
         public static final String TABLE_NAME = "UniversityInfo";
         public static final String COL_FULLNAME = "fullname";
@@ -139,7 +147,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public static class TeachersHelper {
+    public static class TeachersHelper { // [CR] и во всех это поправить
 
         public static final String TABLE_NAME = "Teachers";
         public static final String COL_ID_TEACHER = "id_teacher";

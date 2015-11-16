@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        ArrayList<GroupsModel> list = DBHelper.UsedSchedulesHelper.getGroupsModelList(getApplicationContext());
 
         if(settings.getBoolean("isFirstStart",true)) {
 
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
        username = settings.getString("UserFirstName","")+  " " +settings.getString("UserLastName","")+" "+getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
 
-       email = settings.getString("Email","no email");
+       email = settings.getString("email","no email");
     }
 
     void initDrawer(){
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+// [CR] Нельзя так делать. ты работаешь с базой данных вне класса базы данных. утащи это дело в DBHelper
     public static String getUserGroup(int id,Context context){
         String groupName= "";
 
@@ -208,7 +207,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE); //Удалить активную группу
-        settings.edit().remove("openGroup");
-        settings.edit().remove("openIsGroup");
+        settings.edit().remove("openGroup").apply();
+        settings.edit().remove("openIsGroup").apply();
+        settings.edit().remove("openGroupName").apply();
     }
 }
