@@ -227,7 +227,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 settings.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()); //Запись по id. потом по нему открывать расписание
                 settings.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new DailyScheduleFragment()).commit();
+                ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -358,7 +358,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
             adapter.notifyDataSetChanged();
             int index = grid.getFirstVisiblePosition();
             int top = (grid.getChildAt(0) == null) ? 0 : grid.getChildAt(0).getTop();
-            grid.setSelectionFromTop(index, top);
+//            grid.setSelectionFromTop(index, top);
         }
     }
 

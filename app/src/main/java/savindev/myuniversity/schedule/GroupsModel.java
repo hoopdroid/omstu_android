@@ -65,5 +65,28 @@ public class GroupsModel {
         this.selected = selected;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        GroupsModel that = (GroupsModel) o;
+
+        if (id != that.id) return false;
+        if (isGroup != that.isGroup) return false;
+        if (selected != that.selected) return false;
+        if (!name.equals(that.name)) return false;
+        return lastRefresh.equals(that.lastRefresh);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (isGroup ? 1 : 0);
+        result = 31 * result + name.hashCode();
+        result = 31 * result + lastRefresh.hashCode();
+        result = 31 * result + (selected ? 1 : 0);
+        return result;
+    }
 }

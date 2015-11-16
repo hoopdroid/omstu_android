@@ -172,9 +172,9 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDetach() {
         getActivity().unregisterReceiver(broadcastReceiver);
+        super.onDetach();
     }
 }
 

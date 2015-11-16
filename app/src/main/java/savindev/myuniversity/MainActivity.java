@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        ArrayList<GroupsModel> list = DBHelper.UsedSchedulesHelper.getGroupsModelList(getApplicationContext());
 
         if(settings.getBoolean("isFirstStart",true)) {
 
@@ -208,7 +207,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE); //Удалить активную группу
-        settings.edit().remove("openGroup");
-        settings.edit().remove("openIsGroup");
+        settings.edit().remove("openGroup").apply();
+        settings.edit().remove("openIsGroup").apply();
+        settings.edit().remove("openGroupName").apply();
     }
 }

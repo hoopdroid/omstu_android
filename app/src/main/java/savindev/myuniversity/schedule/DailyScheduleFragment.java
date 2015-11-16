@@ -7,9 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,21 +23,15 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -46,7 +45,7 @@ import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class DailyScheduleFragment extends DialogFragment
-        implements OnClickListener, OnScrollListener, SwipeRefreshLayout.OnRefreshListener {
+        implements OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     /**
      * Класс, отображающий расписание на определенный срок в виде списка предметов с параметрами
      */
@@ -55,44 +54,89 @@ public class DailyScheduleFragment extends DialogFragment
     private GregorianCalendar calendar;
     private LoadMoreTask lmt;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ListView scheduleList;
+    private RecyclerView scheduleList;
     private GetInitializationInfoTask giit;
     private boolean isGroup = true;
     private int currentID = 0;
+    private String currentGroup = "";
     private GroupsModel main;
+    private LinearLayoutManager llm;
+    private boolean loading = true;
+    private ArrayList<ScheduleModel> models;
+    private int i;
+
+
+    void inialize() {
+        models = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            for (int j = 0; j < 4; j++) {
+                ScheduleModel model = new ScheduleModel(0,0,0,0,0,0,Integer.toString(j),"1","2",Integer.toString(i),
+                        "a","b","c","d","e",false);
+                models.add(model);
+            }
+        }
+    }
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        setRetainInstance(true);
+        inialize();
+        i = 0;
+
         adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
         View view = null;
         calendar = new GregorianCalendar();
         SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
         main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
-
         if (userInfo.contains("openGroup")) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
             currentID = userInfo.getInt("openGroup", 0);
             isGroup = userInfo.getBoolean("openIsGroup", true);
+            currentGroup = userInfo.getString("openGroupName", "");
         } else if (main != null) { //Проверка на наличие главной группы авторизованного
             currentID = main.getId();
             isGroup = main.isGroup();
+            currentGroup = main.getName();
         } else {
-            if (usedList != null) { //Проверка на наличие хоть какой-нибудь группы
+            if (!usedList.isEmpty()) { //Проверка на наличие хоть какой-нибудь группы
                 currentID = usedList.get(0).getId();
                 isGroup = usedList.get(0).isGroup();
+                currentGroup = usedList.get(0).getName();
             }
         }
 
-        if (currentID != 0 ) //Если данные существуют:
+        if (currentID != 0) //Если данные существуют:
         {
             view = inflater.inflate(R.layout.fragment_daily_schedule, null);
-            scheduleList = (ListView) view.findViewById(R.id.schedule);
+            scheduleList = (RecyclerView) view.findViewById(R.id.schedule);
+            llm = new LinearLayoutManager(getActivity());
+            if (savedInstanceState != null) {
+                int a = savedInstanceState.getInt("currentPosition");
+                llm.scrollToPosition(savedInstanceState.getInt("currentPosition"));
+            }
+            scheduleList.setLayoutManager(llm);
             scheduleList.setAdapter(adapter);
-            lmt = new LoadMoreTask(isGroup, currentID);
+            lmt = new LoadMoreTask();
             lmt.execute(14); //Вывод данных на ближайшие 14 дней
-            scheduleList.setOnScrollListener(this);
+            //Реализация подгрузки данных при достижении конца списка
+            scheduleList.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                int pastVisiblesItems, visibleItemCount, totalItemCount;
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    visibleItemCount = llm.getChildCount();
+                    totalItemCount = llm.getItemCount();
+                    pastVisiblesItems = llm.findFirstVisibleItemPosition();
+
+                    if (loading) {
+                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                            loading = false;
+                            lmt = new LoadMoreTask();
+                            lmt.execute(totalItemCount);
+                        }
+                    }
+                }
+            });
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
             mSwipeRefreshLayout.setOnRefreshListener(this);
         } else {
@@ -108,6 +152,7 @@ public class DailyScheduleFragment extends DialogFragment
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("FINISH_UPDATE"));
 
         setHasOptionsMenu(true);
+        setRetainInstance(true);
 
         return view;
     }
@@ -116,6 +161,7 @@ public class DailyScheduleFragment extends DialogFragment
     @Override
     public void onRefresh() {
         // начинаем показывать прогресс
+        mSwipeRefreshLayout.setRefreshing(true);
         GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
         GroupsModel currentSchedule = null;
         if (main.getId() == currentID && main.isGroup() == isGroup) { //Проверка на совпадение с главной группкой
@@ -136,7 +182,7 @@ public class DailyScheduleFragment extends DialogFragment
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            lmt = new LoadMoreTask(isGroup, currentID);
+            lmt = new LoadMoreTask();
             lmt.execute(14);
         }
     };
@@ -184,9 +230,7 @@ public class DailyScheduleFragment extends DialogFragment
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.daily_schedule, menu);
-        String group = "Группа";
 
-        usedList.add(DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()));
         //Если имеются используемые расписания
         if (usedList != null && !usedList.isEmpty() || main != null) {
             usedList.remove(null);
@@ -198,7 +242,7 @@ public class DailyScheduleFragment extends DialogFragment
             });
             usedList.add(0, main); //И добавить первым элементом главную запись
             usedList.remove(null);
-            SubMenu subMenuGroup = menu.addSubMenu(Menu.NONE, 100, 10, (main == null ? "Группа" : main.getName()));
+            SubMenu subMenuGroup = menu.addSubMenu(Menu.NONE, 100, 10, currentGroup);
             subMenuGroup.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
             for (int i = 0; i < usedList.size(); i++) {
                 subMenuGroup.add(Menu.NONE, 101 + i, Menu.NONE, usedList.get(i).getName());
@@ -216,140 +260,105 @@ public class DailyScheduleFragment extends DialogFragment
                 break; //Для вывода бокового меню
             default:
                 //Отобразить новую выбранную группу
-                SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE); //Записать новую выбранную группу в файл для его открытия
-                settings.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()); //Запись по id. потом по нему открывать расписание
-                settings.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
+                SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                GroupsModel m = usedList.get(item.getItemId() - 101);
+                userInfo.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()).apply(); //Запись по id. потом по нему открывать расписание
+                userInfo.edit().putString("openGroupName", usedList.get(item.getItemId() - 101).getName()).apply();
+                userInfo.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new DailyScheduleFragment()).commit();
+                ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-    }
+    public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
 
+        public class ScheduleViewHolder extends RecyclerView.ViewHolder {
 
-    //При пролистывании вниз
-    @Override
-    public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
-        boolean loadMore = firstVisible + visibleCount >= totalCount;
+            private TextView pairNumber;
+            private TextView pairTime;
+            private TextView pairName;
+            private TextView pairTeacher;
+            private TextView pairAuditory;
+            private TextView pairType;
+            private TextView pairDate;
+            private CardView cv;
 
-        if (loadMore && lmt.getStatus() == AsyncTask.Status.FINISHED) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-            lmt = new LoadMoreTask(isGroup, currentID);
-            lmt.execute(totalCount);
-        }
-    }
-
-    static class ViewHolder {
-        //список
-        public TextView n;
-        public TextView time;
-        public TextView name;
-        public TextView teacher;
-        public TextView auditory;
-        public TextView tipe;
-        public TextView date;
-        public LinearLayout pairContainer;
-    }
-
-    public class ScheduleAdapter extends BaseAdapter {
-        //Адаптер для заполнения списка расписания
-
-        ArrayList<ScheduleModel> list;
-        ArrayList<String> namesArray;
-
-
-        ScheduleAdapter(ArrayList<ScheduleModel> list) {
-            this.list = list;
-            Set<String> name = null;
-
-            if (name != null) {
-                namesArray = new ArrayList<String>(name);
+            ScheduleViewHolder(View itemView) {
+                super(itemView);
+                cv = (CardView) itemView.findViewById(R.id.cv);
+                pairNumber = (TextView) itemView.findViewById(R.id.pairNumber);
+                pairTime = (TextView) itemView.findViewById(R.id.pairTime);
+                pairName = (TextView) itemView.findViewById(R.id.pairName);
+                pairTeacher = (TextView) itemView.findViewById(R.id.pairTeacher);
+                pairAuditory = (TextView) itemView.findViewById(R.id.pairAuditory);
+                pairType = (TextView) itemView.findViewById(R.id.pairType);
+                pairDate = (TextView) itemView.findViewById(R.id.pairDate);
             }
         }
 
-        // кол-во элементов
-        @Override
-        public int getCount() {
-            return list.size();
+        List<ScheduleModel> models;
+
+        ScheduleAdapter(List<ScheduleModel> models) {
+            this.models = models;
         }
 
-        // элемент по позиции
         @Override
-        public Object getItem(int position) {
-            return list.get(position);
+        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+            super.onAttachedToRecyclerView(recyclerView);
         }
 
-        // id по позиции
         @Override
-        public long getItemId(int position) {
-            return position;
+        public ScheduleViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.schedule_line, viewGroup, false);
+            ScheduleViewHolder svh = new ScheduleViewHolder(v);
+            return svh;
         }
 
-        // пункт списка
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            // Очищает сущетсвующий шаблон, если параметр задан
-            // Работает только если базовый шаблон для всех классов один и тот же
-            View rowView = convertView;
-            if (rowView == null) {
-                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(getActivity().LAYOUT_INFLATER_SERVICE);
-                rowView = inflater.inflate(R.layout.schedule_line, null, true);
-                holder = new ViewHolder();
-                holder.n = (TextView) rowView.findViewById(R.id.pairNumber);
-                holder.time = (TextView) rowView.findViewById(R.id.pairTime);
-                holder.name = (TextView) rowView.findViewById(R.id.pairName);
-                holder.teacher = (TextView) rowView.findViewById(R.id.teacher);
-                holder.auditory = (TextView) rowView.findViewById(R.id.auditory);
-                holder.tipe = (TextView) rowView.findViewById(R.id.pairType);
-                holder.date = (TextView) rowView.findViewById(R.id.date);
-                holder.pairContainer = (LinearLayout) rowView.findViewById(R.id.pairContainer);
-                rowView.setTag(holder);
+        public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, int i) {
+            scheduleViewHolder.pairNumber.setText(models.get(i).getN());
+            String a = models.get(i).getStartTime();
+            String b = models.get(i).getEndTime();
+            scheduleViewHolder.pairTime.setText(a + "-" + b);
+            scheduleViewHolder.pairName.setText(models.get(i).getName());
+            scheduleViewHolder.pairTeacher.setText(models.get(i).getTeacher());
+            scheduleViewHolder.pairAuditory.setText(models.get(i).getClassroom());
+            scheduleViewHolder.pairType.setText(models.get(i).getTipe());
+            scheduleViewHolder.pairDate.setText(models.get(i).getDate());
+            if (i == 0 || !models.get(i).getDate().equals(models.get(i-1).getDate())) {
+                scheduleViewHolder.pairDate.setBackgroundColor(Color.GREEN);
+                scheduleViewHolder.pairDate.setVisibility(View.VISIBLE);
             } else {
-                holder = (ViewHolder) rowView.getTag();
+                scheduleViewHolder.pairDate.setVisibility(View.GONE);
             }
+        }
 
-            holder.n.setText(list.get(position).getN());
-            //holder.time.setText(list.get(position).getTime());
-            holder.name.setText(list.get(position).getName());
-            holder.teacher.setText(list.get(position).getTeacher());
-            //holder.auditory.setText(list.get(position).getAuditory());
-            holder.tipe.setText(list.get(position).getTipe());
-           // holder.date.setText(list.get(position).getDate());
-
-
-            if (list.get(position).getClassroom().isEmpty()) {
-                holder.date.setVisibility(View.GONE);
-            } else {
-                holder.date.setVisibility(View.VISIBLE);
-            }
-
-            return rowView;
+        @Override
+        public int getItemCount() {
+            return models.size();
         }
 
         public void add(ArrayList<ScheduleModel> data) {
-            this.list.addAll(data);
+            this.models.addAll(data);
         }
-
     }
 
     //Реализует подгрузку данных при достижении конца списка
     public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleModel>> {
-        boolean isGroup;
-        int id;
-
-        LoadMoreTask(boolean isGroup, int id) {
-            this.isGroup = isGroup;
-            this.id = id;
-        }
 
         @Override
         protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
-            return null;
+            ArrayList data = new ArrayList();
+            int j = i;
+            for (; i < j + params[0]; i++) {
+                if (i < models.size()) {
+                    data.add(models.get(i));
+                }
+            }
+
+            return data;
         }
 
         @Override
@@ -361,10 +370,33 @@ public class DailyScheduleFragment extends DialogFragment
             //Обновить адаптер и вернуть на последнюю просмотренную позицию
             adapter.add(data);
             adapter.notifyDataSetChanged();
-            int index = scheduleList.getFirstVisiblePosition();
+            int index = llm.findFirstVisibleItemPosition();
             int top = (scheduleList.getChildAt(0) == null) ? 0 : scheduleList.getChildAt(0).getTop();
-            scheduleList.setSelectionFromTop(index, top);
+            llm.scrollToPositionWithOffset(index, top);
+            loading = true;
         }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("currentPosition", llm.onSaveInstanceState());
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if(savedInstanceState != null) {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable("currentPosition");
+            llm.onRestoreInstanceState(savedRecyclerLayoutState);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        getActivity().unregisterReceiver(broadcastReceiver);
+        super.onDetach();
+    }
+
 
 }

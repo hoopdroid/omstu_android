@@ -9,6 +9,7 @@ public class ScheduleModel {
     private int idTeacher;//Напрямую из объекта в базе
     private int idClassroom;//Напрямую из объекта в базе
     private int subgroup;//Напрямую из объекта в базе
+    private String date;  //Дата проведения пары, напрямую из объекта
 	private String n;  //Номер пары можно получить по ее id из базы PAIRS
 	private String startTime; //Начало пары, из той же таблички
     private String endTime; //Конец пары, из той же таблички
@@ -21,7 +22,7 @@ public class ScheduleModel {
 
 
     public ScheduleModel(int idSchedule, int idPair, int idGroup, int idTeacher, int idClassroom,
-                         int subgroup, String n, String startTime, String endTime, String name, String teacher,
+                         int subgroup, String n, String startTime, String endTime, String date, String name, String teacher,
                          String group, String classroom, String tipe, boolean isCancelled) {
         this.idSchedule = idSchedule;
         this.idPair = idPair;
@@ -38,6 +39,7 @@ public class ScheduleModel {
         this.classroom = classroom;
         this.tipe = tipe;
         this.isCancelled = isCancelled;
+        this.date = date;
     }
 
     public boolean isCancelled() {
@@ -98,6 +100,10 @@ public class ScheduleModel {
 
     public int getIdSchedule() {
         return idSchedule;
+    }
+
+    public String getDate() {
+        return date;
     }
 }
 
