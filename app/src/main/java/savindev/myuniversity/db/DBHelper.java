@@ -19,6 +19,7 @@ import java.util.Date;
 
 import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
+import savindev.myuniversity.schedule.ScheduleModel;
 import savindev.myuniversity.serverTasks.Schedule;
 
 // TODO При get-запросах к локальной БД проверять искомые данные на наличие перед выполнением запроса.
@@ -305,9 +306,25 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+       public int getPairNumber(Context context,int pairId){
+           int number =0;
 
-        }
+           DBHelper dbHelper = getInstance(context);
+           SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
+
+           try {
+               String selectQuery = "SELECT " + COL_PAIR_NUMBER + " FROM " + TABLE_NAME+ " WHERE " + COL_ID_PAIR + "="+pairId;
+               Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
+               if (c.moveToFirst()) {
+                   number = c.getInt(c.getColumnIndex(COL_PAIR_NUMBER));
+               }
+               c.close();
+           } catch (SQLiteException e) {
+               Log.e("DB EXCEPTION", e.toString(), e);
+           }
+
+           return number;
+       }
 
 
     }
@@ -518,6 +535,55 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
         }
+
+        public ArrayList<ScheduleModel> getSchedules(Context context,String date){
+
+            ArrayList<ScheduleModel> scheduleModelArrayList = new ArrayList<>();
+
+            SQLiteDatabase db;
+            DBHelper dbHelper = new DBHelper(context);
+            db = dbHelper.getWritableDatabase();
+
+
+            Cursor cursor;
+            try {
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME , null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+                    /*
+                    ScheduleModel scheduleModel = new ScheduleModel(
+                            cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),
+                            cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID)),
+                            cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID)),
+                            cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID)),
+                            cursor.getInt(cursor.getColumnIndex(COL_SUBGROUP_NUMBER)),
+                            cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_DATE)),
+                            getPairsHelper().getPairNumber(context,)//pair numbers
+                            //start time by number in Pairs
+                            //endtime by number in Pairs
+                            cursor.getInt(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
+                            //getTeacher by id
+                            //getGroup by id
+                            //classroom  пока ниоткуда?
+                            cursor.getInt(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
+                            //isCancelled?!!?
+
+                            );
+
+
+                    scheduleModelArrayList.add(scheduleModel);
+                    cursor.moveToNext(); */
+                }
+
+            } catch (SQLiteException e) {
+                Log.e("SQLITE DB EXCEPTION", e.toString(), e);
+            }
+
+            return scheduleModelArrayList;
+        }
+
 
     }
 
