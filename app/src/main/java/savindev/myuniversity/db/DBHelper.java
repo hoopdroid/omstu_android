@@ -9,10 +9,17 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 
+import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
+import savindev.myuniversity.serverTasks.Schedule;
 
 // TODO При get-запросах к локальной БД проверять искомые данные на наличие перед выполнением запроса.
 // При отсутствии - выводить сообщение об ошибке с предложением скачать данные с сервера.
@@ -39,6 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private FacultiesHelper facultiesHelper;
     private DepartmentsHelper departmentsHelper;
     private UsedSchedulesHelper usedSchedulesHelper;
+    private SchedulesHelper schedulesHelper;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -51,6 +59,7 @@ public class DBHelper extends SQLiteOpenHelper {
         facultiesHelper = new FacultiesHelper();
         departmentsHelper = new DepartmentsHelper();
         usedSchedulesHelper = new UsedSchedulesHelper();
+        schedulesHelper = new SchedulesHelper();
 
     }
 
@@ -70,6 +79,7 @@ public class DBHelper extends SQLiteOpenHelper {
         facultiesHelper.create(db);
         departmentsHelper.create(db);
         usedSchedulesHelper.create(db);
+        schedulesHelper.create(db);
     }
 
     @Override
@@ -108,6 +118,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public UsedSchedulesHelper getUsedSchedulesHelper() {
         return usedSchedulesHelper;
+    }
+
+    public SchedulesHelper getSchedulesHelper() {
+        return schedulesHelper;
     }
 
 
@@ -250,6 +264,24 @@ public class DBHelper extends SQLiteOpenHelper {
 
             return getList(context, table, selection, null, 0);
 
+        }
+
+        public String getSemesterEndDate(Context context,int idSemester){
+            String endDate = "";
+
+            DBHelper dbHelper = DBHelper.getInstance(context);
+            SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
+            String find = "SELECT "+COL_END_DATE+" FROM  " + TABLE_NAME + " WHERE " + COL_ID_SEMESTER + " = " + idSemester;
+            Cursor cursor = sqLiteDatabase.rawQuery(find, null);
+
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast()) {
+                endDate = cursor.getString(cursor.getColumnIndex(COL_END_DATE));
+                cursor.moveToNext();
+            }
+            cursor.close();
+            return  endDate;
         }
     }
 
@@ -398,6 +430,97 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     }
+
+    public class SchedulesHelper {
+
+        public static final String TABLE_NAME = "Schedules";
+        public static final String COL_SCHEDULE_ID = "schedule_id";
+        public static final String COL_PAIR_ID = "pair_id";
+        public static final String COL_GROUP_ID = "group_id";
+        public static final String COL_TEACHER_ID = "teacher_id";
+        public static final String COL_DISCIPLINE_NAME = "discipline_name";
+        public static final String COL_DISCIPLINE_TYPE = "discipline_type";
+        public static final String COL_SCHEDULE_DATE = "schedule__date";
+        public static final String COL_CLASSROOM_ID = "classroom_id";
+        public static final String COL_SUBGROUP_NUMBER = "subgroup_number";
+
+
+        public void create(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_SCHEDULE_ID + " INTEGER," +
+                    COL_PAIR_ID + " INTEGER," +
+                    COL_GROUP_ID + " INTEGER," +
+                    COL_TEACHER_ID + " INTEGER," +
+                    COL_DISCIPLINE_NAME + " TEXT," +
+                    COL_DISCIPLINE_TYPE + " TEXT," +
+                    COL_SCHEDULE_DATE+ " TEXT," +
+                    COL_CLASSROOM_ID+ " INTEGER," +
+                    COL_SUBGROUP_NUMBER + " INTEGER" +
+                    ");");
+
+        }
+
+        public String dateFormat(ArrayList<Schedule> schedule,int index){
+             String dt = schedule.get(0).SCHEDULE_FIRST_DATE;
+            Log.d("BEFORE",dt);// Start date
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            Calendar c = Calendar.getInstance();
+            try {
+                c.setTime(sdf.parse(dt));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            c.add(Calendar.DATE, schedule.get(index).SCHEDULE_INTERVAL);  // number of days to add
+            dt = sdf.format(c.getTime());  // dt is now the new date
+            Log.d("AFTER",dt);
+            return  dt;
+        }
+
+        public void setSchedule(Context context,ArrayList<Schedule> schedule) {
+
+
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+
+            Date beginDate = null;
+            Date endDate=null;
+
+            for (int index = 1; index < schedule.size(); index++) {
+
+                try {
+                    beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
+                    endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
+                    String previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
+                    while(beginDate.compareTo(endDate) <= 0) { // если дата начала пары раньше конца семестра
+
+                        ContentValues scheduleRow = new ContentValues();
+                        scheduleRow.put(SchedulesHelper.COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
+                        scheduleRow.put(SchedulesHelper.COL_PAIR_ID, schedule.get(index).ID_PAIR);
+                        scheduleRow.put(SchedulesHelper.COL_GROUP_ID, schedule.get(index).ID_GROUP);
+                        scheduleRow.put(SchedulesHelper.COL_TEACHER_ID, schedule.get(index).ID_TEACHER);
+                        scheduleRow.put(SchedulesHelper.COL_DISCIPLINE_NAME, schedule.get(index).DISCIPLINE_NAME);
+                        scheduleRow.put(SchedulesHelper.COL_DISCIPLINE_TYPE, schedule.get(index).DISCIPLINE_TYPE);
+                        previousValue = DateUtil.dateFormatIncrease(schedule, index,previousValue);
+                        scheduleRow.put(SchedulesHelper.COL_SCHEDULE_DATE,previousValue );
+                        scheduleRow.put(SchedulesHelper.COL_CLASSROOM_ID, schedule.get(index).ID_CLASSROOM);
+                        scheduleRow.put(SchedulesHelper.COL_SUBGROUP_NUMBER, schedule.get(index).SUBGROUP_NUMBER);
+
+                        sqliteDatabase.insert(TABLE_NAME, null, scheduleRow);
+                        beginDate = format.parse(previousValue);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+        }
+
+    }
+
 
 
     public static class UsedSchedulesHelper {

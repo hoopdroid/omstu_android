@@ -17,13 +17,13 @@ public class ScheduleModel {
 	private String teacher; //Из соответствующей таблички по id
     private String group; //Из соответствующей таблички по id
 	private String classroom; //В формате корпус + "-" аудитория
-	private String tipe;//Напрямую из объекта в базе
+	private String type;//Напрямую из объекта в базе
 	private boolean isCancelled; //Напрямую из объекта в базе
 
 
     public ScheduleModel(int idSchedule, int idPair, int idGroup, int idTeacher, int idClassroom,
                          int subgroup, String n, String startTime, String endTime, String date, String name, String teacher,
-                         String group, String classroom, String tipe, boolean isCancelled) {
+                         String group, String classroom, String type, boolean isCancelled) {
         this.idSchedule = idSchedule;
         this.idPair = idPair;
         this.idGroup = idGroup;
@@ -37,7 +37,7 @@ public class ScheduleModel {
         this.teacher = teacher;
         this.group = group;
         this.classroom = classroom;
-        this.tipe = tipe;
+        this.type = type;
         this.isCancelled = isCancelled;
         this.date = date;
     }
@@ -47,7 +47,7 @@ public class ScheduleModel {
     }
 
     public String getTipe() {
-        return tipe;
+        return type;
     }
 
     public String getClassroom() {

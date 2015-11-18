@@ -108,7 +108,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 String lastResresh = obj.getString("LAST_REFRESH"); //дата обновления, в таблицу дат
                 ArrayList<Schedule> sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
                 ArrayList<ScheduleDates> scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
-//              parsetoSqlite(init);
+                parsetoSqlite(sched);
                 addToScheduleList(lastResresh);
                 break;
             case "ERROR":   //Неопознанная ошибка
@@ -123,9 +123,13 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         return false;
     }
 
-    private void parsetoSqlite(Schedule init) {
+    private void parsetoSqlite(ArrayList<Schedule> sched) {
         // [CR] вызовешь тут что-то кроме геттеров-сеттеров - покусаю
         //TODO Parse Schedule to SQlite
+        DBHelper dbHelper = DBHelper.getInstance(context);
+        dbHelper.getSchedulesHelper().setSchedule(context,sched);
+
+
     }
 
     private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний
