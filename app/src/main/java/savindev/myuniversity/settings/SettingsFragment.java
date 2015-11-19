@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 
 /**Фрагмент - лист с элементами настроек
@@ -65,7 +65,7 @@ public class SettingsFragment extends Fragment{
 				switch (position) {
 				case 0: //Нулевая позиция - выбор групп
 					//проверка на наличие записей по IitializationInfo в БД, если нет - попытаться загрузить
-					if (!DBHelper.isInitializationInfoThere(getActivity())) {
+					if (!DBRequest.isInitializationInfoThere(getActivity())) {
 						if (MainActivity.isNetworkConnected(getActivity())) {
 							refreshItem.setActionView(R.layout.actionbar_progress);
 							refreshItem.setVisible(true);
@@ -84,7 +84,7 @@ public class SettingsFragment extends Fragment{
 									+ "Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
 						}
 					}
-					if (DBHelper.isInitializationInfoThere(getActivity())) { //если выполнено успешно или ключ существует
+					if (DBRequest.isInitializationInfoThere(getActivity())) { //если выполнено успешно или ключ существует
 						settints.setBackgroundColor(Color.WHITE); //перекрасить выделенный элемент
 						settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
 						lastPosition = position;

@@ -2,6 +2,7 @@ package savindev.myuniversity.serverTasks;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.schedule.GroupsModel;
 
 public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
@@ -51,8 +53,8 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 e.printStackTrace();
             }
         }
-
-        String uri = context.getResources().getString(R.string.uri) + "getSchedule?idGroup=197";
+        SharedPreferences settings = context.getSharedPreferences("UserInfo", 0);
+        String uri = context.getResources().getString(R.string.uri) + "getSchedule?idGroup="+ settings.getInt("UserGroup", 0);
         URL url;
         HttpURLConnection urlConnection = null;
 
@@ -106,8 +108,20 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
                 String lastResresh = obj.getString("LAST_REFRESH"); //дата обновления, в таблицу дат
-                ArrayList<Schedule> sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
-                ArrayList<ScheduleDates> scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
+                ArrayList<Schedule> sched = null;
+                ArrayList<ScheduleDates> scheddates = null;
+                try {
+                    scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
+                } catch (JSONException e) {
+                    //Поле оказалось нулевым?
+                    e.printStackTrace();
+                }
+                try {
+                    sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
+                } catch (JSONException e) {
+                    //Поле оказалось нулевым?
+                    e.printStackTrace();
+                }
                 parsetoSqlite(sched);
                 addToScheduleList(lastResresh);
                 break;
