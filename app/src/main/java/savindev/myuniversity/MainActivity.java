@@ -13,7 +13,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,15 +26,12 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
-import savindev.myuniversity.schedule.DateUtil;
-import savindev.myuniversity.schedule.GroupsModel;
+import savindev.myuniversity.schedule.ScheduleModel;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
@@ -67,25 +63,12 @@ public class MainActivity extends AppCompatActivity {
             initDrawer();
 
             DBHelper dbHelper = DBHelper.getInstance(this);
-            ArrayList test = dbHelper.getAllDBTables(this);
+            ArrayList test = DBRequest.getAllDBTables(this);
+
+            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151119",137,true);
+
             int a = 5;
-           /* SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-            Date beginDate=null;
-            Date endDate=null;
-            try {
-                beginDate = format.parse("20160909");//дата начала пары
-                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(this, 1))); //конец семестра
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
 
-            if(beginDate.compareTo(endDate) <= 0){
-                Log.d("DATE","LESSS");
-
-            }
-            else
-                Log.d("DATE","MORE");
-                */
 
         }
 

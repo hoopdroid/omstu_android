@@ -11,6 +11,10 @@
         app:showAsAction="ifRoom|withText"
         android:title="Подробно">
     </item>
+    <item android:id="@+id/transition"
+        android:orderInCategory="100"
+        android:title="Список"
+        app:showAsAction="ifRoom|withText"/>
 
 
 </menu>

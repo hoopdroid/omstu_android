@@ -18,7 +18,7 @@ import android.widget.LinearLayout;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 
 public class FirstStartActivity extends AppCompatActivity implements View.OnClickListener {
@@ -34,7 +34,7 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!DBHelper.isInitializationInfoThere(this)) {
+        if(!DBRequest.isInitializationInfoThere(this)) {
             GetInitializationInfoTask giit = new GetInitializationInfoTask(getBaseContext(), null);
             giit.execute();
         }

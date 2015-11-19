@@ -1,5 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
 
+    <item android:id="@+id/transition"
+        android:orderInCategory="100"
+        android:title="Календарь"
+        app:showAsAction="always"/>
+
 
 </menu>
