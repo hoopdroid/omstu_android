@@ -61,7 +61,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent i = new Intent(getActivity(), FirstStartActivity.class);
-                                deleteUserPreferences();
+                                deleteUserPreferences();//TODO удаление расписаний пользователя,ибо при новом запуске к существующему добавляется еще одно
                                 startActivity(i);
                                 getActivity().finish();
                             }

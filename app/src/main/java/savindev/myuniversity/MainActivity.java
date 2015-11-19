@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
 
-       username = settings.getString("UserFirstName","")+  " " +settings.getString("UserLastName","")+" "+getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
+       username = settings.getString("UserFirstName","")+  " " +settings.getString("UserLastName","")+" "+DBRequest.getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
 
        email = settings.getString("email","no email");
     }
@@ -191,26 +191,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-// [CR] Нельзя так делать. ты работаешь с базой данных вне класса базы данных. утащи это дело в DBHelper
-    public static String getUserGroup(int id,Context context){
-        String groupName= "";
 
-        DBHelper dbHelper = new DBHelper(context);
-        SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
-        String find = "SELECT * FROM  "+ DBHelper.GroupsHelper.TABLE_NAME + " WHERE "+ DBHelper.GroupsHelper.COL_ID_GROUP +" = " +id ;
-        Cursor cursor = sqLiteDatabase.rawQuery(find,null);
-
-        cursor.moveToFirst();
-
-        while (!cursor.isAfterLast()) {
-
-            groupName=cursor.getString(cursor.getColumnIndex(DBHelper.GroupsHelper.COL_GROUP_NAME));
-            cursor.moveToNext();
-
-        }
-        cursor.close();
-        return groupName;
-    }
 
     @Override
     protected void onDestroy() {
