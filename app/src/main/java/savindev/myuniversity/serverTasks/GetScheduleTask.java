@@ -106,8 +106,20 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
                 String lastResresh = obj.getString("LAST_REFRESH"); //дата обновления, в таблицу дат
-                ArrayList<Schedule> sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
-                ArrayList<ScheduleDates> scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
+                ArrayList<Schedule> sched = null;
+                ArrayList<ScheduleDates> scheddates = null;
+                try {
+                    scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
+                } catch (JSONException e) {
+                    //Поле оказалось нулевым?
+                    e.printStackTrace();
+                }
+                try {
+                    sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
+                } catch (JSONException e) {
+                    //Поле оказалось нулевым?
+                    e.printStackTrace();
+                }
                 parsetoSqlite(sched);
                 addToScheduleList(lastResresh);
                 break;

@@ -253,19 +253,29 @@ public class DailyScheduleFragment extends DialogFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        SharedPreferences userInfo;
+        FragmentTransaction ft;
         switch (item.getItemId()) {
             case 100:
                 break; //Для вывода подменю
             case 16908332:
                 break; //Для вывода бокового меню
+            case R.id.transition:
+                //Переход на календарный вид
+                userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                userInfo.edit().putInt("openGroup", currentID).apply(); //Запись по id. потом по нему открывать расписание
+                userInfo.edit().putString("openGroupName", currentGroup).apply();
+                userInfo.edit().putBoolean("openIsGroup", isGroup).apply();
+                ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.content_main, new CalendarScheduleFragment()).commit();
+                break;
             default:
                 //Отобразить новую выбранную группу
-                SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-                GroupsModel m = usedList.get(item.getItemId() - 101);
+                userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 userInfo.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()).apply(); //Запись по id. потом по нему открывать расписание
                 userInfo.edit().putString("openGroupName", usedList.get(item.getItemId() - 101).getName()).apply();
                 userInfo.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
                 break;
         }
