@@ -96,10 +96,6 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         return true;
     }
 
-    static class Holder {
-        public TextView textGroup;
-    }
-
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
@@ -107,12 +103,6 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.group_view, null);
-        }
-
-        if (isExpanded) {
-            //Изменяем что-нибудь, если текущая Group раскрыта
-        } else {
-            //Изменяем что-нибудь, если текущая Group скрыта
         }
 
         TextView textGroup = (TextView) convertView.findViewById(R.id.textGroup);
@@ -132,9 +122,8 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         View view = null;
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(R.layout.child_view, null);
-        GroupsModel g = mGroup.get(groupPosition).get(childPosition);
         if (mGroup.get(groupPosition).get(childPosition).isSelected()) {
-            view.setBackgroundColor(Color.GREEN);
+            view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
         }
         final ViewHolder holder = new ViewHolder();
         holder.textView = (TextView) view.findViewById(R.id.textChild);
@@ -143,7 +132,7 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
             @Override
             public void onClick(View view) {
                 if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {
-                    view.setBackgroundColor(Color.GREEN);
+                    view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
                     mGroup.get(groupPosition).get(childPosition).setSelected(true);
                     addGroup(mGroup.get(groupPosition).get(childPosition));
                     Log.d("11", "add " + mGroup.get(groupPosition).get(childPosition).getName());
