@@ -54,7 +54,14 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             }
         }
         SharedPreferences settings = context.getSharedPreferences("UserInfo", 0);
-        String uri = context.getResources().getString(R.string.uri) + "getSchedule?idGroup=197";
+        String uri = context.getResources().getString(R.string.uri) + "getSchedule?";
+        for (GroupsModel m : params) {
+            if (m.isGroup()) {
+                uri += "idGroup" + m.getId();
+            } else {
+                uri += "idTeacher" + m.getId();
+            }
+        }
         URL url;
         HttpURLConnection urlConnection = null;
 
