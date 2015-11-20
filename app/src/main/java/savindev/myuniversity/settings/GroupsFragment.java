@@ -37,6 +37,8 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     ExpListAdapter adapter;
     MenuItem refreshItem;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    MenuItem searchItem;
+    SearchView searchView;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -70,8 +72,8 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.groups_settings, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск");
         searchView.setOnQueryTextListener(new OnQueryTextListener() {
 

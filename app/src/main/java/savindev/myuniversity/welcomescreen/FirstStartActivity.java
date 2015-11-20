@@ -35,10 +35,10 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
 
         //TODO когда база будет реагировать на даты, проверку убрать. пусть ищет обновления
-        if(!DBRequest.isInitializationInfoThere(this)) {
+//        if(!DBRequest.isInitializationInfoThere(this)) {
             GetInitializationInfoTask giit = new GetInitializationInfoTask(getBaseContext(), null);
             giit.execute();
-        }
+//        }
 
         setContentView(R.layout.activity_first_start);
         buttons = (LinearLayout)findViewById(R.id.buttonsLayout);

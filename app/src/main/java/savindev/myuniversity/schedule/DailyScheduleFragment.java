@@ -356,6 +356,13 @@ public class DailyScheduleFragment extends DialogFragment
                 daySchedule = DBHelper.SchedulesHelper.getSchedules(getActivity(),
                         "" + calendar.get(Calendar.YEAR) + calendar.get(Calendar.MONTH) + calendar.get(Calendar.DAY_OF_MONTH),
                         currentID, isGroup);  //Получение расписания на день
+                //TODO костыль, удалить после организации сортировки по дате начала в БД
+                Collections.sort(daySchedule,  new Comparator<ScheduleModel>() {
+                    @Override
+                    public int compare(ScheduleModel arg0, ScheduleModel arg1) {
+                        return arg0.getStartTime().compareTo(arg1.getStartTime());
+                    }
+                });
                 data.addAll(daySchedule);
             }
 
@@ -384,14 +391,14 @@ public class DailyScheduleFragment extends DialogFragment
         outState.putParcelable("currentPosition", llm.onSaveInstanceState());
     }
 
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if(savedInstanceState != null) {
-            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable("currentPosition");
-            llm.onRestoreInstanceState(savedRecyclerLayoutState);
-        }
-    }
+//    @Override
+//    public void onViewStateRestored(Bundle savedInstanceState) {
+//        super.onViewStateRestored(savedInstanceState);
+//        if(savedInstanceState != null) {
+//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable("currentPosition");
+//            llm.onRestoreInstanceState(savedRecyclerLayoutState);
+//        }
+//    }
 
     @Override
     public void onDetach() {

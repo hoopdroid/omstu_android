@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
             DBHelper dbHelper = DBHelper.getInstance(this);
 
-            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151126",137,true);
+//            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151126",197,true);
 
             int a = 5;
 
