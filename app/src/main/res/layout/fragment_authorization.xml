@@ -86,7 +86,7 @@
                 android:layout_alignParentStart="true" />
         </RelativeLayout>
 
-        <Button android:id="@+id/btn_signin"
+        <Button android:id="@+id/btn_sign_in"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/btn_sign_in"

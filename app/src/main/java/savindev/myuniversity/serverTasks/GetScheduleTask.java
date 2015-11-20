@@ -54,7 +54,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             }
         }
         SharedPreferences settings = context.getSharedPreferences("UserInfo", 0);
-        String uri = context.getResources().getString(R.string.uri) + "getSchedule?idGroup="+ settings.getInt("UserGroup", 0);
+        String uri = context.getResources().getString(R.string.uri) + "getSchedule?idGroup=197";
         URL url;
         HttpURLConnection urlConnection = null;
 
@@ -122,7 +122,10 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                     //Поле оказалось нулевым?
                     e.printStackTrace();
                 }
-                parsetoSqlite(sched);
+                if (sched != null)
+                     parsetoSqlite(sched);
+//                if (scheddates != null)
+//                    parsetoSqlite(scheddates);
                 addToScheduleList(lastResresh);
                 break;
             case "ERROR":   //Неопознанная ошибка
@@ -151,7 +154,8 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             if (DBHelper.UsedSchedulesHelper.getGroupsModelList(context).contains(model)) {
                 //Если уже имеется - обновить дату
                 //TODO обновить дату при появлении метода в БД
-            } else if (DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) {
+            } else if (DBHelper.UsedSchedulesHelper.getMainGroupModel(context) != null &&
+                    DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) {
                 //Если уже имеется - обновить дату
                 //TODO обновить дату при появлении метода в БД
             } else {

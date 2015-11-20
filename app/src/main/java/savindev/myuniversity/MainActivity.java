@@ -63,9 +63,8 @@ public class MainActivity extends AppCompatActivity {
             initDrawer();
 
             DBHelper dbHelper = DBHelper.getInstance(this);
-            ArrayList test = DBRequest.getAllDBTables(this);
 
-            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151119",137,true);
+            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151126",137,true);
 
             int a = 5;
 

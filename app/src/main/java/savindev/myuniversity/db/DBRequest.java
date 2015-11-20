@@ -176,11 +176,6 @@ public class DBRequest {
         db.delete(table, select + "=" + id, null);
     }
 
-    public static ArrayList sortList(ArrayList arrayList) {
-        Collections.sort(arrayList);
-        return arrayList;
-    }
-
     public static String getUserGroup(int id, Context context) {
         String groupName = "Group";
 

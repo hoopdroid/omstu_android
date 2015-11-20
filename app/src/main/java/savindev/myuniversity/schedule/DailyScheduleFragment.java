@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -27,7 +26,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -64,25 +65,11 @@ public class DailyScheduleFragment extends DialogFragment
     private LinearLayoutManager llm;
     private boolean loading = true;
     private ArrayList<ScheduleModel> models;
-    private int i;
-
-
-    void inialize() {
-        models = new ArrayList<>();
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 4; j++) {
-                ScheduleModel model = new ScheduleModel(0,0,0,0,0,0,Integer.toString(j),"1","2",Integer.toString(i),
-                        "a","b","c","d","e",false);
-                models.add(model);
-            }
-        }
-    }
-
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        inialize();
-        i = 0;
+        calendar = new GregorianCalendar();  //Получение текущей даты для начала заполнения расписания
+        calendar.add(Calendar.DAY_OF_MONTH, -1); //Чтобы не пропускать день при работе в цикле
 
         adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
         View view = null;
@@ -361,12 +348,15 @@ public class DailyScheduleFragment extends DialogFragment
 
         @Override
         protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
-            ArrayList data = new ArrayList();
-            int j = i;
-            for (; i < j + params[0]; i++) {
-                if (i < models.size()) {
-                    data.add(models.get(i));
-                }
+            ArrayList<ScheduleModel> data = new ArrayList();
+            for (int i = 0; i < params[0]; i++) { //Добавить число записей, равное params[0]
+                calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
+                //TODO подумать, как нужно обрабатывать выходные дни
+                ArrayList<ScheduleModel> daySchedule;
+                daySchedule = DBHelper.SchedulesHelper.getSchedules(getActivity(),
+                        "" + calendar.get(Calendar.YEAR) + calendar.get(Calendar.MONTH) + calendar.get(Calendar.DAY_OF_MONTH),
+                        currentID, isGroup);  //Получение расписания на день
+                data.addAll(daySchedule);
             }
 
             return data;
