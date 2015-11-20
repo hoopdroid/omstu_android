@@ -339,7 +339,7 @@ public class DailyScheduleFragment extends DialogFragment
             scheduleViewHolder.pairType.setText(models.get(i).getTipe());
             scheduleViewHolder.pairDate.setText(models.get(i).getDate());
             if (i == 0 || !models.get(i).getDate().equals(models.get(i-1).getDate())) {
-                scheduleViewHolder.pairDate.setBackgroundColor(Color.GREEN);
+                scheduleViewHolder.pairDate.setBackgroundColor(getResources().getColor(R.color.primary_dark));
                 scheduleViewHolder.pairDate.setVisibility(View.VISIBLE);
             } else {
                 scheduleViewHolder.pairDate.setVisibility(View.GONE);
@@ -387,7 +387,6 @@ public class DailyScheduleFragment extends DialogFragment
             loading = true;
         }
     }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
