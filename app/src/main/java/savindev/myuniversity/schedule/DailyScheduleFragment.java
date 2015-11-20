@@ -39,6 +39,7 @@ import java.util.concurrent.TimeoutException;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
 import savindev.myuniversity.settings.GroupsActivity;
@@ -197,7 +198,7 @@ public class DailyScheduleFragment extends DialogFragment
                 startActivity(intent);
                 break;
             case R.id.set_id:
-                if (!DBHelper.isInitializationInfoThere(getActivity())) {
+                if (!DBRequest.isInitializationInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
                         giit = new GetInitializationInfoTask(getActivity().getBaseContext(), null);
                         giit.execute();
@@ -214,7 +215,7 @@ public class DailyScheduleFragment extends DialogFragment
                                 + "Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
                     }
                 }
-                if (!DBHelper.isInitializationInfoThere(getActivity())) {
+                if (!DBRequest.isInitializationInfoThere(getActivity())) {
                     intent = new Intent(getActivity(), GroupsActivity.class);
                     startActivity(intent);
                 }

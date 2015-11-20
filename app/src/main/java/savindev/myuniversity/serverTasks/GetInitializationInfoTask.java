@@ -24,6 +24,7 @@ import java.util.Date;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.DBRequest;
 
 
 /**
@@ -168,7 +169,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
             sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);}
             else{
-                DBHelper.delete_byID(sqliteDatabase, DBHelper.TeachersHelper.TABLE_NAME, DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
+                DBRequest.delete_byID(sqliteDatabase, DBHelper.TeachersHelper.TABLE_NAME, DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
             }
 
 
@@ -186,7 +187,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 sqliteDatabase.insert(DBHelper.SemestersHelper.TABLE_NAME, null, semestresRow);
             }
             else{
-                DBHelper.delete_byID(sqliteDatabase, DBHelper.SemestersHelper.TABLE_NAME, DBHelper.SemestersHelper.COL_ID_SEMESTER,init.SEMESTERS.get(index).ID_SEMESTER);
+                DBRequest.delete_byID(sqliteDatabase, DBHelper.SemestersHelper.TABLE_NAME, DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
             }
         }
 
@@ -201,7 +202,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
             }
             else {
-                DBHelper.delete_byID(sqliteDatabase, DBHelper.PairsHelper.TABLE_NAME, DBHelper.PairsHelper.COL_ID_PAIR,init.PAIRS.get(index).ID_PAIR);
+                DBRequest.delete_byID(sqliteDatabase, DBHelper.PairsHelper.TABLE_NAME, DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
             }
         }
 
@@ -215,7 +216,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 sqliteDatabase.insert(DBHelper.GroupsHelper.TABLE_NAME, null, groupsRow);
             }
             else{
-                DBHelper.delete_byID(sqliteDatabase, DBHelper.GroupsHelper.TABLE_NAME, DBHelper.GroupsHelper.COL_ID_GROUP,init.GROUPS.get(index).ID_GROUP);
+                DBRequest.delete_byID(sqliteDatabase, DBHelper.GroupsHelper.TABLE_NAME, DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
             }
         }
 
@@ -231,7 +232,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 sqliteDatabase.insert(DBHelper.DepartmentsHelper.TABLE_NAME, null, departmentsRow);
             }
             else {
-                DBHelper.delete_byID(sqliteDatabase, DBHelper.DepartmentsHelper.TABLE_NAME, DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID,init.DEPARTMENTS.get(index).ID_DEPARTMENT);
+                DBRequest.delete_byID(sqliteDatabase, DBHelper.DepartmentsHelper.TABLE_NAME, DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
             }
         }
 
@@ -245,7 +246,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 sqliteDatabase.insert(DBHelper.FacultiesHelper.TABLE_NAME, null, facultiesRow);
             }
             else {
-                DBHelper.delete_byID(sqliteDatabase, DBHelper.FacultiesHelper.TABLE_NAME, DBHelper.FacultiesHelper.COL_FACULTY_ID,init.FACULTIES.get(index).ID_FACULTY);
+                DBRequest.delete_byID(sqliteDatabase, DBHelper.FacultiesHelper.TABLE_NAME, DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
             }
         }
 

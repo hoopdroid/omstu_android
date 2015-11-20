@@ -19,7 +19,6 @@ public class DateUtil {
 
     public static String dateFormatIncrease(ArrayList<Schedule> schedule,int index,String previousValue){
         String dt = previousValue;
-        Log.d("BEFORE", dt);// Start date
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         Calendar c = Calendar.getInstance();
         if(index>0){
@@ -30,7 +29,6 @@ public class DateUtil {
             }
             c.add(Calendar.DATE, schedule.get(index).SCHEDULE_INTERVAL);  // number of days to add
             dt = sdf.format(c.getTime());  // dt is now the new date
-            Log.d("AFTER",dt);
             return  dt;}
 
         else
