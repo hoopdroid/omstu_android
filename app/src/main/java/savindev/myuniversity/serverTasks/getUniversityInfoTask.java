@@ -35,31 +35,26 @@ import savindev.myuniversity.db.DBRequest;
  * факультетах, кафедрах, группах, преподавателях.
  * После запроса на сервер информация разбирается с помощью подклассов класса Parsers
  */
-public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
+public class getUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
     final private int TIMEOUT_MILLISEC = 5000;
     int errorCode = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    SharedPreferences settings;
 
-
-    public GetInitializationInfoTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
+    public getUniversityInfoTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
         super();
         this.context = context;
         this.mSwipeRefreshLayout = mSwipeRefreshLayout;
     }
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-
-    }
-
-    @Override
     protected Boolean doInBackground(Void... params) {
         //Возвращать false, если изменений нет
-        SharedPreferences settings = context.getSharedPreferences("UserInfo", 0);
+        settings = context.getSharedPreferences("UserInfo", 0);
         String refreshDate = settings.getString("init_last_refresh", "20000101000000"); //дата последнего обновления
-        String uri = context.getResources().getString(R.string.uri) + "getInitializationInfo?universityAcronym=" +
+        refreshDate = "20151121212300";
+        String uri = context.getResources().getString(R.string.uri) + "getUniversityInfo?universityAcronym=" +
                 context.getResources().getString(R.string.university) + "&lastRefresh=" +
                 refreshDate;
         URL url;
@@ -78,7 +73,6 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
             }
             String reply = "";
             reply = buffer.toString();
-            urlConnection.disconnect();
             if (reply.isEmpty()) { //Если после всех операций все равно пустой
                 return false;
             }
@@ -96,7 +90,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     private void parseReply(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-        Initialization init = null;
+        UniversityInfo init = null;
         JSONObject obj = null;
         obj = new JSONObject(reply);
         sw:    switch (obj.get("STATE").toString()) {//определение типа полученного результата
@@ -105,15 +99,15 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                 //Если полученная дата больше, записать новые данные и новую дату
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault());
-                SharedPreferences settings = context.getSharedPreferences("UserInfo", 0);
                 String modified = obj.getString("LAST_REFRESH");
+                modified = "20151121212300";
                 String date = settings.getString("init_last_refresh", ""); // Старая записанная дата обновления
                 if (!(date.equals(""))) { //Если хранящаяся дата не пуста
                     Date lastModifiedDate = null; //Полученная от сервера дата
                     Date oldModifiedDate = null;
                     try {
-                        lastModifiedDate = (Date)formatter.parse(modified); //Дата с сервера
-                        oldModifiedDate = (Date)formatter.parse(date); //Дата с файла
+                        lastModifiedDate = formatter.parse(modified); //Дата с сервера
+                        oldModifiedDate = formatter.parse(date); //Дата с файла
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -122,10 +116,11 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
                         break sw;
                     }
                 }
-                settings.edit().putString("init_last_refresh", modified).apply(); //Если не совпадают, занести новую дату
+
                 JSONObject content = obj.getJSONObject("CONTENT");
-                init = Initialization.fromJson(content);
+                init = UniversityInfo.fromJson(content);
                 parsetoSqlite(init);
+                settings.edit().putString("init_last_refresh", modified).apply(); //Если не совпадают, занести новую дату
                 Log.d("DOWNLOADING DATA", "SUCCESS");
                 break;
             case "ERROR":   //Неопознанная ошибка
@@ -142,7 +137,7 @@ public class GetInitializationInfoTask extends AsyncTask<Void, Void, Boolean> {
     }
 
 
-    void parsetoSqlite(Initialization init) {
+    void parsetoSqlite(UniversityInfo init) {
 
         // [CR] убери всю эту жуть в класс БД. Вне этого класса вызывать только геттеры-сеттеры
 

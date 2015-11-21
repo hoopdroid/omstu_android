@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBRequest;
-import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
+import savindev.myuniversity.serverTasks.getUniversityInfoTask;
 
 /**Фрагмент - лист с элементами настроек
  */
@@ -69,10 +69,10 @@ public class SettingsFragment extends Fragment{
 						if (MainActivity.isNetworkConnected(getActivity())) {
 							refreshItem.setActionView(R.layout.actionbar_progress);
 							refreshItem.setVisible(true);
-							GetInitializationInfoTask giit = new GetInitializationInfoTask(getActivity().getBaseContext(), null);
-							giit.execute();
+							getUniversityInfoTask guit = new getUniversityInfoTask(getActivity().getBaseContext(), null);
+							guit.execute();
 							try {
-								if (giit.get(7, TimeUnit.SECONDS)) {
+								if (guit.get(7, TimeUnit.SECONDS)) {
 									//Подождать загрузку данных
 									//TODO проанимировать это дело
 								}

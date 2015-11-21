@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +25,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -41,8 +39,8 @@ import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
-import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
+import savindev.myuniversity.serverTasks.getUniversityInfoTask;
 import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
@@ -57,14 +55,12 @@ public class DailyScheduleFragment extends DialogFragment
     private LoadMoreTask lmt;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView scheduleList;
-    private GetInitializationInfoTask giit;
     private boolean isGroup = true;
     private int currentID = 0;
     private String currentGroup = "";
     private GroupsModel main;
     private LinearLayoutManager llm;
     private boolean loading = true;
-    private ArrayList<ScheduleModel> models;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -99,7 +95,6 @@ public class DailyScheduleFragment extends DialogFragment
             scheduleList = (RecyclerView) view.findViewById(R.id.schedule);
             llm = new LinearLayoutManager(getActivity());
             if (savedInstanceState != null) {
-                int a = savedInstanceState.getInt("currentPosition");
                 llm.scrollToPosition(savedInstanceState.getInt("currentPosition"));
             }
             scheduleList.setLayoutManager(llm);
@@ -163,6 +158,7 @@ public class DailyScheduleFragment extends DialogFragment
                 }
             }
         }
+        calendar = new GregorianCalendar();
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -187,10 +183,10 @@ public class DailyScheduleFragment extends DialogFragment
             case R.id.set_id:
                 if (!DBRequest.isInitializationInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
-                        giit = new GetInitializationInfoTask(getActivity().getBaseContext(), null);
-                        giit.execute();
+                        getUniversityInfoTask guit = new getUniversityInfoTask(getActivity().getBaseContext(), null);
+                        guit.execute();
                         try {
-                            if (giit.get(7, TimeUnit.SECONDS)) {
+                            if (guit.get(7, TimeUnit.SECONDS)) {
                                 intent = new Intent(getActivity(), GroupsActivity.class);
                                 startActivity(intent);
                             }
