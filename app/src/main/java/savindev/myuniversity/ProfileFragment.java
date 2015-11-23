@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 
@@ -43,7 +44,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", 0);
 
-       String username = settings.getString("UserName", "no user");
+        String username = settings.getString("UserFirstName","")+ " "+settings.getString("UserMiddleName","") +" " +settings.getString("UserLastName","");
         userNameTxt.setText(username);
         return view;
     }
@@ -62,7 +63,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent i = new Intent(getActivity(), FirstStartActivity.class);
                                 deleteUserPreferences();//TODO удаление расписаний пользователя,ибо при новом запуске к существующему добавляется еще одно
-                                //DBHelper.UsedSchedulesHelper.deleteSchedule(getActivity(),true);
+                                DBRequest.removeAllSchedules(getActivity());
                                 startActivity(i);
                                 getActivity().finish();
                             }

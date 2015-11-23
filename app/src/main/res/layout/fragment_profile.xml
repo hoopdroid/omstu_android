@@ -7,21 +7,20 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal|top"
-        android:background="@color/primary">
+        android:layout_gravity="center_horizontal|top">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView4"
-            android:src="@drawable/ic_account_circle_white_48dp" />
+            android:src="@drawable/ic_account_circle_white_48dp"
+            android:background="@color/primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="UserName"
             android:id="@+id/usernameTxt"
-            android:textColor="#ffffff"
             android:textSize="30dp"
             android:layout_below="@+id/imageView4"
             android:layout_alignParentLeft="true"
@@ -32,11 +31,8 @@
             android:layout_height="wrap_content"
             android:text="ВЫЙТИ"
             android:id="@+id/buttonLogOut"
-            android:layout_alignBottom="@+id/imageView4"
-            android:layout_toRightOf="@+id/imageView4"
-            android:layout_toEndOf="@+id/imageView4"
-            android:layout_marginLeft="61dp"
-            android:layout_marginStart="61dp"
-            android:layout_marginBottom="47dp" />
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 </FrameLayout>

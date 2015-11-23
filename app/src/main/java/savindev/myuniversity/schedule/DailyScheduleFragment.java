@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -158,7 +159,7 @@ public class DailyScheduleFragment extends DialogFragment
                 }
             }
         }
-        calendar = new GregorianCalendar();
+        //calendar = new GregorianCalendar();
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -320,6 +321,7 @@ public class DailyScheduleFragment extends DialogFragment
             scheduleViewHolder.pairTeacher.setText(models.get(i).getTeacher());
             scheduleViewHolder.pairAuditory.setText(models.get(i).getClassroom());
             scheduleViewHolder.pairType.setText(models.get(i).getTipe());
+            //scheduleViewHolder.pairDate.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault())+ ", "+models.get(i).getDate().substring(6,8)+" "+calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()));
             scheduleViewHolder.pairDate.setText(models.get(i).getDate());
             if (i == 0 || !models.get(i).getDate().equals(models.get(i-1).getDate())) {
                 scheduleViewHolder.pairDate.setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
@@ -350,15 +352,10 @@ public class DailyScheduleFragment extends DialogFragment
                 //TODO подумать, как нужно обрабатывать выходные дни
                 ArrayList<ScheduleModel> daySchedule;
                 daySchedule = DBHelper.SchedulesHelper.getSchedules(getActivity(),
-                        "" + calendar.get(Calendar.YEAR) + calendar.get(Calendar.MONTH) + calendar.get(Calendar.DAY_OF_MONTH),
+                        "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH)+1) + calendar.get(Calendar.DAY_OF_MONTH),
                         currentID, isGroup);  //Получение расписания на день
                 //TODO костыль, удалить после организации сортировки по дате начала в БД
-                Collections.sort(daySchedule,  new Comparator<ScheduleModel>() {
-                    @Override
-                    public int compare(ScheduleModel arg0, ScheduleModel arg1) {
-                        return arg0.getStartTime().compareTo(arg1.getStartTime());
-                    }
-                });
+
                 data.addAll(daySchedule);
             }
 

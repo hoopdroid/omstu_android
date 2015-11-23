@@ -219,7 +219,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 Log.e("SQLITE EXCEPTION", e.toString(), e);
             }
 
-            ArrayList teacherIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_TEACHER, COL_ID_DEPARTMENT, teacher_id);
+            ArrayList teacherIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_TEACHER, COL_ID_DEPARTMENT, teacher_id,COL_ID_TEACHER);
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
 
             for (int i = 0; i < teachersNameList.size(); i++) {
@@ -286,7 +286,7 @@ public class DBHelper extends SQLiteOpenHelper {
             String table = TABLE_NAME;
             String selection = COL_BEGIN_DATE;
 
-            return DBRequest.getList(context, table, selection, null, 0);
+            return DBRequest.getList(context, table, selection, null, 0,selection);
 
         }
 
@@ -329,25 +329,26 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-       public int getPairNumber(Context context,int pairId){
-           int number =0;
+        public String getPairNumber(Context context,int pairId){
 
-           DBHelper dbHelper = getInstance(context);
-           SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
+            int number =0;
 
-           try {
-               String selectQuery = "SELECT " + COL_PAIR_NUMBER + " FROM " + TABLE_NAME+ " WHERE " + COL_ID_PAIR + "="+pairId;
-               Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
-               if (c.moveToFirst()) {
-                   number = c.getInt(c.getColumnIndex(COL_PAIR_NUMBER));
-               }
-               c.close();
-           } catch (SQLiteException e) {
-               Log.e("DB EXCEPTION", e.toString(), e);
-           }
+            DBHelper dbHelper = getInstance(context);
+            SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
 
-           return number;
-       }
+            try {
+                String selectQuery = "SELECT " + COL_PAIR_NUMBER + " FROM " + TABLE_NAME+ " WHERE " + COL_ID_PAIR + "="+pairId;
+                Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
+                if (c.moveToFirst()) {
+                    number = c.getInt(c.getColumnIndex(COL_PAIR_NUMBER));
+                }
+                c.close();
+            } catch (SQLiteException e) {
+                Log.e("DB EXCEPTION", e.toString(), e);
+            }
+
+            return Integer.toString(number);
+        }
 
         public String getPairTime(Context context,String selectionTime,int pairId){
             String time = "";
@@ -359,7 +360,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 String selectQuery = "SELECT " + selectionTime + " FROM " + TABLE_NAME+ " WHERE " + COL_ID_PAIR + "="+pairId;
                 Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
                 if (c.moveToFirst()) {
-                    time = c.getString(c.getColumnIndex(selectionTime)).substring(0,5);
+                    time = c.getString(c.getColumnIndex(selectionTime)).substring(0, 5);
 
                 }
                 c.close();
@@ -369,6 +370,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
             return time;
         }
+
+
+
+
 
 
     }
@@ -400,10 +405,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
             String selection = FacultiesHelper.COL_FACULTY_ID;
             int group_id = DBRequest.getIdFromString(context, FacultiesHelper.TABLE_NAME, selection, FacultiesHelper.COL_FACULTY_SHORTNAME, faculty);
-            ArrayList<String> groupNameList = DBRequest.getList(context, TABLE_NAME, COL_GROUP_NAME, COL_ID_FACULTY, group_id);
-            ArrayList groupIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_GROUP, COL_ID_FACULTY, group_id);
+            ArrayList<String> groupNameList = DBRequest.getList(context, TABLE_NAME, COL_GROUP_NAME, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
+            ArrayList groupIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_GROUP, COL_ID_FACULTY, group_id,COL_GROUP_NAME);
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
-
+            int g = 5;
             for (int i = 0; i < groupNameList.size(); i++) {
                 GroupsModel groupsModel = new GroupsModel(
                         groupNameList.get(i),
@@ -412,7 +417,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 );
                 groupsModelArrayList.add(groupsModel);
             }
-
+            int a = 5;
             return groupsModelArrayList;
 
         }
@@ -426,7 +431,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 String selectQuery = "SELECT "+COL_GROUP_NAME+ " FROM " + TABLE_NAME + " WHERE " + COL_ID_GROUP + "="+groupId;
                 Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
                 if (c.moveToFirst()) {
-                   groupName = c.getString(c.getColumnIndex(COL_GROUP_NAME));
+                    groupName = c.getString(c.getColumnIndex(COL_GROUP_NAME));
                 }
                 c.close();
             } catch (SQLiteException e) {
@@ -542,7 +547,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         public String dateFormat(ArrayList<Schedule> schedule,int index){
-             String dt = schedule.get(0).SCHEDULE_FIRST_DATE;
+            String dt = schedule.get(0).SCHEDULE_FIRST_DATE;
             Log.d("BEFORE",dt);// Start date
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             Calendar c = Calendar.getInstance();
@@ -570,33 +575,33 @@ public class DBHelper extends SQLiteOpenHelper {
 
             for (int index = 1; index < schedule.size(); index++) {
                 if (!schedule.get(index).IS_DELETED) {
-                   //TODO test all variants of work dataalreadyornot function)) {
+                    //TODO test all variants of work dataalreadyornot function)) {
                     try {
-                            beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
-                            endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
-                            previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
-                            while (beginDate.compareTo(endDate) <= 0) { // если дата начала пары раньше конца семестра
+                        beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
+                        endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
+                        previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
+                        while (beginDate.compareTo(endDate) <= 0) { // если дата начала пары раньше конца семестра
 
-                                ContentValues scheduleRow = new ContentValues();
-                                scheduleRow.put(SchedulesHelper.COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
-                                scheduleRow.put(SchedulesHelper.COL_PAIR_ID, schedule.get(index).ID_PAIR);
-                                scheduleRow.put(SchedulesHelper.COL_GROUP_ID, schedule.get(index).ID_GROUP);
-                                scheduleRow.put(SchedulesHelper.COL_TEACHER_ID, schedule.get(index).ID_TEACHER);
-                                scheduleRow.put(SchedulesHelper.COL_DISCIPLINE_NAME, schedule.get(index).DISCIPLINE_NAME);
-                                scheduleRow.put(SchedulesHelper.COL_DISCIPLINE_TYPE, schedule.get(index).DISCIPLINE_TYPE);
-                                previousValue = DateUtil.dateFormatIncrease(schedule, index, previousValue);
-                                scheduleRow.put(SchedulesHelper.COL_SCHEDULE_DATE, previousValue);
-                                scheduleRow.put(SchedulesHelper.COL_CLASSROOM_ID, schedule.get(index).ID_CLASSROOM);
-                                scheduleRow.put(SchedulesHelper.COL_SUBGROUP_NUMBER, schedule.get(index).SUBGROUP_NUMBER);
+                            ContentValues scheduleRow = new ContentValues();
+                            scheduleRow.put(SchedulesHelper.COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
+                            scheduleRow.put(SchedulesHelper.COL_PAIR_ID, schedule.get(index).ID_PAIR);
+                            scheduleRow.put(SchedulesHelper.COL_GROUP_ID, schedule.get(index).ID_GROUP);
+                            scheduleRow.put(SchedulesHelper.COL_TEACHER_ID, schedule.get(index).ID_TEACHER);
+                            scheduleRow.put(SchedulesHelper.COL_DISCIPLINE_NAME, schedule.get(index).DISCIPLINE_NAME);
+                            scheduleRow.put(SchedulesHelper.COL_DISCIPLINE_TYPE, schedule.get(index).DISCIPLINE_TYPE);
+                            previousValue = DateUtil.dateFormatIncrease(schedule, index, previousValue);
+                            scheduleRow.put(SchedulesHelper.COL_SCHEDULE_DATE, previousValue);
+                            scheduleRow.put(SchedulesHelper.COL_CLASSROOM_ID, schedule.get(index).ID_CLASSROOM);
+                            scheduleRow.put(SchedulesHelper.COL_SUBGROUP_NUMBER, schedule.get(index).SUBGROUP_NUMBER);
 
-                                if(!DBRequest.checkIsDataAlreadyInDBorNot(context,TABLE_NAME,COL_SCHEDULE_ID,schedule.get(index).ID_SCHEDULE,COL_SCHEDULE_DATE,previousValue))
+                            if(!DBRequest.checkIsDataAlreadyInDBorNot(context,TABLE_NAME,COL_SCHEDULE_ID,schedule.get(index).ID_SCHEDULE,COL_SCHEDULE_DATE,previousValue))
                                 sqliteDatabase.insert(TABLE_NAME, null, scheduleRow);
-                                else break;
-                                beginDate = format.parse(previousValue);
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                            else break;
+                            beginDate = format.parse(previousValue);
                         }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
@@ -608,42 +613,44 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         public static ArrayList<ScheduleModel> getSchedules(Context context,String date,int groupId ,boolean isGroup){
-            /*
-            1.Дата - сегодняшняя в формате yyyyMMdd
-            2.groupId - использовать для выборки из Schedules Table (-groupId брать из контекста)
-            3.isGroup -> лезть в UsedSchedules -> смотреть по id_schedule -чоооо вообще не понял - пока опущу
-            */
 
             ArrayList<ScheduleModel> scheduleModelArrayList = new ArrayList<>();
-
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
             Cursor cursor;
-
-            // 1. Достаем делаем выборку scheduleModel arraylist по group_id
+            int selectionGroup,selectionTeacher;
 
             try {
 
-                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_SCHEDULE_DATE + " = " + date + " AND " + COL_GROUP_ID + " = "+ groupId, null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME  + " WHERE " + COL_SCHEDULE_DATE + " = " + date + " AND " + COL_GROUP_ID + " = "+ groupId +" ORDER BY " +COL_PAIR_ID, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
+
+                    if (isGroup){
+                        selectionGroup =  cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));
+                        selectionTeacher =cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));}
+                    else {
+                        selectionGroup = cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));
+                        selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));}
+
+
                     ScheduleModel scheduleModel = new ScheduleModel(
 
                             cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),
                             cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID)),
-                            cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID)),
-                            cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID)),
+                            selectionGroup,
+                            selectionTeacher,
                             cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID)),
                             cursor.getInt(cursor.getColumnIndex(COL_SUBGROUP_NUMBER)),
-                            cursor.getString(cursor.getColumnIndex(COL_PAIR_ID)),// IS IT CORRECT? IS PAIR_ID ALWAYS EQUALS PAIR NUMBER ?
+                            dbHelper.getPairsHelper().getPairNumber(context,cursor.getColumnIndex(COL_PAIR_ID)),
                             dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME,cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
                             dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
                             cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)), cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
-                            dbHelper.getTeachersHelper().getTeacherById(context,cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID))),//getTeacher by id
-                            dbHelper.getGroupsHelper().getGroupById(context,cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID))),//getGroup by id
-                            "1-330",//classroom  пока ниоткуда?
+                            dbHelper.getTeachersHelper().getTeacherById(context,cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID))),
+                            dbHelper.getGroupsHelper().getGroupById(context,cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID))),
+                            "1-250",
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
                             false// Идем в UsedSchedules таблицу и смотрим там по id_schedule группа это или препоД?
 
@@ -655,6 +662,7 @@ public class DBHelper extends SQLiteOpenHelper {
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
+            int a =5 ;
             return scheduleModelArrayList;
 
         }

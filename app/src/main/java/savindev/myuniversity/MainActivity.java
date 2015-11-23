@@ -38,7 +38,7 @@ import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    static Toolbar toolbar;
+   public static Toolbar toolbar;
     String username;
     String email;
 
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
 //            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151126",197,true);
 
-
+            addfragment(R.string.drawer_schedule,new DailyScheduleFragment());
 
         }
 
@@ -164,9 +164,9 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction;
         fragmentTransaction=fragmentManager
                 .beginTransaction();
-        fragmentTransaction.replace(R.id.content_main,fragment);
+        fragmentTransaction.replace(R.id.content_main, fragment);
         fragmentTransaction.commit();
-        Toast.makeText(getApplicationContext(), title, Toast.LENGTH_SHORT).show();
+
 
     }
 

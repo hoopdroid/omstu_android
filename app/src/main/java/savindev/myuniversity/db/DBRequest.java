@@ -18,7 +18,7 @@ public class DBRequest {
     }
 
 
-    static ArrayList getList(Context context, String table, String selection, String findColumn, int valueColumn) {
+    static ArrayList getList(Context context, String table, String selection, String findColumn, int valueColumn,String orderBy) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
@@ -26,7 +26,7 @@ public class DBRequest {
         ArrayList list = new ArrayList();
         Cursor cursor;
         try {
-            cursor = db.rawQuery("SELECT " + selection + " FROM " + table + " WHERE " + findColumn + " = " + valueColumn + " ORDER BY " + selection, null);
+            cursor = db.rawQuery("SELECT " + selection + " FROM " + table + " WHERE " + findColumn + " = " + valueColumn + " ORDER BY " + orderBy, null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
@@ -146,16 +146,11 @@ public class DBRequest {
         return id;
     }
 
-    public static void removeAllFromDatabase(Context context) {
+    public static void removeAllSchedules(Context context) {
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(DBHelper.TeachersHelper.TABLE_NAME, null, null);
-        db.delete(DBHelper.GroupsHelper.TABLE_NAME, null, null);
-        db.delete(DBHelper.DepartmentsHelper.TABLE_NAME, null, null);
-        db.delete(DBHelper.FacultiesHelper.TABLE_NAME, null, null);
-        db.delete(DBHelper.UniversityInfoHelper.TABLE_NAME, null, null);
-        db.delete(DBHelper.PairsHelper.TABLE_NAME, null, null);
-        db.delete(DBHelper.SemestersHelper.TABLE_NAME, null, null);
+        db.delete(DBHelper.UsedSchedulesHelper.TABLE_NAME, null, null);
+
     }
 
     public static boolean checkIsDataAlreadyInDBorNot(Context context,String TableName,
