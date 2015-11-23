@@ -2,7 +2,6 @@ package savindev.myuniversity.serverTasks;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -69,42 +68,20 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-//        String uri = context.getResources().getString(R.string.uri) + "getSchedule";
-        String uri;
-        if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
-            uri = context.getResources().getString(R.string.uri_test) + "getSchedule?";
-        } else
-            uri = context.getResources().getString(R.string.uri) + "getSchedule?";
-
-        for (GroupsModel m : params) {
-            uri += "&";
-            if (m.isGroup()) {
-                uri += "idGroup=" + m.getId();
-            } else {
-                uri += "idTeacher=" + m.getId();
-            }
-        }
-        URL url;
-        uri = uri.replaceFirst("\\&", "");
+        String uri = context.getResources().getString(R.string.uri) + "getSchedule";
         HttpURLConnection urlConnection = null;
         try {
-            url = new URL(uri);
+            URL url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
-            InputStream inputStream;
-            if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
-                urlConnection.setDoOutput(true); //Отправка json
-                OutputStream output = urlConnection.getOutputStream();
-                output.write(body.getBytes("UTF-8"));
-                output.close();
-                errorCode = urlConnection.getResponseCode();
+            urlConnection.setDoOutput(true); //Отправка json
+            OutputStream output = urlConnection.getOutputStream();
+            output.write(body.getBytes("UTF-8"));
+            output.close();
+            errorCode = urlConnection.getResponseCode();
 
-
-                inputStream = urlConnection.getErrorStream(); //Получение результата
-                if (inputStream == null) {
-                    inputStream = urlConnection.getInputStream();
-                }
-            } else {
+            InputStream inputStream = urlConnection.getErrorStream(); //Получение результата
+            if (inputStream == null) {
                 inputStream = urlConnection.getInputStream();
             }
             StringBuffer buffer = new StringBuffer();
@@ -116,7 +93,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             reader.close();
             String reply = buffer.toString();
 
-            if (reply.isEmpty()) { //Если ответ пустой
+            if (reply.isEmpty()) { //Если ответ пустой, вернуть ошибку
                 return -1;
             }
             replyParse(reply);
@@ -126,7 +103,6 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         } finally {
             urlConnection.disconnect();
         }
-
         return 1;
     }
 
@@ -146,14 +122,11 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     private boolean replyParse(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-        if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
-            if (errorCode != 200) {
-                //TODO обрабатывать коды возврата
-                return false;
-            }
+        if (errorCode != 200) {
+            //TODO обрабатывать коды возврата
+            return false;
         }
-        JSONObject obj = null;
-        obj = new JSONObject(reply);
+        JSONObject obj = new JSONObject(reply);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
@@ -189,7 +162,6 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
     }
 
     private void parsetoSqlite(ArrayList<Schedule> sched) {
-        // [CR] вызовешь тут что-то кроме геттеров-сеттеров - покусаю
         //TODO Parse Schedule to SQlite
         DBHelper dbHelper = DBHelper.getInstance(context);
         dbHelper.getSchedulesHelper().setSchedule(context, sched);
