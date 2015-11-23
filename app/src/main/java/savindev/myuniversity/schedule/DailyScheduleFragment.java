@@ -152,7 +152,7 @@ public class DailyScheduleFragment extends DialogFragment
         } else {
             br:
             for (GroupsModel model : usedList) {
-                if (model.getId() == currentID && model.isGroup() == isGroup) {
+                if (model != null && model.getId() == currentID && model.isGroup() == isGroup) {
                     currentSchedule = model;
                     break br;
                 }

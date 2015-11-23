@@ -53,7 +53,7 @@ public class getUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
         //Возвращать false, если изменений нет
         settings = context.getSharedPreferences("UserInfo", 0);
         String refreshDate = settings.getString("init_last_refresh", "20000101000000"); //дата последнего обновления
-        refreshDate = "20151121212300";
+//        refreshDate = "20151121212300";
         String uri = context.getResources().getString(R.string.uri) + "getUniversityInfo?universityAcronym=" +
                 context.getResources().getString(R.string.university) + "&lastRefresh=" +
                 refreshDate;
@@ -100,7 +100,7 @@ public class getUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault());
                 String modified = obj.getString("LAST_REFRESH");
-                modified = "20151121212300";
+//                modified = "20151121212300";
                 String date = settings.getString("init_last_refresh", ""); // Старая записанная дата обновления
                 if (!(date.equals(""))) { //Если хранящаяся дата не пуста
                     Date lastModifiedDate = null; //Полученная от сервера дата
