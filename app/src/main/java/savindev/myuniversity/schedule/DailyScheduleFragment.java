@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,14 +25,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -42,8 +39,8 @@ import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
-import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
+import savindev.myuniversity.serverTasks.getUniversityInfoTask;
 import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
@@ -58,15 +55,12 @@ public class DailyScheduleFragment extends DialogFragment
     private LoadMoreTask lmt;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView scheduleList;
-    private GetInitializationInfoTask giit;
     private boolean isGroup = true;
     private int currentID = 0;
     private String currentGroup = "";
     private GroupsModel main;
     private LinearLayoutManager llm;
     private boolean loading = true;
-    private ArrayList<ScheduleModel> models;
-    String month;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -101,7 +95,6 @@ public class DailyScheduleFragment extends DialogFragment
             scheduleList = (RecyclerView) view.findViewById(R.id.schedule);
             llm = new LinearLayoutManager(getActivity());
             if (savedInstanceState != null) {
-                int a = savedInstanceState.getInt("currentPosition");
                 llm.scrollToPosition(savedInstanceState.getInt("currentPosition"));
             }
             scheduleList.setLayoutManager(llm);
@@ -165,6 +158,7 @@ public class DailyScheduleFragment extends DialogFragment
                 }
             }
         }
+        calendar = new GregorianCalendar();
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -189,10 +183,10 @@ public class DailyScheduleFragment extends DialogFragment
             case R.id.set_id:
                 if (!DBRequest.isInitializationInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
-                        giit = new GetInitializationInfoTask(getActivity().getBaseContext(), null);
-                        giit.execute();
+                        getUniversityInfoTask guit = new getUniversityInfoTask(getActivity().getBaseContext(), null);
+                        guit.execute();
                         try {
-                            if (giit.get(7, TimeUnit.SECONDS)) {
+                            if (guit.get(7, TimeUnit.SECONDS)) {
                                 intent = new Intent(getActivity(), GroupsActivity.class);
                                 startActivity(intent);
                             }
@@ -326,10 +320,9 @@ public class DailyScheduleFragment extends DialogFragment
             scheduleViewHolder.pairTeacher.setText(models.get(i).getTeacher());
             scheduleViewHolder.pairAuditory.setText(models.get(i).getClassroom());
             scheduleViewHolder.pairType.setText(models.get(i).getTipe());
-            scheduleViewHolder.pairDate.setText(models.get(i).getDate().substring(6,8)+ " " );
+            scheduleViewHolder.pairDate.setText(models.get(i).getDate());
             if (i == 0 || !models.get(i).getDate().equals(models.get(i-1).getDate())) {
-                scheduleViewHolder.pairDate.setBackgroundColor(getResources().getColor(R.color.primary_dark));
-
+                scheduleViewHolder.pairDate.setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                 scheduleViewHolder.pairDate.setVisibility(View.VISIBLE);
             } else {
                 scheduleViewHolder.pairDate.setVisibility(View.GONE);
@@ -356,9 +349,8 @@ public class DailyScheduleFragment extends DialogFragment
                 calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
                 //TODO подумать, как нужно обрабатывать выходные дни
                 ArrayList<ScheduleModel> daySchedule;
-
                 daySchedule = DBHelper.SchedulesHelper.getSchedules(getActivity(),
-                        "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH)+1) + calendar.get(Calendar.DAY_OF_MONTH),
+                        "" + calendar.get(Calendar.YEAR) + calendar.get(Calendar.MONTH) + calendar.get(Calendar.DAY_OF_MONTH),
                         currentID, isGroup);  //Получение расписания на день
                 //TODO костыль, удалить после организации сортировки по дате начала в БД
                 Collections.sort(daySchedule,  new Comparator<ScheduleModel>() {
@@ -388,6 +380,7 @@ public class DailyScheduleFragment extends DialogFragment
             loading = true;
         }
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -410,4 +403,4 @@ public class DailyScheduleFragment extends DialogFragment
     }
 
 
-    }
+}

@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Несколько подклассов связываются в основной класс, представляющий собой полноценный
  * json разбираемого запроса
  */
-public class Initialization {
+public class UniversityInfo {
     public final String UNIVERSITY_FULLNAME;
     public final String UNIVERSITY_SHORTNAME;
     public final int DAYS_IN_WEEK;
@@ -23,48 +23,65 @@ public class Initialization {
     public final ArrayList<DEPARTMENT> DEPARTMENTS;
     public final ArrayList<GROUP> GROUPS;
     public final ArrayList<TEACHER> TEACHERS;
+    public final ArrayList<CAMPUS> CAMPUSES;
+    public final ArrayList<CLASSROOM> CLASSROOMS;
+    public final ArrayList<BUILDING> BUILDINGS;
 
-    public Initialization(String UNIVERSITY_FULLNAME, String UNIVERSITY_SHORTNAME,
-                          int DAYS_IN_WEEK, JSONArray SEMESTERS,
-                          JSONArray FACULTIES, JSONArray DEPARTMENTS,
-                          JSONArray GROUPS, JSONArray TEACHERS,JSONArray Pairs) {
+    public UniversityInfo(String UNIVERSITY_FULLNAME, String UNIVERSITY_SHORTNAME,
+                          int DAYS_IN_WEEK, JSONArray SEMESTERS, JSONArray FACULTIES,
+                          JSONArray DEPARTMENTS, JSONArray GROUPS, JSONArray TEACHERS,
+                          JSONArray PAIRS, JSONArray CAMPUSES, JSONArray CLASSROOMS,
+                          JSONArray BUILDINGS) {
         this.UNIVERSITY_FULLNAME = UNIVERSITY_FULLNAME;
         this.UNIVERSITY_SHORTNAME = UNIVERSITY_SHORTNAME;
         this.DAYS_IN_WEEK = DAYS_IN_WEEK;
-        this.SEMESTERS = SEMESTER.fromJson(SEMESTERS);
-        this.FACULTIES = FACULTY.fromJson(FACULTIES);
-        this.DEPARTMENTS = DEPARTMENT.fromJson(DEPARTMENTS);
-        this.GROUPS = GROUP.fromJson(GROUPS);
-        this.TEACHERS = TEACHER.fromJson(TEACHERS);
-        this.PAIRS = PAIR.fromJson(Pairs);
+        if (SEMESTERS != null)
+            this.SEMESTERS = SEMESTER.fromJson(SEMESTERS);
+        else this.SEMESTERS = new ArrayList<>();
+        if (FACULTIES != null)
+            this.FACULTIES = FACULTY.fromJson(FACULTIES);
+        else this.FACULTIES = new ArrayList<>();
+        if (DEPARTMENTS != null)
+            this.DEPARTMENTS = DEPARTMENT.fromJson(DEPARTMENTS);
+        else this.DEPARTMENTS = new ArrayList<>();
+        if (GROUPS != null)
+            this.GROUPS = GROUP.fromJson(GROUPS);
+        else this.GROUPS = new ArrayList<>();
+        if (TEACHERS != null)
+            this.TEACHERS = TEACHER.fromJson(TEACHERS);
+        else this.TEACHERS = new ArrayList<>();
+        if (PAIRS != null)
+            this.PAIRS = PAIR.fromJson(PAIRS);
+        else this.PAIRS = new ArrayList<>();
+        if (CAMPUSES != null)
+            this.CAMPUSES = CAMPUS.fromJson(CAMPUSES);
+        else this.CAMPUSES = new ArrayList<>();
+        if (CLASSROOMS != null)
+            this.CLASSROOMS = CLASSROOM.fromJson(CLASSROOMS);
+        else this.CLASSROOMS = new ArrayList<>();
+        if (BUILDINGS != null)
+            this.BUILDINGS = BUILDING.fromJson(BUILDINGS);
+        else this.BUILDINGS = new ArrayList<>();
     }
 
-    public static Initialization fromJson(final JSONObject object) {
-        JSONArray SEMESTERS = null;
-        JSONArray FACULTIES = null;
-        JSONArray DEPARTMENTS = null;
-        JSONArray GROUPS = null;
-        JSONArray TEACHERS = null;
-        JSONArray PAIRS = null;
-        String UNIVERSITY_FULLNAME = "";
-        String UNIVERSITY_SHORTNAME = "";
-        int DAYS_IN_WEEK = 0;
-        try {
-            SEMESTERS = object.getJSONArray("SEMESTERS");
-            FACULTIES = object.getJSONArray("FACULTIES");
-            DEPARTMENTS = object.getJSONArray("DEPARTMENTS");
-            GROUPS = object.getJSONArray("GROUPS");
-            TEACHERS = object.getJSONArray("TEACHERS");
-            PAIRS = object.getJSONArray("PAIRS");
-            UNIVERSITY_FULLNAME = object.getString("UNIVERSITY_FULLNAME");
-            UNIVERSITY_SHORTNAME = object.getString("UNIVERSITY_SHORTNAME");
-            DAYS_IN_WEEK = object.getInt("DAYS_IN_WEEK");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public static UniversityInfo fromJson(final JSONObject object) {
 
-        return new Initialization(UNIVERSITY_FULLNAME, UNIVERSITY_SHORTNAME,
-                DAYS_IN_WEEK, SEMESTERS, FACULTIES, DEPARTMENTS, GROUPS, TEACHERS,PAIRS);
+        JSONArray SEMESTERS = object.optJSONArray("SEMESTERS");
+        JSONArray FACULTIES = object.optJSONArray("FACULTIES");
+        JSONArray DEPARTMENTS = object.optJSONArray("DEPARTMENTS");
+        JSONArray GROUPS = object.optJSONArray("GROUPS");
+        JSONArray TEACHERS = object.optJSONArray("TEACHERS");
+        JSONArray PAIRS = object.optJSONArray("PAIRS");
+        JSONArray CAMPUSES = object.optJSONArray("CAMPUSES");
+        JSONArray CLASSROOMS = object.optJSONArray("CLASSROOMS");
+        JSONArray BUILDING = object.optJSONArray("BUILDINGS");
+        String UNIVERSITY_FULLNAME = object.optString("UNIVERSITY_FULLNAME");
+        String UNIVERSITY_SHORTNAME = object.optString("UNIVERSITY_SHORTNAME");
+        int DAYS_IN_WEEK = object.optInt("DAYS_IN_WEEK");
+
+        return new UniversityInfo(UNIVERSITY_FULLNAME, UNIVERSITY_SHORTNAME,
+                DAYS_IN_WEEK, SEMESTERS, FACULTIES, DEPARTMENTS, GROUPS, TEACHERS, PAIRS,
+                CAMPUSES, CLASSROOMS, BUILDING);
     }
 
     public static class SEMESTER { //Классы для парсинга: семестры
@@ -200,7 +217,7 @@ public class Initialization {
             final String DEPARTMENT_SHORTNAME = object.optString("DEPARTMENT_SHORTNAME", "");
             final boolean IS_DELETED = object.optBoolean("IS_DELETED", false);
             return new DEPARTMENT(ID_DEPARTMENT, ID_FACULTY, ID_CLASSROOM,
-            DEPARTMENT_FULLNAME, DEPARTMENT_SHORTNAME, IS_DELETED);
+                    DEPARTMENT_FULLNAME, DEPARTMENT_SHORTNAME, IS_DELETED);
         }
 
         public static ArrayList<DEPARTMENT> fromJson(final JSONArray array) {
@@ -232,8 +249,8 @@ public class Initialization {
         }
 
         public static GROUP fromJson(final JSONObject object) {
-            final int ID_GROUP= object.optInt("ID_GROUP", 0);
-            final int ID_FACULTY= object.optInt("ID_FACULTY", 0);
+            final int ID_GROUP = object.optInt("ID_GROUP", 0);
+            final int ID_FACULTY = object.optInt("ID_FACULTY", 0);
             final String GROUP_NAME = object.optString("GROUP_NAME", "");
             final boolean IS_DELETED = object.optBoolean("IS_DELETED", false);
             return new GROUP(ID_GROUP, ID_FACULTY, GROUP_NAME, IS_DELETED);
@@ -274,8 +291,8 @@ public class Initialization {
         }
 
         public static TEACHER fromJson(final JSONObject object) {
-            final int ID_TEACHER= object.optInt("ID_TEACHER", 0);
-            final int ID_DEPARTMENT= object.optInt("ID_DEPARTMENT", 0);
+            final int ID_TEACHER = object.optInt("ID_TEACHER", 0);
+            final int ID_DEPARTMENT = object.optInt("ID_DEPARTMENT", 0);
             final String TEACHER_LASTNAME = object.optString("TEACHER_LASTNAME", "");
             final String TEACHER_FIRSTNAME = object.optString("TEACHER_FIRSTNAME", "");
             final String TEACHER_MIDDLENAME = object.optString("TEACHER_MIDDLENAME", "");
@@ -285,7 +302,7 @@ public class Initialization {
                     TEACHER_MIDDLENAME, GENDER, IS_DELETED);
         }
 
-        public static  ArrayList<TEACHER> fromJson(final JSONArray array) {
+        public static ArrayList<TEACHER> fromJson(final JSONArray array) {
             final ArrayList<TEACHER> TEACHERS = new ArrayList<TEACHER>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
@@ -295,6 +312,136 @@ public class Initialization {
                 }
             }
             return TEACHERS;
+        }
+    }
+
+    public static class CAMPUS { //Классы для парсинга: кампуса
+
+        public final int ID_CAMPUS;
+        public final String CAMPUS_NAME;
+        public final boolean IS_DELETED;
+
+        public CAMPUS(int ID_CAMPUS, String CAMPUS_NAME, boolean IS_DELETED) {
+            this.ID_CAMPUS = ID_CAMPUS;
+            this.CAMPUS_NAME = CAMPUS_NAME;
+            this.IS_DELETED = IS_DELETED;
+        }
+
+        public static CAMPUS fromJson(final JSONObject object) {
+            final int ID_CAMPUS = object.optInt("ID_CAMPUS", 0);
+            final String CAMPUS_NAME = object.optString("CAMPUS_NAME", "");
+            final boolean IS_DELETED = object.optBoolean("IS_DELETED", false);
+            return new CAMPUS(ID_CAMPUS, CAMPUS_NAME, IS_DELETED);
+        }
+
+        public static ArrayList<CAMPUS> fromJson(final JSONArray array) {
+            final ArrayList<CAMPUS> CAMPUSES = new ArrayList<CAMPUS>();
+            for (int index = 0; index < array.length(); ++index) {
+                try {
+                    final CAMPUS campus = fromJson(array.getJSONObject(index));
+                    if (null != campus) CAMPUSES.add(campus);
+                } catch (final JSONException ignored) {
+                }
+            }
+            return CAMPUSES;
+        }
+    }
+
+    public static class CLASSROOM { //Классы для парсинга: аудитории
+
+        public final int ID_CLASSROOM;
+        public final int ID_BUILDING;
+        public final int CLASSROOM_FLOOR;
+        public final String CLASSROOM_FULLNAME;
+        public final String CLASSROOM_DESCRIPTION;
+        public final String CLASSROOM_NAME;
+        public final String CLASSROOM_TYPE_NAME;
+        public final boolean IS_DELETED;
+
+        public CLASSROOM(int ID_CLASSROOM, int ID_BUILDING, int CLASSROOM_FLOOR, String CLASSROOM_FULLNAME,
+                         String CLASSROOM_DESCRIPTION, String CLASSROOM_NAME, String CLASSROOM_TYPE_NAME, boolean IS_DELETED) {
+            this.ID_CLASSROOM = ID_CLASSROOM;
+            this.CLASSROOM_FLOOR = CLASSROOM_FLOOR;
+            this.ID_BUILDING = ID_BUILDING;
+            this.CLASSROOM_FULLNAME = CLASSROOM_FULLNAME;
+            this.CLASSROOM_DESCRIPTION = CLASSROOM_DESCRIPTION;
+            this.CLASSROOM_NAME = CLASSROOM_NAME;
+            this.CLASSROOM_TYPE_NAME = CLASSROOM_TYPE_NAME;
+            this.IS_DELETED = IS_DELETED;
+        }
+
+        public static CLASSROOM fromJson(final JSONObject object) {
+            final int ID_CLASSROOM = object.optInt("ID_CLASSROOM", 0);
+            final int ID_BUILDING = object.optInt("ID_BUILDING", 0);
+            final int CLASSROOM_FLOOR = object.optInt("CLASSROOM_FLOOR", 0);
+            final String CLASSROOM_FULLNAME = object.optString("CLASSROOM_FULLNAME", "");
+            final String CLASSROOM_DESCRIPTION = object.optString("CLASSROOM_DESCRIPTION", "");
+            final String CLASSROOM_NAME = object.optString("CLASSROOM_NAME", "");
+            final String CLASSROOM_TYPE_NAME = object.optString("CLASSROOM_TYPE_NAME", "");
+            final boolean IS_DELETED = object.optBoolean("IS_DELETED", false);
+            return new CLASSROOM(ID_CLASSROOM, ID_BUILDING, CLASSROOM_FLOOR, CLASSROOM_FULLNAME,
+                    CLASSROOM_DESCRIPTION, CLASSROOM_NAME, CLASSROOM_TYPE_NAME, IS_DELETED);
+        }
+
+        public static ArrayList<CLASSROOM> fromJson(final JSONArray array) {
+            final ArrayList<CLASSROOM> CLASSROOMS = new ArrayList<CLASSROOM>();
+            for (int index = 0; index < array.length(); ++index) {
+                try {
+                    final CLASSROOM classroom = fromJson(array.getJSONObject(index));
+                    if (null != classroom) CLASSROOMS.add(classroom);
+                } catch (final JSONException ignored) {
+                }
+            }
+            return CLASSROOMS;
+        }
+    }
+
+    public static class BUILDING { //Классы для парсинга: здания
+
+        public final int ID_BUILDING;
+        public final int ID_CAMPUS;
+        public final String BUILDING_TYPE_NAME;
+        public final int BUILDING_NUMBER;
+        public final int BUILDING_FLOOR_COUNT;
+        public final String BUILDING_NAME;
+        public final boolean HAS_GROUND_FLOOR;
+        public final boolean IS_DELETED;
+
+        public BUILDING(int ID_BUILDING, int ID_CAMPUS, String BUILDING_TYPE_NAME, int BUILDING_NUMBER,
+                        int BUILDING_FLOOR_COUNT, String BUILDING_NAME, boolean HAS_GROUND_FLOOR, boolean IS_DELETED) {
+            this.ID_BUILDING = ID_BUILDING;
+            this.ID_CAMPUS = ID_CAMPUS;
+            this.BUILDING_TYPE_NAME = BUILDING_TYPE_NAME;
+            this.BUILDING_NUMBER = BUILDING_NUMBER;
+            this.BUILDING_FLOOR_COUNT = BUILDING_FLOOR_COUNT;
+            this.BUILDING_NAME = BUILDING_NAME;
+            this.HAS_GROUND_FLOOR = HAS_GROUND_FLOOR;
+            this.IS_DELETED = IS_DELETED;
+        }
+
+        public static BUILDING fromJson(final JSONObject object) {
+            final int ID_BUILDING = object.optInt("ID_BUILDING", 0);
+            final int ID_CAMPUS = object.optInt("ID_CAMPUS", 0);
+            final String BUILDING_TYPE_NAME = object.optString("BUILDING_TYPE_NAME", "");
+            final int BUILDING_NUMBER = object.optInt("BUILDING_NUMBER", 0);
+            final int BUILDING_FLOOR_COUNT = object.optInt("BUILDING_FLOOR_COUNT", 0);
+            final String BUILDING_NAME = object.optString("BUILDING_NAME", "");
+            final boolean IS_DELETED = object.optBoolean("IS_DELETED", false);
+            final boolean HAS_GROUND_FLOOR = object.optBoolean("HAS_GROUND_FLOOR", false);
+            return new BUILDING(ID_BUILDING, ID_CAMPUS, BUILDING_TYPE_NAME, BUILDING_NUMBER,
+                    BUILDING_FLOOR_COUNT, BUILDING_NAME, HAS_GROUND_FLOOR, IS_DELETED);
+        }
+
+        public static ArrayList<BUILDING> fromJson(final JSONArray array) {
+            final ArrayList<BUILDING> BUILDINGS = new ArrayList<BUILDING>();
+            for (int index = 0; index < array.length(); ++index) {
+                try {
+                    final BUILDING building = fromJson(array.getJSONObject(index));
+                    if (null != building) BUILDINGS.add(building);
+                } catch (final JSONException ignored) {
+                }
+            }
+            return BUILDINGS;
         }
     }
 

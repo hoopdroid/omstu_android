@@ -47,8 +47,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        Map i = settings.getAll();
-        int n =5;
         if(settings.getBoolean("isFirstStart",true)) {
 
             Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
@@ -68,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
 //            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151126",197,true);
 
-            int a = 5;
-            addfragment(R.string.drawer_schedule,new DailyScheduleFragment());
 
 
         }
@@ -121,19 +117,12 @@ public class MainActivity extends AppCompatActivity {
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         itemSchedule,
-
                         itemNavigation,
-
                         itemNotes,
-
                         itemNews,
-
                         itemEducation,
-
                         itemSettings,
                         new SecondaryDrawerItem()
-
-
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override

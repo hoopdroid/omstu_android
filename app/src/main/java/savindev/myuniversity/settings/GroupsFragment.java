@@ -27,8 +27,8 @@ import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.GroupsModel;
-import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
+import savindev.myuniversity.serverTasks.getUniversityInfoTask;
 
 
 public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -66,8 +66,8 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        GetInitializationInfoTask giit = new GetInitializationInfoTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
-        giit.execute(); //Выполняем запрос на получение нужных расписаний
+        getUniversityInfoTask guit = new getUniversityInfoTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
+        guit.execute(); //Выполняем запрос на получение нужных расписаний
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

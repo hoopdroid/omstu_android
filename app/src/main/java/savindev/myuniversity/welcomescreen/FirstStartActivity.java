@@ -18,12 +18,10 @@ import android.widget.LinearLayout;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBRequest;
-import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
+import savindev.myuniversity.serverTasks.getUniversityInfoTask;
 
 public class FirstStartActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Toolbar toolbar;
     private Button btnSignin;
     private Button btnSkip;
     AuthorizationFragment authorizationFragment;
@@ -36,8 +34,8 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
 
         //TODO когда база будет реагировать на даты, проверку убрать. пусть ищет обновления
 //        if(!DBRequest.isInitializationInfoThere(this)) {
-            GetInitializationInfoTask giit = new GetInitializationInfoTask(getBaseContext(), null);
-            giit.execute();
+        getUniversityInfoTask guit = new getUniversityInfoTask(getBaseContext(), null);
+            guit.execute();
 //        }
 
         setContentView(R.layout.activity_first_start);
@@ -78,28 +76,6 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
                 startActivity(intent);
                 break;
         }
-//        if(v==btnSignin){
-//
-//            SlideToDown();
-//            ResizeIcon();
-//            authorizationFragment = new AuthorizationFragment();
-//            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//            transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-//            transaction.replace(R.id.login_fragment, authorizationFragment);
-//            transaction.addToBackStack(null);
-//            transaction.commit();
-//        }
-//
-//        if(v==btnSkip){
-//
-//            SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-//            settings.edit().putBoolean("isFirstStart", false);
-//            SharedPreferences.Editor editor = settings.edit();
-//            editor.putBoolean("isFirstStart", false);
-//            editor.commit();
-//            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//            startActivity(intent);
-//        }
     }
 
 

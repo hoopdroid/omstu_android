@@ -7,14 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,23 +21,17 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -49,8 +40,8 @@ import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
-import savindev.myuniversity.serverTasks.GetInitializationInfoTask;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
+import savindev.myuniversity.serverTasks.getUniversityInfoTask;
 import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
@@ -64,7 +55,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     private RecyclerView scheduleList;
     GregorianCalendar calendar;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    private GetInitializationInfoTask giit;
+    private getUniversityInfoTask guit;
     private ArrayList<GroupsModel> usedList;
     private boolean isGroup = true;
     private String currentGroup = "";
@@ -243,10 +234,10 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 // переход к окну настройки
                 if (!DBRequest.isInitializationInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
-                        giit = new GetInitializationInfoTask(getActivity().getBaseContext(), null);
-                        giit.execute();
+                        guit = new getUniversityInfoTask(getActivity().getBaseContext(), null);
+                        guit.execute();
                         try {
-                            if (giit.get(7, TimeUnit.SECONDS)) {
+                            if (guit.get(7, TimeUnit.SECONDS)) {
                                 intent = new Intent(getActivity(), GroupsActivity.class);
                                 startActivity(intent);
                             }
