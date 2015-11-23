@@ -90,7 +90,7 @@ public class SettingsFragment extends Fragment{
 						lastPosition = position;
 						if (getResources().getConfiguration().orientation ==
 								Configuration.ORIENTATION_LANDSCAPE) {
-							settints.getChildAt(position).setBackgroundColor(Color.GREEN);
+							settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
 							FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
 							fragmentTransaction.replace(R.id.frgmCont, new GroupsFragment());
 							fragmentTransaction.commit();
@@ -112,7 +112,7 @@ public class SettingsFragment extends Fragment{
 					lastPosition = position;
 					if (getResources().getConfiguration().orientation ==
 							Configuration.ORIENTATION_LANDSCAPE) {
-						settints.getChildAt(position).setBackgroundColor(Color.GREEN);
+						settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
 					}
 					break;
 				case 2:
@@ -121,7 +121,7 @@ public class SettingsFragment extends Fragment{
 					lastPosition = position;
 					if (getResources().getConfiguration().orientation ==
 							Configuration.ORIENTATION_LANDSCAPE) {
-						settints.getChildAt(position).setBackgroundColor(Color.GREEN);
+						settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
 					}
 					break;
 				case 3:
@@ -130,7 +130,7 @@ public class SettingsFragment extends Fragment{
 					lastPosition = position;
 					if (getResources().getConfiguration().orientation ==
 							Configuration.ORIENTATION_LANDSCAPE) {
-						settints.getChildAt(position).setBackgroundColor(Color.GREEN);
+						settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
 					}
 					break;
 				default:

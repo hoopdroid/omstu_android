@@ -27,6 +27,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
@@ -46,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-
+        Map i = settings.getAll();
+        int n =5;
         if(settings.getBoolean("isFirstStart",true)) {
 
             Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
@@ -63,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
             initDrawer();
 
             DBHelper dbHelper = DBHelper.getInstance(this);
-            ArrayList test = DBRequest.getAllDBTables(this);
 
-            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151119",137,true);
+//            ArrayList<ScheduleModel> models =  dbHelper.getSchedulesHelper().getSchedules(this,"20151126",197,true);
 
             int a = 5;
+            addfragment(R.string.drawer_schedule,new DailyScheduleFragment());
 
 
         }

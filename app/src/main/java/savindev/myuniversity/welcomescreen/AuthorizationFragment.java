@@ -28,7 +28,7 @@ public class AuthorizationFragment extends Fragment {
 
     private EditText inputEmail, inputPassword;
     private TextInputLayout inputLayoutEmail, inputLayoutPassword;
-    private Button btnSignIn;
+    private Button signIn;
 
     public AuthorizationFragment() {
         // Required empty public constructor
@@ -46,13 +46,13 @@ public class AuthorizationFragment extends Fragment {
 
         inputEmail = (EditText) view.findViewById(R.id.input_email);
         inputPassword = (EditText) view.findViewById(R.id.input_password);
-        btnSignIn = (Button) view.findViewById(R.id.btn_signin);
+        signIn = (Button) view.findViewById(R.id.btn_sign_in);
 
         // TODO change vovik0134 to vovik0134@gmail.com inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
         //inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
 
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
+        signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 

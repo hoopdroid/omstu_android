@@ -513,7 +513,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public class SchedulesHelper {
+    public static class SchedulesHelper {
 
         public static final String TABLE_NAME = "Schedules";
         public static final String COL_SCHEDULE_ID = "schedule_id";
@@ -539,7 +539,6 @@ public class DBHelper extends SQLiteOpenHelper {
                     COL_CLASSROOM_ID+ " INTEGER," +
                     COL_SUBGROUP_NUMBER + " INTEGER" +
                     ");");
-
         }
 
         public String dateFormat(ArrayList<Schedule> schedule,int index){
@@ -560,7 +559,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void setSchedule(Context context,ArrayList<Schedule> schedule) {
 
-
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
@@ -573,7 +571,7 @@ public class DBHelper extends SQLiteOpenHelper {
             for (int index = 1; index < schedule.size(); index++) {
                 if (!schedule.get(index).IS_DELETED) {
                    //TODO test all variants of work dataalreadyornot function)) {
-                        try {
+                    try {
                             beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
                             endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
                             previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
@@ -610,7 +608,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public ArrayList<ScheduleModel> getSchedules(Context context,String date,int groupId ,boolean isGroup){
+        public static ArrayList<ScheduleModel> getSchedules(Context context,String date,int groupId ,boolean isGroup){
             /*
             1.Дата - сегодняшняя в формате yyyyMMdd
             2.groupId - использовать для выборки из Schedules Table (-groupId брать из контекста)
@@ -633,6 +631,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
                 while (!cursor.isAfterLast()) {
                     ScheduleModel scheduleModel = new ScheduleModel(
+
                             cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),
                             cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID)),
                             cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID)),
@@ -657,7 +656,6 @@ public class DBHelper extends SQLiteOpenHelper {
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
-            int a =5;
             return scheduleModelArrayList;
 
         }
@@ -694,6 +692,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
         public static void setSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh) {
+
+
+            //CR: почему бы и нет?
+//            int isGroupDB = 0, isMainDB = 0;
+//            if (isGroup)
+//                isGroupDB = 1;
+//            if (isMain)
+//                isMainDB = 1;
 
             int isGroupDB, isMainDB;
 
