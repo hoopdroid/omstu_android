@@ -133,6 +133,17 @@ public class SettingsFragment extends Fragment{
 						settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
 					}
 					break;
+					case 4: //Тестовая функция, перевод порта
+						settints.setBackgroundColor(Color.WHITE);
+						settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+						lastPosition = position;
+						if (getResources().getConfiguration().orientation ==
+								Configuration.ORIENTATION_LANDSCAPE) {
+							settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+						}
+                        Intent intent = new Intent(getActivity(), Test.class);
+                        startActivity(intent);
+                        break;
 				default:
 					break;
 				}

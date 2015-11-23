@@ -147,7 +147,7 @@ public class DailyScheduleFragment extends DialogFragment
         mSwipeRefreshLayout.setRefreshing(true);
         GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
         GroupsModel currentSchedule = null;
-        if (main.getId() == currentID && main.isGroup() == isGroup) { //Проверка на совпадение с главной группкой
+        if (main != null && main.getId() == currentID && main.isGroup() == isGroup) { //Проверка на совпадение с главной группкой
             currentSchedule = main;
         } else {
             br:

@@ -597,7 +597,6 @@ public class DBHelper extends SQLiteOpenHelper {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                    //}
                 }
 
 

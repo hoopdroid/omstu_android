@@ -70,8 +70,12 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             e.printStackTrace();
         }
 //        String uri = context.getResources().getString(R.string.uri) + "getSchedule";
+        String uri;
+        if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
+            uri = context.getResources().getString(R.string.uri_test) + "getSchedule?";
+        } else
+            uri = context.getResources().getString(R.string.uri) + "getSchedule?";
 
-        String uri = context.getResources().getString(R.string.uri) + "getSchedule?";
         for (GroupsModel m : params) {
             uri += "&";
             if (m.isGroup()) {
@@ -87,17 +91,20 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
+            InputStream inputStream;
+            if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
+                urlConnection.setDoOutput(true); //Отправка json
+                OutputStream output = urlConnection.getOutputStream();
+                output.write(body.getBytes("UTF-8"));
+                output.close();
+                errorCode = urlConnection.getResponseCode();
 
 
-            urlConnection.setDoOutput(true); //Отправка json
-            OutputStream output = urlConnection.getOutputStream();
-            output.write(body.getBytes("UTF-8"));
-            output.close();
-            errorCode = urlConnection.getResponseCode();
-
-
-            InputStream inputStream = urlConnection.getErrorStream(); //Получение результата
-            if (inputStream == null) {
+                inputStream = urlConnection.getErrorStream(); //Получение результата
+                if (inputStream == null) {
+                    inputStream = urlConnection.getInputStream();
+                }
+            } else {
                 inputStream = urlConnection.getInputStream();
             }
             StringBuffer buffer = new StringBuffer();
@@ -139,9 +146,11 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     private boolean replyParse(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-        if (errorCode != 200) {
-            //TODO обрабатывать коды возврата
-            return false;
+        if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
+            if (errorCode != 200) {
+                //TODO обрабатывать коды возврата
+                return false;
+            }
         }
         JSONObject obj = null;
         obj = new JSONObject(reply);

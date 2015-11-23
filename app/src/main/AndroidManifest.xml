@@ -27,6 +27,10 @@
             android:name=".settings.GroupsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.Common"/>
+        <activity
+            android:name=".settings.Test"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme.Common"/>
     </application>
 
 </manifest>

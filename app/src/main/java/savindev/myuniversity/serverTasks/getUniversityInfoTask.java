@@ -54,9 +54,15 @@ public class getUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
         settings = context.getSharedPreferences("UserInfo", 0);
         String refreshDate = settings.getString("init_last_refresh", "20000101000000"); //дата последнего обновления
 //        refreshDate = "20151121212300";
-        String uri = context.getResources().getString(R.string.uri) + "getUniversityInfo?universityAcronym=" +
-                context.getResources().getString(R.string.university) + "&lastRefresh=" +
-                refreshDate;
+        String uri;
+        if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
+            uri = context.getResources().getString(R.string.uri_test) + "getUniversityInfo?universityAcronym=" +
+                    context.getResources().getString(R.string.university) + "&lastRefresh=" + refreshDate;
+        } else {
+            uri = context.getResources().getString(R.string.uri) + "getUniversityInfo?universityAcronym=" +
+                    context.getResources().getString(R.string.university) + "&lastRefresh=" + refreshDate;
+        }
+
         URL url;
         HttpURLConnection urlConnection = null;
         try {
