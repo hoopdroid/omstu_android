@@ -167,7 +167,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         if (!deleteList.isEmpty()) { //Если есть группы для удаления - удалить
             for (GroupsModel model : deleteList) {
-                DBHelper.UsedSchedulesHelper.deleteSchedule(getActivity().getBaseContext(), model.getId());
+                DBHelper.UsedSchedulesHelper.deleteUsedSchedule(getActivity().getBaseContext(), model.getId());
             }
             //TODO удалять расписания из БД
         }

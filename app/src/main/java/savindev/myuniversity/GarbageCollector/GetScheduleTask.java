@@ -165,7 +165,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний
         for (GroupsModel model : params) {
-            DBHelper.UsedSchedulesHelper.setSchedule(context, model.getId(), model.isGroup(), false, lastResresh);
+            DBHelper.UsedSchedulesHelper.setUsedSchedule(context, model.getId(), model.isGroup(), false, lastResresh);
         }
     }
 }

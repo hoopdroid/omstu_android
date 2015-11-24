@@ -180,7 +180,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 //TODO обновить дату при появлении метода в БД
             } else {
                 //Не имеется, добавить
-                DBHelper.UsedSchedulesHelper.setSchedule(context, model.getId(), model.isGroup(), false, lastResresh);
+                DBHelper.UsedSchedulesHelper.setUsedSchedule(context, model.getId(), model.isGroup(), false, lastResresh);
             }
         }
     }

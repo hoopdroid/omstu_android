@@ -219,7 +219,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 Log.e("SQLITE EXCEPTION", e.toString(), e);
             }
 
-            ArrayList teacherIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_TEACHER, COL_ID_DEPARTMENT, teacher_id,COL_ID_TEACHER);
+            ArrayList teacherIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_TEACHER, COL_ID_DEPARTMENT, teacher_id,COL_TEACHER_LASTNAME);
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
 
             for (int i = 0; i < teachersNameList.size(); i++) {
@@ -230,6 +230,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 );
                 groupsModelArrayList.add(groupsModel);
             }
+            int a =5 ;
             return groupsModelArrayList;
         }
 
@@ -530,6 +531,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String COL_SCHEDULE_DATE = "schedule__date";
         public static final String COL_CLASSROOM_ID = "classroom_id";
         public static final String COL_SUBGROUP_NUMBER = "subgroup_number";
+        public static final String COL_IS_CANCELLED = "is_cancelled";
 
 
         public void create(SQLiteDatabase db) {
@@ -542,7 +544,8 @@ public class DBHelper extends SQLiteOpenHelper {
                     COL_DISCIPLINE_TYPE + " TEXT," +
                     COL_SCHEDULE_DATE+ " TEXT," +
                     COL_CLASSROOM_ID+ " INTEGER," +
-                    COL_SUBGROUP_NUMBER + " INTEGER" +
+                    COL_SUBGROUP_NUMBER + " INTEGER," +
+                    COL_IS_CANCELLED + " INTEGER" +
                     ");");
         }
 
@@ -593,6 +596,7 @@ public class DBHelper extends SQLiteOpenHelper {
                             scheduleRow.put(SchedulesHelper.COL_SCHEDULE_DATE, previousValue);
                             scheduleRow.put(SchedulesHelper.COL_CLASSROOM_ID, schedule.get(index).ID_CLASSROOM);
                             scheduleRow.put(SchedulesHelper.COL_SUBGROUP_NUMBER, schedule.get(index).SUBGROUP_NUMBER);
+                            scheduleRow.put(SchedulesHelper.COL_IS_CANCELLED, false);//TODO Сделать обработку в ScheduleDates
 
                             if(!DBRequest.checkIsDataAlreadyInDBorNot(context,TABLE_NAME,COL_SCHEDULE_ID,schedule.get(index).ID_SCHEDULE,COL_SCHEDULE_DATE,previousValue))
                                 sqliteDatabase.insert(TABLE_NAME, null, scheduleRow);
@@ -613,7 +617,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         public static ArrayList<ScheduleModel> getSchedules(Context context,String date,int groupId ,boolean isGroup){
-
+            boolean isCancelled;
             ArrayList<ScheduleModel> scheduleModelArrayList = new ArrayList<>();
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
@@ -635,8 +639,13 @@ public class DBHelper extends SQLiteOpenHelper {
                         selectionGroup = cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));
                         selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));}
 
+                            if(cursor.getInt(cursor.getColumnIndex(COL_IS_CANCELLED))==1)
+                                isCancelled = true;
+                            else
+                                isCancelled = false;
 
-                    ScheduleModel scheduleModel = new ScheduleModel(
+
+                            ScheduleModel scheduleModel = new ScheduleModel(
 
                             cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),
                             cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID)),
@@ -652,7 +661,7 @@ public class DBHelper extends SQLiteOpenHelper {
                             dbHelper.getGroupsHelper().getGroupById(context,cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID))),
                             "1-250",
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
-                            false// Идем в UsedSchedules таблицу и смотрим там по id_schedule группа это или препоД?
+                            isCancelled
 
                     );
                     scheduleModelArrayList.add(scheduleModel);
@@ -698,27 +707,15 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public static void setSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh) {
+        public static void setUsedSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh) {
 
 
-            //CR: почему бы и нет?
-//            int isGroupDB = 0, isMainDB = 0;
-//            if (isGroup)
-//                isGroupDB = 1;
-//            if (isMain)
-//                isMainDB = 1;
+           int isGroupDB = 0, isMainDB = 0;
+           if (isGroup)
+               isGroupDB = 1;
+           if (isMain)
+               isMainDB = 1;
 
-            int isGroupDB, isMainDB;
-
-            if (isGroup)
-                isGroupDB = 1;
-            else
-                isGroupDB = 0;
-
-            if (isMain)
-                isMainDB = 1;
-            else
-                isMainDB = 0;
 
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
@@ -733,7 +730,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public static void deleteSchedule(Context context, int id) {
+        public static void deleteUsedSchedule(Context context, int id) {
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();

@@ -17,8 +17,6 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
@@ -193,7 +191,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 editor.apply();
                 DBHelper dbHelper = DBHelper.getInstance(context);
 
-                dbHelper.getUsedSchedulesHelper().setSchedule(context, groupId, true, true, "20000101000000"); //запись нового основного в таблицу
+                dbHelper.getUsedSchedulesHelper().setUsedSchedule(context, groupId, true, true, "20000101000000"); //запись нового основного в таблицу
 
                 ArrayList<GroupsModel> models = dbHelper.getUsedSchedulesHelper().getGroupsModelList(context); //Получить список id не-основных активных расписаний
                 forbreak:
