@@ -34,6 +34,7 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
     private ArrayList<String> mOriginalNames;
     private ArrayList<GroupsModel> deleteList = new ArrayList<GroupsModel>();
     private ArrayList<GroupsModel> addList = new ArrayList<GroupsModel>();
+    private GroupsModel main;
 
 
     public ExpListAdapter(Context context, ArrayList<String> names,
@@ -44,6 +45,7 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
 
         //Для выделения элементов, сохранных в расписании ранее
         ArrayList<GroupsModel> oldListModel = DBHelper.UsedSchedulesHelper.getGroupsModelList(context); //Список старых групп
+        main = DBHelper.UsedSchedulesHelper.getMainGroupModel(context); //Основная группа, чтобы ее не добавлять и не удалять
         ArrayList<Integer> oldlistId = new ArrayList<>(); //Два листа для уникальности: требуется сравнить все поля по и id idGroup
         ArrayList<Boolean> oldlist = new ArrayList<>();
         for (GroupsModel model : oldListModel) {
@@ -59,6 +61,7 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
                     }
                 }
             }
+
     }
 
     @Override
@@ -123,7 +126,11 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(R.layout.child_view, null);
         if (mGroup.get(groupPosition).get(childPosition).isSelected()) {
-            view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
+            view.setBackgroundColor(mContext.getResources().getColor(R.color.primary)); //Выделение ранее сохраненных групп
+        }
+        if (mGroup.get(groupPosition).get(childPosition).getId() == main.getId() &&
+                mGroup.get(groupPosition).get(childPosition).isGroup() == main.isGroup()) {
+            view.setBackgroundColor(Color.CYAN); //Выделение главной группы
         }
         final ViewHolder holder = new ViewHolder();
         holder.textView = (TextView) view.findViewById(R.id.textChild);
@@ -131,16 +138,19 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {
-                    view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
-                    mGroup.get(groupPosition).get(childPosition).setSelected(true);
-                    addGroup(mGroup.get(groupPosition).get(childPosition));
-                    Log.d("11", "add " + mGroup.get(groupPosition).get(childPosition).getName());
-                } else {
-                    view.setBackgroundColor(Color.WHITE);
-                    mGroup.get(groupPosition).get(childPosition).setSelected(false);
-                    deleteGroup(mGroup.get(groupPosition).get(childPosition));
-                    Log.d("11", "add " + mGroup.get(groupPosition).get(childPosition).getName());
+                if (!(mGroup.get(groupPosition).get(childPosition).getId() == main.getId() &&
+                        mGroup.get(groupPosition).get(childPosition).isGroup() == main.isGroup())) { //Выполнять только для не главной группы
+                    if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {
+                        view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
+                        mGroup.get(groupPosition).get(childPosition).setSelected(true);
+                        addGroup(mGroup.get(groupPosition).get(childPosition));
+                        Log.d("11", "add " + mGroup.get(groupPosition).get(childPosition).getName());
+                    } else {
+                        view.setBackgroundColor(Color.WHITE);
+                        mGroup.get(groupPosition).get(childPosition).setSelected(false);
+                        deleteGroup(mGroup.get(groupPosition).get(childPosition));
+                        Log.d("11", "add " + mGroup.get(groupPosition).get(childPosition).getName());
+                    }
                 }
             }
         });

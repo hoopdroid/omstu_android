@@ -171,6 +171,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
             //TODO удалять расписания из БД
         }
+        adapter.deleteLists(); //Подчистить на случай повторного сохранения
     }
 
     @Override
