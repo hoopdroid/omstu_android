@@ -47,24 +47,36 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         for (int i = 0; i < params.length; i++) {
             JSONObject obj = new JSONObject();
             try {
-                obj.put("ID_GROUP", params[i].getId());
                 obj.put("LAST_REFRESH", params[i].getLastRefresh());
                 if (params[i].isGroup()) {
+                    obj.put("ID_GROUP", params[i].getId());
                     GROUPS.put(obj);
                 } else {
+                    obj.put("ID_TEACHER", params[i].getId());
                     TEACHERS.put(obj);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        if (TEACHERS.toString().length() < 3)
-            TEACHERS = null;
-        if (GROUPS.toString().length() < 3)
-            GROUPS = null;
+
+
+        JSONObject obj = new JSONObject();
         try {
-            body = new String(new JSONObject().
-                    put("GROUPS", GROUPS).put("TEACHERS", TEACHERS).toString());
+            obj.put("GROUPS", (GROUPS.length() == 0) ? JSONObject.NULL : GROUPS);
+            obj.put("TEACHERS", (TEACHERS.length() == 0) ? JSONObject.NULL : TEACHERS);
+//        if (GROUPS.length() == 0) {
+//            obj.put("GROUPS", JSONObject.NULL);
+//        } else {
+//            obj.put("GROUPS", GROUPS);
+//        }
+//        if (TEACHERS.length() == 0) {
+//            obj.put("TEACHERS", JSONObject.NULL);
+//        } else {
+//            obj.put("TEACHERS", TEACHERS);
+//        }
+
+            body = obj.toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -74,6 +86,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             URL url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
+            urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             urlConnection.setDoOutput(true); //Отправка json
             OutputStream output = urlConnection.getOutputStream();
             output.write(body.getBytes("UTF-8"));

@@ -78,6 +78,7 @@ public class SettingsFragment extends Fragment{
 								}
 							} catch (InterruptedException | ExecutionException | TimeoutException e1) {
 								e1.printStackTrace();
+								refreshItem.setVisible(false);
 							}
 						} else {
 							Toast.makeText(getActivity(), "Не удалось получить списки" + '\n'

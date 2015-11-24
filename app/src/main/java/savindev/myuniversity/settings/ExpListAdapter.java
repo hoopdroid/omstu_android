@@ -173,6 +173,11 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         return deleteList;
     }
 
+    public void deleteLists() {
+        addList = new ArrayList<>();
+        deleteList = new ArrayList<>();
+    }
+
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;

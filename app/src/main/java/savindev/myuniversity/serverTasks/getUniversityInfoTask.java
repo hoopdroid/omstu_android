@@ -69,6 +69,7 @@ public class getUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
             url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
+            urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
 

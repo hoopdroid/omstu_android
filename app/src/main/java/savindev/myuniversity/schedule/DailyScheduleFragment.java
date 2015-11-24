@@ -318,6 +318,8 @@ public class DailyScheduleFragment extends DialogFragment
             String b = models.get(i).getEndTime();
             scheduleViewHolder.pairTime.setText(a + "-" + b);
             scheduleViewHolder.pairName.setText(models.get(i).getName());
+            if (models.get(i).getSubgroup() != 0)
+                scheduleViewHolder.pairName.setText(scheduleViewHolder.pairName.getText() + ", подгруппа " + models.get(i).getSubgroup());
             scheduleViewHolder.pairTeacher.setText(models.get(i).getTeacher());
             scheduleViewHolder.pairAuditory.setText(models.get(i).getClassroom());
             scheduleViewHolder.pairType.setText(models.get(i).getTipe());
@@ -351,10 +353,12 @@ public class DailyScheduleFragment extends DialogFragment
                 calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
                 //TODO подумать, как нужно обрабатывать выходные дни
                 ArrayList<ScheduleModel> daySchedule;
+                String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+                if (day.length() < 2)
+                    day = "0" + day;
                 daySchedule = DBHelper.SchedulesHelper.getSchedules(getActivity(),
-                        "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH)+1) + calendar.get(Calendar.DAY_OF_MONTH),
+                        "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH)+1) + day,
                         currentID, isGroup);  //Получение расписания на день
-                //TODO костыль, удалить после организации сортировки по дате начала в БД
 
                 data.addAll(daySchedule);
             }
@@ -381,7 +385,8 @@ public class DailyScheduleFragment extends DialogFragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("currentPosition", llm.onSaveInstanceState());
+        if (llm != null)
+             outState.putParcelable("currentPosition", llm.onSaveInstanceState());
     }
 
 //    @Override

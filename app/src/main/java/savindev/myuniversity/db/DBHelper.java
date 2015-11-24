@@ -20,17 +20,6 @@ import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.schedule.ScheduleModel;
 import savindev.myuniversity.serverTasks.Schedule;
 
-// TODO При get-запросах к локальной БД проверять искомые данные на наличие перед выполнением запроса.
-// При отсутствии - выводить сообщение об ошибке с предложением скачать данные с сервера.
-// Проверять по имени таблице в базе
-// Если невозможно - прописать в контракте методов об ошибке, буду отлавливать у себя
-
-
-// [CR] сделай статичными все классы-методы, где возможно
-// [CR] переведи геттеры на использование VIEW
-// [CR] не склеивай строки при формировании запросов. Используй bind-переменные
-// [CR] и засунь сюда все, что работает с базой данных. негоже им по всей программе расползаться
-
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "university.db";
@@ -219,7 +208,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 Log.e("SQLITE EXCEPTION", e.toString(), e);
             }
 
-            ArrayList teacherIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_TEACHER, COL_ID_DEPARTMENT, teacher_id,COL_TEACHER_LASTNAME);
+            ArrayList teacherIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_TEACHER, COL_ID_DEPARTMENT, teacher_id, COL_TEACHER_LASTNAME);
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
 
             for (int i = 0; i < teachersNameList.size(); i++) {
@@ -230,19 +219,19 @@ public class DBHelper extends SQLiteOpenHelper {
                 );
                 groupsModelArrayList.add(groupsModel);
             }
-            int a =5 ;
+            int a = 5;
             return groupsModelArrayList;
         }
 
-        public String getTeacherById(Context context,int teacher_id){
+        public String getTeacherById(Context context, int teacher_id) {
             String teacherName = "";
 
             DBHelper dbHelper = getInstance(context);
             SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
 
             try {
-                String selectQuery = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID_TEACHER + "="+teacher_id;
-                Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
+                String selectQuery = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID_TEACHER + "=" + teacher_id;
+                Cursor c = sqLiteDatabase.rawQuery(selectQuery, null);
                 if (c.moveToFirst()) {
 
                     String lastname = c.getString(c.getColumnIndex(COL_TEACHER_LASTNAME));
@@ -256,7 +245,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 Log.e("DB EXCEPTION", e.toString(), e);
             }
 
-            return  teacherName;
+            return teacherName;
         }
 
     }
@@ -287,16 +276,16 @@ public class DBHelper extends SQLiteOpenHelper {
             String table = TABLE_NAME;
             String selection = COL_BEGIN_DATE;
 
-            return DBRequest.getList(context, table, selection, null, 0,selection);
+            return DBRequest.getList(context, table, selection, null, 0, selection);
 
         }
 
-        public String getSemesterEndDate(Context context,int idSemester){
+        public String getSemesterEndDate(Context context, int idSemester) {
             String endDate = "";
 
             DBHelper dbHelper = DBHelper.getInstance(context);
             SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
-            String find = "SELECT "+COL_END_DATE+" FROM  " + TABLE_NAME + " WHERE " + COL_ID_SEMESTER + " = " + idSemester;
+            String find = "SELECT " + COL_END_DATE + " FROM  " + TABLE_NAME + " WHERE " + COL_ID_SEMESTER + " = " + idSemester;
             Cursor cursor = sqLiteDatabase.rawQuery(find, null);
 
             cursor.moveToFirst();
@@ -306,7 +295,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 cursor.moveToNext();
             }
             cursor.close();
-            return  endDate;
+            return endDate;
         }
     }
 
@@ -330,16 +319,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public String getPairNumber(Context context,int pairId){
+        public String getPairNumber(Context context, int pairId) {
 
-            int number =0;
+            int number = 0;
 
             DBHelper dbHelper = getInstance(context);
             SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
 
             try {
-                String selectQuery = "SELECT " + COL_PAIR_NUMBER + " FROM " + TABLE_NAME+ " WHERE " + COL_ID_PAIR + "="+pairId;
-                Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
+                String selectQuery = "SELECT " + COL_PAIR_NUMBER + " FROM " + TABLE_NAME + " WHERE " + COL_ID_PAIR + "=" + pairId;
+                Cursor c = sqLiteDatabase.rawQuery(selectQuery, null);
                 if (c.moveToFirst()) {
                     number = c.getInt(c.getColumnIndex(COL_PAIR_NUMBER));
                 }
@@ -351,15 +340,15 @@ public class DBHelper extends SQLiteOpenHelper {
             return Integer.toString(number);
         }
 
-        public String getPairTime(Context context,String selectionTime,int pairId){
+        public String getPairTime(Context context, String selectionTime, int pairId) {
             String time = "";
 
             DBHelper dbHelper = getInstance(context);
             SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
 
             try {
-                String selectQuery = "SELECT " + selectionTime + " FROM " + TABLE_NAME+ " WHERE " + COL_ID_PAIR + "="+pairId;
-                Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
+                String selectQuery = "SELECT " + selectionTime + " FROM " + TABLE_NAME + " WHERE " + COL_ID_PAIR + "=" + pairId;
+                Cursor c = sqLiteDatabase.rawQuery(selectQuery, null);
                 if (c.moveToFirst()) {
                     time = c.getString(c.getColumnIndex(selectionTime)).substring(0, 5);
 
@@ -371,10 +360,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
             return time;
         }
-
-
-
-
 
 
     }
@@ -407,7 +392,7 @@ public class DBHelper extends SQLiteOpenHelper {
             String selection = FacultiesHelper.COL_FACULTY_ID;
             int group_id = DBRequest.getIdFromString(context, FacultiesHelper.TABLE_NAME, selection, FacultiesHelper.COL_FACULTY_SHORTNAME, faculty);
             ArrayList<String> groupNameList = DBRequest.getList(context, TABLE_NAME, COL_GROUP_NAME, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
-            ArrayList groupIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_GROUP, COL_ID_FACULTY, group_id,COL_GROUP_NAME);
+            ArrayList groupIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_GROUP, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
             int g = 5;
             for (int i = 0; i < groupNameList.size(); i++) {
@@ -423,14 +408,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public String getGroupById(Context context,int groupId){
+        public String getGroupById(Context context, int groupId) {
             String groupName = "";
 
             DBHelper dbHelper = getInstance(context);
             SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
             try {
-                String selectQuery = "SELECT "+COL_GROUP_NAME+ " FROM " + TABLE_NAME + " WHERE " + COL_ID_GROUP + "="+groupId;
-                Cursor c = sqLiteDatabase.rawQuery(selectQuery,null);
+                String selectQuery = "SELECT " + COL_GROUP_NAME + " FROM " + TABLE_NAME + " WHERE " + COL_ID_GROUP + "=" + groupId;
+                Cursor c = sqLiteDatabase.rawQuery(selectQuery, null);
                 if (c.moveToFirst()) {
                     groupName = c.getString(c.getColumnIndex(COL_GROUP_NAME));
                 }
@@ -438,7 +423,6 @@ public class DBHelper extends SQLiteOpenHelper {
             } catch (SQLiteException e) {
                 Log.e("DB EXCEPTION", e.toString(), e);
             }
-
 
 
             return groupName;
@@ -542,16 +526,16 @@ public class DBHelper extends SQLiteOpenHelper {
                     COL_TEACHER_ID + " INTEGER," +
                     COL_DISCIPLINE_NAME + " TEXT," +
                     COL_DISCIPLINE_TYPE + " TEXT," +
-                    COL_SCHEDULE_DATE+ " TEXT," +
-                    COL_CLASSROOM_ID+ " INTEGER," +
+                    COL_SCHEDULE_DATE + " TEXT," +
+                    COL_CLASSROOM_ID + " INTEGER," +
                     COL_SUBGROUP_NUMBER + " INTEGER," +
                     COL_IS_CANCELLED + " INTEGER" +
                     ");");
         }
 
-        public String dateFormat(ArrayList<Schedule> schedule,int index){
+        public String dateFormat(ArrayList<Schedule> schedule, int index) {
             String dt = schedule.get(0).SCHEDULE_FIRST_DATE;
-            Log.d("BEFORE",dt);// Start date
+            Log.d("BEFORE", dt);// Start date
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             Calendar c = Calendar.getInstance();
             try {
@@ -561,20 +545,20 @@ public class DBHelper extends SQLiteOpenHelper {
             }
             c.add(Calendar.DATE, schedule.get(index).SCHEDULE_INTERVAL);  // number of days to add
             dt = sdf.format(c.getTime());  // dt is now the new date
-            Log.d("AFTER",dt);
-            return  dt;
+            Log.d("AFTER", dt);
+            return dt;
         }
 
-        public void setSchedule(Context context,ArrayList<Schedule> schedule) {
+        public void setSchedule(Context context, ArrayList<Schedule> schedule) {
 
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
 
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-            String previousValue="";
+            String previousValue = "";
             Date beginDate = null;
-            Date endDate=null;
+            Date endDate = null;
 
             for (int index = 1; index < schedule.size(); index++) {
                 if (!schedule.get(index).IS_DELETED) {
@@ -598,7 +582,7 @@ public class DBHelper extends SQLiteOpenHelper {
                             scheduleRow.put(SchedulesHelper.COL_SUBGROUP_NUMBER, schedule.get(index).SUBGROUP_NUMBER);
                             scheduleRow.put(SchedulesHelper.COL_IS_CANCELLED, false);//TODO Сделать обработку в ScheduleDates
 
-                            if(!DBRequest.checkIsDataAlreadyInDBorNot(context,TABLE_NAME,COL_SCHEDULE_ID,schedule.get(index).ID_SCHEDULE,COL_SCHEDULE_DATE,previousValue))
+                            if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE, COL_SCHEDULE_DATE, previousValue))
                                 sqliteDatabase.insert(TABLE_NAME, null, scheduleRow);
                             else break;
                             beginDate = format.parse(previousValue);
@@ -606,46 +590,44 @@ public class DBHelper extends SQLiteOpenHelper {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                }
-
-
-                else
+                } else
                     DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
             }
 
 
         }
 
-        public static ArrayList<ScheduleModel> getSchedules(Context context,String date,int groupId ,boolean isGroup){
+        public static ArrayList<ScheduleModel> getSchedules(Context context, String date, int groupId, boolean isGroup) {
             boolean isCancelled;
             ArrayList<ScheduleModel> scheduleModelArrayList = new ArrayList<>();
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
             Cursor cursor;
-            int selectionGroup,selectionTeacher;
+            int selectionGroup, selectionTeacher;
 
             try {
 
-                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME  + " WHERE " + COL_SCHEDULE_DATE + " = " + date + " AND " + COL_GROUP_ID + " = "+ groupId +" ORDER BY " +COL_PAIR_ID, null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_SCHEDULE_DATE + " = " + date + " AND " + COL_GROUP_ID + " = " + groupId + " ORDER BY " + COL_PAIR_ID, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
 
-                    if (isGroup){
-                        selectionGroup =  cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));
-                        selectionTeacher =cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));}
-                    else {
+                    if (isGroup) {
+                        selectionGroup = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));
+                        selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));
+                    } else {
                         selectionGroup = cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));
-                        selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));}
+                        selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));
+                    }
 
-                            if(cursor.getInt(cursor.getColumnIndex(COL_IS_CANCELLED))==1)
-                                isCancelled = true;
-                            else
-                                isCancelled = false;
+                    if (cursor.getInt(cursor.getColumnIndex(COL_IS_CANCELLED)) == 1)
+                        isCancelled = true;
+                    else
+                        isCancelled = false;
 
 
-                            ScheduleModel scheduleModel = new ScheduleModel(
+                    ScheduleModel scheduleModel = new ScheduleModel(
 
                             cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),
                             cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID)),
@@ -653,12 +635,12 @@ public class DBHelper extends SQLiteOpenHelper {
                             selectionTeacher,
                             cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID)),
                             cursor.getInt(cursor.getColumnIndex(COL_SUBGROUP_NUMBER)),
-                            dbHelper.getPairsHelper().getPairNumber(context,cursor.getColumnIndex(COL_PAIR_ID)),
-                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME,cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
+                            dbHelper.getPairsHelper().getPairNumber(context, cursor.getColumnIndex(COL_PAIR_ID)),
+                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME, cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
                             dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
                             cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)), cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
-                            dbHelper.getTeachersHelper().getTeacherById(context,cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID))),
-                            dbHelper.getGroupsHelper().getGroupById(context,cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID))),
+                            dbHelper.getTeachersHelper().getTeacherById(context, cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID))),
+                            dbHelper.getGroupsHelper().getGroupById(context, cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID))),
                             "1-250",
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
                             isCancelled
@@ -671,14 +653,12 @@ public class DBHelper extends SQLiteOpenHelper {
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
-            int a =5 ;
             return scheduleModelArrayList;
 
         }
 
 
     }
-
 
 
     public static class UsedSchedulesHelper {
@@ -710,11 +690,11 @@ public class DBHelper extends SQLiteOpenHelper {
         public static void setUsedSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh) {
 
 
-           int isGroupDB = 0, isMainDB = 0;
-           if (isGroup)
-               isGroupDB = 1;
-           if (isMain)
-               isMainDB = 1;
+            int isGroupDB = 0, isMainDB = 0;
+            if (isGroup)
+                isGroupDB = 1;
+            if (isMain)
+                isMainDB = 1;
 
 
             SQLiteDatabase db;
@@ -731,6 +711,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         public static void deleteUsedSchedule(Context context, int id) {
+            //TODO сначала удалить пары из бд, потом саму группу из используемых. для удаления пар воспользоваться методом
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
