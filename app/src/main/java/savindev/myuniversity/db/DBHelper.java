@@ -20,6 +20,7 @@ import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.schedule.ScheduleModel;
 import savindev.myuniversity.serverTasks.Schedule;
 import savindev.myuniversity.serverTasks.ScheduleDates;
+import savindev.myuniversity.serverTasks.UniversityInfo;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -56,7 +57,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static DBHelper getInstance(Context context) {
         if (instance == null)
-            instance = new DBHelper(context);
+            instance = new DBHelper(context.getApplicationContext());
         return instance;
     }
 
@@ -123,10 +124,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // [CR] почему внутренние переменные публичные?
 
-       public static final String TABLE_NAME = "UniversityInfo";
-       public static final String COL_FULLNAME = "fullname";
-       public static final String COL_SHORTNAME = "shortname";
-       public static final String COL_DAYS_IN_WEEK = "daysinweek";
+       protected static final String TABLE_NAME = "UniversityInfo";
+       protected static final String COL_FULLNAME = "fullname";
+       protected static final String COL_SHORTNAME = "shortname";
+       protected static final String COL_DAYS_IN_WEEK = "daysinweek";
 
 
         public void create(SQLiteDatabase db) {
@@ -153,17 +154,31 @@ public class DBHelper extends SQLiteOpenHelper {
         public int getUniversityDaysInWeek(Cursor cursor) {
             return cursor.getInt(cursor.getColumnIndex(COL_DAYS_IN_WEEK));
         }
+
+        public void setUniversityInfo(Context context,UniversityInfo init){
+            //PARSE UNIVERSITY INFO TO SQLITE
+
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+            ContentValues uninfoRow = new ContentValues();
+            uninfoRow.put(DBHelper.UniversityInfoHelper.COL_FULLNAME, init.UNIVERSITY_FULLNAME);
+            uninfoRow.put(DBHelper.UniversityInfoHelper.COL_SHORTNAME, init.UNIVERSITY_SHORTNAME);
+            uninfoRow.put(DBHelper.UniversityInfoHelper.COL_DAYS_IN_WEEK, init.DAYS_IN_WEEK);
+            sqliteDatabase.insert(DBHelper.UniversityInfoHelper.TABLE_NAME, null, uninfoRow);
+        }
     }
 
     public static class TeachersHelper { // [CR] и во всех это поправить
 
-        public static final String TABLE_NAME = "Teachers";
-        public static final String COL_ID_TEACHER = "id_teacher";
-        public static final String COL_ID_DEPARTMENT = "id_department";
-        public static final String COL_TEACHER_LASTNAME = "teacher_lastname";
-        public static final String COL_TEACHER_FIRSTNAME = "teacher_firstname";
-        public static final String COL_TEACHER_MIDDLENAME = "teacher_middlename";
-        public static final String COL_TEACHER_GENDER = "gender";
+        protected static final String TABLE_NAME = "Teachers";
+        protected static final String COL_ID_TEACHER = "id_teacher";
+        protected static final String COL_ID_DEPARTMENT = "id_department";
+        protected static final String COL_TEACHER_LASTNAME = "teacher_lastname";
+        protected static final String COL_TEACHER_FIRSTNAME = "teacher_firstname";
+        protected static final String COL_TEACHER_MIDDLENAME = "teacher_middlename";
+        protected static final String COL_TEACHER_GENDER = "gender";
 
 
         public void create(SQLiteDatabase db) {
@@ -179,6 +194,27 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
+       public void setTeachers(Context context,UniversityInfo init) {
+
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+            ContentValues teacherRow = new ContentValues();
+            for (int index = 0; index < init.TEACHERS.size(); index++) {
+                if (!init.TEACHERS.get(index).IS_DELETED) {
+                    teacherRow.put(DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
+                    teacherRow.put(DBHelper.TeachersHelper.COL_ID_DEPARTMENT, init.TEACHERS.get(index).ID_DEPARTMENT);
+                    teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_LASTNAME, init.TEACHERS.get(index).TEACHER_LASTNAME);
+                    teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_FIRSTNAME, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
+                    teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
+                    sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);
+                } else {
+                    DBRequest.delete_byID(sqliteDatabase, DBHelper.TeachersHelper.TABLE_NAME, DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
+                }
+            }
+        }
+
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
@@ -191,7 +227,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
-            db = dbHelper.getWritableDatabase();
+            db = dbHelper.getReadableDatabase();
             Cursor cursor;
             try {
                 cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID_DEPARTMENT + " = " + teacher_id + " ORDER BY " + COL_TEACHER_LASTNAME, null);
@@ -233,7 +269,7 @@ public class DBHelper extends SQLiteOpenHelper {
             String teacherName = "";
 
             DBHelper dbHelper = getInstance(context);
-            SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
+            SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
 
             try {
                 String selectQuery = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID_TEACHER + "=" + teacher_id;
@@ -258,10 +294,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public class SemestersHelper {
 
-        public static final String TABLE_NAME = "Semesters";
-        public static final String COL_ID_SEMESTER = "id_semester";
-        public static final String COL_BEGIN_DATE = "begindate";
-        public static final String COL_END_DATE = "enddate";
+       protected static final String TABLE_NAME = "Semesters";
+       protected static final String COL_ID_SEMESTER = "id_semester";
+       protected static final String COL_BEGIN_DATE = "begindate";
+       protected static final String COL_END_DATE = "enddate";
 
 
         public void create(SQLiteDatabase db) {
@@ -275,6 +311,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+        }
+
+       public void setSemesters(Context context,UniversityInfo init) {
+
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+
+            //PARSE SEMESTRES TO SQLITE
+            ContentValues semestresRow = new ContentValues();
+            for (int index = 0; index < init.SEMESTERS.size(); index++) {
+                if(!init.SEMESTERS.get(index).IS_DELETED) {
+                    semestresRow.put(DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
+                    semestresRow.put(DBHelper.SemestersHelper.COL_BEGIN_DATE, init.SEMESTERS.get(index).BEGIN_DT);
+                    semestresRow.put(DBHelper.SemestersHelper.COL_END_DATE, init.SEMESTERS.get(index).END_DT);
+                    sqliteDatabase.insert(DBHelper.SemestersHelper.TABLE_NAME, null, semestresRow);
+                }
+                else{
+                    DBRequest.delete_byID(sqliteDatabase, DBHelper.SemestersHelper.TABLE_NAME, DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
+                }
+            }
         }
 
         public ArrayList getSemesters(Context context) {
@@ -305,14 +363,13 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-
     public class PairsHelper {
 
-       public static final String TABLE_NAME = "Pairs";
-       public static final String COL_ID_PAIR = "pair_id";
-       public static final String COL_PAIR_NUMBER = "pair_number";
-       public static final String COL_BEGIN_TIME = "pair_begin_time";
-       public static final String COL_END_TIME = "pair_end_time";
+       protected static final String TABLE_NAME = "Pairs";
+       protected static final String COL_ID_PAIR = "pair_id";
+       protected static final String COL_PAIR_NUMBER = "pair_number";
+       protected static final String COL_BEGIN_TIME = "pair_begin_time";
+       protected static final String COL_END_TIME = "pair_end_time";
 
 
         public void create(SQLiteDatabase db) {
@@ -325,12 +382,35 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
+       public void setPairs(Context context,UniversityInfo init) {
+
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+
+            //PARSE PAIRS TO SQLITE
+            ContentValues pairsRow = new ContentValues();
+            for (int index = 0; index < init.PAIRS.size(); index++) {
+                if(!init.PAIRS.get(index).IS_DELETED) {
+                    pairsRow.put(DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
+                    pairsRow.put(DBHelper.PairsHelper.COL_PAIR_NUMBER, init.PAIRS.get(index).PAIR_NUMBER);
+                    pairsRow.put(DBHelper.PairsHelper.COL_BEGIN_TIME, init.PAIRS.get(index).PAIR_BEGIN_TIME);
+                    pairsRow.put(DBHelper.PairsHelper.COL_END_TIME, init.PAIRS.get(index).PAIR_END_TIME);
+                    sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
+                }
+                else {
+                    DBRequest.delete_byID(sqliteDatabase, DBHelper.PairsHelper.TABLE_NAME, DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
+                }
+            }
+        }
+
         public String getPairNumber(Context context, int pairId) {
 
             int number = 0;
 
             DBHelper dbHelper = getInstance(context);
-            SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
+            SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
 
             try {
                 String selectQuery = "SELECT " + COL_PAIR_NUMBER + " FROM " + TABLE_NAME + " WHERE " + COL_ID_PAIR + "=" + pairId;
@@ -350,7 +430,7 @@ public class DBHelper extends SQLiteOpenHelper {
             String time = "";
 
             DBHelper dbHelper = getInstance(context);
-            SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
+            SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
 
             try {
                 String selectQuery = "SELECT " + selectionTime + " FROM " + TABLE_NAME + " WHERE " + COL_ID_PAIR + "=" + pairId;
@@ -372,10 +452,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static class GroupsHelper {
 
-       public static final String TABLE_NAME = "Groups";
-       public static final String COL_ID_GROUP = "group_id";
-       public static final String COL_ID_FACULTY = "faculty_id";
-       public static final String COL_GROUP_NAME = "name_group";
+       protected static final String TABLE_NAME = "Groups";
+       protected static final String COL_ID_GROUP = "group_id";
+       protected static final String COL_ID_FACULTY = "faculty_id";
+       protected static final String COL_GROUP_NAME = "name_group";
 
 
         public void create(SQLiteDatabase db) {
@@ -389,6 +469,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+        }
+
+       public void setGroups(Context context,UniversityInfo init) {
+
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+
+            //PARSE GROUPS TO SQLITE
+            ContentValues groupsRow = new ContentValues();
+            for (int index = 0; index < init.GROUPS.size(); index++) {
+                if(!init.GROUPS.get(index).IS_DELETED) {
+                    groupsRow.put(DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
+                    groupsRow.put(DBHelper.GroupsHelper.COL_GROUP_NAME, init.GROUPS.get(index).GROUP_NAME);
+                    groupsRow.put(DBHelper.GroupsHelper.COL_ID_FACULTY, init.GROUPS.get(index).ID_FACULTY);
+                    sqliteDatabase.insert(DBHelper.GroupsHelper.TABLE_NAME, null, groupsRow);
+                }
+                else{
+                    DBRequest.delete_byID(sqliteDatabase, DBHelper.GroupsHelper.TABLE_NAME, DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
+                }
+            }
         }
 
 
@@ -418,7 +520,7 @@ public class DBHelper extends SQLiteOpenHelper {
             String groupName = "";
 
             DBHelper dbHelper = getInstance(context);
-            SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
+            SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
             try {
                 String selectQuery = "SELECT " + COL_GROUP_NAME + " FROM " + TABLE_NAME + " WHERE " + COL_ID_GROUP + "=" + groupId;
                 Cursor c = sqLiteDatabase.rawQuery(selectQuery, null);
@@ -439,10 +541,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static class FacultiesHelper {
 
-       public static final String TABLE_NAME = "Faculties";
-       public static final String COL_FACULTY_ID = "faculty_id";
-       public static final String COL_FACULTY_FULLNAME = "faculty_fullname";
-       public static final String COL_FACULTY_SHORTNAME = "faculty_shortname";
+       protected static final String TABLE_NAME = "Faculties";
+       protected static final String COL_FACULTY_ID = "faculty_id";
+       protected static final String COL_FACULTY_FULLNAME = "faculty_fullname";
+       protected static final String COL_FACULTY_SHORTNAME = "faculty_shortname";
 
 
         public void create(SQLiteDatabase db) {
@@ -452,6 +554,28 @@ public class DBHelper extends SQLiteOpenHelper {
                     COL_FACULTY_SHORTNAME + " TEXT" +
                     ");");
 
+        }
+
+       public void setFaculties(Context context,UniversityInfo init) {
+
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+
+            //PARSE FACULTIES TO SQLITE
+            ContentValues facultiesRow = new ContentValues();
+            for(int index = 0 ; index < init.FACULTIES.size();index++) {
+                if(!init.FACULTIES.get(index).IS_DELETED) {
+                    facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
+                    facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_FULLNAME, init.FACULTIES.get(index).FACULTY_FULLNAME);
+                    facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_SHORTNAME, init.FACULTIES.get(index).FACULTY_SHORTNAME);
+                    sqliteDatabase.insert(DBHelper.FacultiesHelper.TABLE_NAME, null, facultiesRow);
+                }
+                else {
+                    DBRequest.delete_byID(sqliteDatabase, DBHelper.FacultiesHelper.TABLE_NAME, DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
+                }
+            }
         }
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -473,12 +597,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public class DepartmentsHelper {
 
-       public static final String TABLE_NAME = "Departments";
-       public static final String COL_DEPARTMENT_ID = "department_id";
-       public static final String COL_FACULTY_ID = "faculty_id";
-       public static final String COL_CLASSROOM_ID = "classroom_id";
-       public static final String COL_DEPARTMENT_FULLNAME = "department_fullname";
-       public static final String COL_DEPARTMENT_SHORTNAME = "department_shortname";
+      protected static final String TABLE_NAME = "Departments";
+      protected static final String COL_DEPARTMENT_ID = "department_id";
+      protected static final String COL_FACULTY_ID = "faculty_id";
+      protected static final String COL_CLASSROOM_ID = "classroom_id";
+      protected static final String COL_DEPARTMENT_FULLNAME = "department_fullname";
+      protected static final String COL_DEPARTMENT_SHORTNAME = "department_shortname";
 
 
         public void create(SQLiteDatabase db) {
@@ -490,6 +614,30 @@ public class DBHelper extends SQLiteOpenHelper {
                     COL_DEPARTMENT_SHORTNAME + " TEXT" +
                     ");");
 
+        }
+
+        public void setDepartments(Context context,UniversityInfo init) {
+
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+
+            //PARSE DEPARTMENTS TO SQLITE
+            ContentValues departmentsRow = new ContentValues();
+            for (int index = 0; index < init.DEPARTMENTS.size(); index++) {
+                if(!init.DEPARTMENTS.get(index).IS_DELETED) {
+                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
+                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_FACULTY_ID, init.DEPARTMENTS.get(index).ID_FACULTY);
+                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_CLASSROOM_ID, init.DEPARTMENTS.get(index).ID_CLASSROOM);
+                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_FULLNAME, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
+                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_SHORTNAME, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
+                    sqliteDatabase.insert(DBHelper.DepartmentsHelper.TABLE_NAME, null, departmentsRow);
+                }
+                else {
+                    DBRequest.delete_byID(sqliteDatabase, DBHelper.DepartmentsHelper.TABLE_NAME, DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
+                }
+            }
         }
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -607,14 +755,16 @@ public class DBHelper extends SQLiteOpenHelper {
             boolean isCancelled;
             ArrayList<ScheduleModel> scheduleModelArrayList = new ArrayList<>();
             SQLiteDatabase db;
-            DBHelper dbHelper = new DBHelper(context);
+            DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
             Cursor cursor;
             int selectionGroup, selectionTeacher;
 
             try {
-
-                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_SCHEDULE_DATE + " = " + date + " AND " + COL_GROUP_ID + " = " + groupId + " ORDER BY " + COL_PAIR_ID, null);
+                if(isGroup)
+                    cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_SCHEDULE_DATE + " = " + date + " AND " + COL_GROUP_ID + " = " + groupId + " ORDER BY " + COL_PAIR_ID, null);
+                else
+                    cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_SCHEDULE_DATE + " = " + date + " AND " + COL_TEACHER_ID + " = " + groupId + " ORDER BY " + COL_PAIR_ID, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
@@ -669,12 +819,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static class UsedSchedulesHelper {
 
-      public static final String TABLE_NAME = "UsedSchedules";
-      public static final String COL_ID_SCHEDULE = "id_schedule";
-      public static final String COL_NAME_SCHEDULE = "name_schedule";
-      public static final String COL_IS_GROUP = "is_group";
-      public static final String COL_IS_MAIN = "is_main";
-      public static final String COL_LAST_REFRESH_DATE = "last_refresh_date";
+      protected static final String TABLE_NAME = "UsedSchedules";
+      protected static final String COL_ID_SCHEDULE = "id_schedule";
+      protected static final String COL_NAME_SCHEDULE = "name_schedule";
+      protected static final String COL_IS_GROUP = "is_group";
+      protected static final String COL_IS_MAIN = "is_main";
+      protected static final String COL_LAST_REFRESH_DATE = "last_refresh_date";
 
 
         public void create(SQLiteDatabase db) {
@@ -711,12 +861,22 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public static void deleteUsedSchedule(Context context, int isMain) {
-            //TODO сначала удалить пары из бд, потом саму группу из используемых. для удаления пар воспользоваться методом
+        public static void deleteMainSchedule(Context context) {
+
+            int isMainDB=1;
+
             SQLiteDatabase db;
-            DBHelper dbHelper = new DBHelper(context);
+            DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
-            db.delete(TABLE_NAME, COL_IS_MAIN + "=" + isMain, null);
+            db.delete(TABLE_NAME, COL_IS_MAIN + "=" + isMainDB, null);
+        }
+
+        public static void deleteUsedSchedule(Context context,int groupId) {
+
+            SQLiteDatabase db;
+            DBHelper dbHelper = DBHelper.getInstance(context);
+            db = dbHelper.getWritableDatabase();
+            db.delete(TABLE_NAME, COL_ID_SCHEDULE + "=" + groupId, null);
         }
 
         public static GroupsModel getMainGroupModel(Context context) {
@@ -724,7 +884,7 @@ public class DBHelper extends SQLiteOpenHelper {
             GroupsModel groupsModelMain = null;
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
-            db = dbHelper.getWritableDatabase();
+            db = dbHelper.getReadableDatabase();
 
             Cursor cursor;
             try {
@@ -763,7 +923,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
-            db = dbHelper.getWritableDatabase();
+            db = dbHelper.getReadableDatabase();
 
             Cursor cursor;
             try {
@@ -800,10 +960,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public class ScheduleDatesHelper {
 
-       public static final String TABLE_NAME = "ScheduleDates";
-       public static final String COL_SCHEDULE_ID = "department_id";
-       public static final String COL_DATE = "date";
-       public static final String COL_IS_CANCELLED = "is_cancelled";
+      protected static final String TABLE_NAME = "ScheduleDates";
+      protected static final String COL_SCHEDULE_ID = "department_id";
+      protected static final String COL_DATE = "date";
+      protected static final String COL_IS_CANCELLED = "is_cancelled";
 
 
 

@@ -146,112 +146,16 @@ public class getUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     void parsetoSqlite(UniversityInfo init) {
 
-        // [CR] убери всю эту жуть в класс БД. Вне этого класса вызывать только геттеры-сеттеры
 
-        SQLiteDatabase sqliteDatabase;
-        DBHelper helper = new DBHelper(context);
-        sqliteDatabase = helper.getWritableDatabase();
+        DBHelper dbHelper = DBHelper.getInstance(context);
 
-        //PARSE UNIVERSITY INFO TO SQLITE
-
-        ContentValues uninfoRow = new ContentValues();
-        uninfoRow.put(DBHelper.UniversityInfoHelper.COL_FULLNAME, init.UNIVERSITY_FULLNAME);
-        uninfoRow.put(DBHelper.UniversityInfoHelper.COL_SHORTNAME, init.UNIVERSITY_SHORTNAME);
-        uninfoRow.put(DBHelper.UniversityInfoHelper.COL_DAYS_IN_WEEK, init.DAYS_IN_WEEK);
-        sqliteDatabase.insert(DBHelper.UniversityInfoHelper.TABLE_NAME, null, uninfoRow);
-
-        //PARSE TEACHERS TO SQLITE
-        ContentValues teacherRow = new ContentValues();
-        for (int index = 0; index < init.TEACHERS.size(); index++) {
-            if(!init.TEACHERS.get(index).IS_DELETED){
-            teacherRow.put(DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
-            teacherRow.put(DBHelper.TeachersHelper.COL_ID_DEPARTMENT, init.TEACHERS.get(index).ID_DEPARTMENT);
-            teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_LASTNAME, init.TEACHERS.get(index).TEACHER_LASTNAME);
-            teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_FIRSTNAME, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
-            teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
-            sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);}
-            else{
-                DBRequest.delete_byID(sqliteDatabase, DBHelper.TeachersHelper.TABLE_NAME, DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
-            }
-
-
-
-
-        }
-
-        //PARSE SEMESTRES TO SQLITE
-        ContentValues semestresRow = new ContentValues();
-        for (int index = 0; index < init.SEMESTERS.size(); index++) {
-            if(!init.SEMESTERS.get(index).IS_DELETED) {
-                semestresRow.put(DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
-                semestresRow.put(DBHelper.SemestersHelper.COL_BEGIN_DATE, init.SEMESTERS.get(index).BEGIN_DT);
-                semestresRow.put(DBHelper.SemestersHelper.COL_END_DATE, init.SEMESTERS.get(index).END_DT);
-                sqliteDatabase.insert(DBHelper.SemestersHelper.TABLE_NAME, null, semestresRow);
-            }
-            else{
-                DBRequest.delete_byID(sqliteDatabase, DBHelper.SemestersHelper.TABLE_NAME, DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
-            }
-        }
-
-        //PARSE PAIRS TO SQLITE
-        ContentValues pairsRow = new ContentValues();
-        for (int index = 0; index < init.PAIRS.size(); index++) {
-            if(!init.PAIRS.get(index).IS_DELETED) {
-                pairsRow.put(DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
-                pairsRow.put(DBHelper.PairsHelper.COL_PAIR_NUMBER, init.PAIRS.get(index).PAIR_NUMBER);
-                pairsRow.put(DBHelper.PairsHelper.COL_BEGIN_TIME, init.PAIRS.get(index).PAIR_BEGIN_TIME);
-                pairsRow.put(DBHelper.PairsHelper.COL_END_TIME, init.PAIRS.get(index).PAIR_END_TIME);
-                sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
-            }
-            else {
-                DBRequest.delete_byID(sqliteDatabase, DBHelper.PairsHelper.TABLE_NAME, DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
-            }
-        }
-
-        //PARSE GROUPS TO SQLITE
-        ContentValues groupsRow = new ContentValues();
-        for (int index = 0; index < init.GROUPS.size(); index++) {
-            if(!init.GROUPS.get(index).IS_DELETED) {
-                groupsRow.put(DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
-                groupsRow.put(DBHelper.GroupsHelper.COL_GROUP_NAME, init.GROUPS.get(index).GROUP_NAME);
-                groupsRow.put(DBHelper.GroupsHelper.COL_ID_FACULTY, init.GROUPS.get(index).ID_FACULTY);
-                sqliteDatabase.insert(DBHelper.GroupsHelper.TABLE_NAME, null, groupsRow);
-            }
-            else{
-                DBRequest.delete_byID(sqliteDatabase, DBHelper.GroupsHelper.TABLE_NAME, DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
-            }
-        }
-
-        //PARSE DEPARTMENTS TO SQLITE
-        ContentValues departmentsRow = new ContentValues();
-        for (int index = 0; index < init.DEPARTMENTS.size(); index++) {
-            if(!init.DEPARTMENTS.get(index).IS_DELETED) {
-                departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
-                departmentsRow.put(DBHelper.DepartmentsHelper.COL_FACULTY_ID, init.DEPARTMENTS.get(index).ID_FACULTY);
-                departmentsRow.put(DBHelper.DepartmentsHelper.COL_CLASSROOM_ID, init.DEPARTMENTS.get(index).ID_CLASSROOM);
-                departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_FULLNAME, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
-                departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_SHORTNAME, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
-                sqliteDatabase.insert(DBHelper.DepartmentsHelper.TABLE_NAME, null, departmentsRow);
-            }
-            else {
-                DBRequest.delete_byID(sqliteDatabase, DBHelper.DepartmentsHelper.TABLE_NAME, DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
-            }
-        }
-
-        //PARSE FACULTIES TO SQLITE
-        ContentValues facultiesRow = new ContentValues();
-        for(int index = 0 ; index < init.FACULTIES.size();index++) {
-            if(!init.FACULTIES.get(index).IS_DELETED) {
-                facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
-                facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_FULLNAME, init.FACULTIES.get(index).FACULTY_FULLNAME);
-                facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_SHORTNAME, init.FACULTIES.get(index).FACULTY_SHORTNAME);
-                sqliteDatabase.insert(DBHelper.FacultiesHelper.TABLE_NAME, null, facultiesRow);
-            }
-            else {
-                DBRequest.delete_byID(sqliteDatabase, DBHelper.FacultiesHelper.TABLE_NAME, DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
-            }
-        }
-
+        dbHelper.getUniversityInfoHelper().setUniversityInfo(context,init);
+        dbHelper.getTeachersHelper().setTeachers(context,init);
+        dbHelper.getSemestersHelper().setSemesters(context,init);
+        dbHelper.getPairsHelper().setPairs(context,init);
+        dbHelper.getGroupsHelper().setGroups(context,init);
+        dbHelper.getFacultiesHelper().setFaculties(context,init);
+        dbHelper.getDepartmentsHelper().setDepartments(context,init);
 
     }
 

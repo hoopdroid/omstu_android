@@ -176,7 +176,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
     }
 
     private void parsetoSqlite(ArrayList<Schedule> sched) {
-        //TODO Parse Schedule to SQlite
+
         DBHelper dbHelper = DBHelper.getInstance(context);
         dbHelper.getSchedulesHelper().setSchedule(context, sched);
     }

@@ -22,7 +22,7 @@ public class DBRequest {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
-        db = dbHelper.getWritableDatabase();
+        db = dbHelper.getReadableDatabase();
         ArrayList list = new ArrayList();
         Cursor cursor;
         try {
@@ -50,7 +50,7 @@ public class DBRequest {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
-        db = dbHelper.getWritableDatabase();
+        db = dbHelper.getReadableDatabase();
         ArrayList list = new ArrayList();
         Cursor cursor;
         try {
@@ -75,7 +75,7 @@ public class DBRequest {
         SQLiteDatabase db;
         ArrayList tables = getAllDBTables(context);
         DBHelper dbHelper = new DBHelper(context);
-        db = dbHelper.getWritableDatabase();
+        db = dbHelper.getReadableDatabase();
 
 
         boolean hasTables = false;
@@ -112,7 +112,7 @@ public class DBRequest {
         SQLiteDatabase db;
         ArrayList tables = new ArrayList();
         DBHelper dbHelper = new DBHelper(context);
-        db = dbHelper.getWritableDatabase();
+        db = dbHelper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
         c.moveToFirst();
         if (c.moveToNext()) {
@@ -131,7 +131,7 @@ public class DBRequest {
 
         int id = 0;
         DBHelper dbHelper = DBHelper.getInstance(context);
-        SQLiteDatabase sqLiteDatabase = dbHelper.getWritableDatabase();
+        SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
 
         try {
             String selectQuery = "SELECT " + selection + " FROM " + tableName + " WHERE " + columnName + "=?";
