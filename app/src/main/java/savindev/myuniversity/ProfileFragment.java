@@ -53,6 +53,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
 
     private void alertDialog() {
+        final DBHelper dbHelper = DBHelper.getInstance(getActivity());
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Сменить пользователя?")
                 .setMessage("Ваши данные могут быть утеряны")
@@ -63,7 +64,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent i = new Intent(getActivity(), FirstStartActivity.class);
                                 deleteUserPreferences();//TODO удаление расписаний пользователя,ибо при новом запуске к существующему добавляется еще одно
-                                DBRequest.removeAllSchedules(getActivity());
+                                dbHelper.getUsedSchedulesHelper().deleteUsedSchedule(getActivity(),1);
                                 startActivity(i);
                                 getActivity().finish();
                             }

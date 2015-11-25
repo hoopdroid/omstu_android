@@ -19,6 +19,7 @@ import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.schedule.ScheduleModel;
 import savindev.myuniversity.serverTasks.Schedule;
+import savindev.myuniversity.serverTasks.ScheduleDates;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -35,6 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private DepartmentsHelper departmentsHelper;
     private UsedSchedulesHelper usedSchedulesHelper;
     private SchedulesHelper schedulesHelper;
+    private ScheduleDatesHelper scheduleDatesHelper;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -48,6 +50,7 @@ public class DBHelper extends SQLiteOpenHelper {
         departmentsHelper = new DepartmentsHelper();
         usedSchedulesHelper = new UsedSchedulesHelper();
         schedulesHelper = new SchedulesHelper();
+        scheduleDatesHelper = new ScheduleDatesHelper();
 
     }
 
@@ -68,6 +71,7 @@ public class DBHelper extends SQLiteOpenHelper {
         departmentsHelper.create(db);
         usedSchedulesHelper.create(db);
         schedulesHelper.create(db);
+        scheduleDatesHelper.create(db);
     }
 
     @Override
@@ -112,15 +116,17 @@ public class DBHelper extends SQLiteOpenHelper {
         return schedulesHelper;
     }
 
+    public ScheduleDatesHelper getScheduleDatesHelper(){return  scheduleDatesHelper;}
+
 
     public class UniversityInfoHelper { // [CR] либо класс сделать приватным, либо убрать геттеры для классов. правильнее - первое
 
         // [CR] почему внутренние переменные публичные?
 
-        public static final String TABLE_NAME = "UniversityInfo";
-        public static final String COL_FULLNAME = "fullname";
-        public static final String COL_SHORTNAME = "shortname";
-        public static final String COL_DAYS_IN_WEEK = "daysinweek";
+       public static final String TABLE_NAME = "UniversityInfo";
+       public static final String COL_FULLNAME = "fullname";
+       public static final String COL_SHORTNAME = "shortname";
+       public static final String COL_DAYS_IN_WEEK = "daysinweek";
 
 
         public void create(SQLiteDatabase db) {
@@ -302,11 +308,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public class PairsHelper {
 
-        public static final String TABLE_NAME = "Pairs";
-        public static final String COL_ID_PAIR = "pair_id";
-        public static final String COL_PAIR_NUMBER = "pair_number";
-        public static final String COL_BEGIN_TIME = "pair_begin_time";
-        public static final String COL_END_TIME = "pair_end_time";
+       public static final String TABLE_NAME = "Pairs";
+       public static final String COL_ID_PAIR = "pair_id";
+       public static final String COL_PAIR_NUMBER = "pair_number";
+       public static final String COL_BEGIN_TIME = "pair_begin_time";
+       public static final String COL_END_TIME = "pair_end_time";
 
 
         public void create(SQLiteDatabase db) {
@@ -366,10 +372,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static class GroupsHelper {
 
-        public static final String TABLE_NAME = "Groups";
-        public static final String COL_ID_GROUP = "group_id";
-        public static final String COL_ID_FACULTY = "faculty_id";
-        public static final String COL_GROUP_NAME = "name_group";
+       public static final String TABLE_NAME = "Groups";
+       public static final String COL_ID_GROUP = "group_id";
+       public static final String COL_ID_FACULTY = "faculty_id";
+       public static final String COL_GROUP_NAME = "name_group";
 
 
         public void create(SQLiteDatabase db) {
@@ -433,10 +439,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static class FacultiesHelper {
 
-        public static final String TABLE_NAME = "Faculties";
-        public static final String COL_FACULTY_ID = "faculty_id";
-        public static final String COL_FACULTY_FULLNAME = "faculty_fullname";
-        public static final String COL_FACULTY_SHORTNAME = "faculty_shortname";
+       public static final String TABLE_NAME = "Faculties";
+       public static final String COL_FACULTY_ID = "faculty_id";
+       public static final String COL_FACULTY_FULLNAME = "faculty_fullname";
+       public static final String COL_FACULTY_SHORTNAME = "faculty_shortname";
 
 
         public void create(SQLiteDatabase db) {
@@ -467,12 +473,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public class DepartmentsHelper {
 
-        public static final String TABLE_NAME = "Departments";
-        public static final String COL_DEPARTMENT_ID = "department_id";
-        public static final String COL_FACULTY_ID = "faculty_id";
-        public static final String COL_CLASSROOM_ID = "classroom_id";
-        public static final String COL_DEPARTMENT_FULLNAME = "department_fullname";
-        public static final String COL_DEPARTMENT_SHORTNAME = "department_shortname";
+       public static final String TABLE_NAME = "Departments";
+       public static final String COL_DEPARTMENT_ID = "department_id";
+       public static final String COL_FACULTY_ID = "faculty_id";
+       public static final String COL_CLASSROOM_ID = "classroom_id";
+       public static final String COL_DEPARTMENT_FULLNAME = "department_fullname";
+       public static final String COL_DEPARTMENT_SHORTNAME = "department_shortname";
 
 
         public void create(SQLiteDatabase db) {
@@ -505,17 +511,17 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static class SchedulesHelper {
 
-        public static final String TABLE_NAME = "Schedules";
-        public static final String COL_SCHEDULE_ID = "schedule_id";
-        public static final String COL_PAIR_ID = "pair_id";
-        public static final String COL_GROUP_ID = "group_id";
-        public static final String COL_TEACHER_ID = "teacher_id";
-        public static final String COL_DISCIPLINE_NAME = "discipline_name";
-        public static final String COL_DISCIPLINE_TYPE = "discipline_type";
-        public static final String COL_SCHEDULE_DATE = "schedule__date";
-        public static final String COL_CLASSROOM_ID = "classroom_id";
-        public static final String COL_SUBGROUP_NUMBER = "subgroup_number";
-        public static final String COL_IS_CANCELLED = "is_cancelled";
+      public static final String TABLE_NAME = "Schedules";
+      public static final String COL_SCHEDULE_ID = "schedule_id";
+      public static final String COL_PAIR_ID = "pair_id";
+      public static final String COL_GROUP_ID = "group_id";
+      public static final String COL_TEACHER_ID = "teacher_id";
+      public static final String COL_DISCIPLINE_NAME = "discipline_name";
+      public static final String COL_DISCIPLINE_TYPE = "discipline_type";
+      public static final String COL_SCHEDULE_DATE = "schedule__date";
+      public static final String COL_CLASSROOM_ID = "classroom_id";
+      public static final String COL_SUBGROUP_NUMBER = "subgroup_number";
+      public static final String COL_IS_CANCELLED = "is_cancelled";
 
 
         public void create(SQLiteDatabase db) {
@@ -663,12 +669,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static class UsedSchedulesHelper {
 
-        public static final String TABLE_NAME = "UsedSchedules";
-        public static final String COL_ID_SCHEDULE = "id_schedule";
-        public static final String COL_NAME_SCHEDULE = "name_schedule";
-        public static final String COL_IS_GROUP = "is_group";
-        public static final String COL_IS_MAIN = "is_main";
-        public static final String COL_LAST_REFRESH_DATE = "last_refresh_date";
+      public static final String TABLE_NAME = "UsedSchedules";
+      public static final String COL_ID_SCHEDULE = "id_schedule";
+      public static final String COL_NAME_SCHEDULE = "name_schedule";
+      public static final String COL_IS_GROUP = "is_group";
+      public static final String COL_IS_MAIN = "is_main";
+      public static final String COL_LAST_REFRESH_DATE = "last_refresh_date";
 
 
         public void create(SQLiteDatabase db) {
@@ -689,33 +695,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public static void setUsedSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh) {
 
-
-            int isGroupDB = 0, isMainDB = 0;
-            if (isGroup)
-                isGroupDB = 1;
-            if (isMain)
-                isMainDB = 1;
-
-
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
             ContentValues scheduleRow = new ContentValues();
             scheduleRow.put(COL_ID_SCHEDULE, groupid);
-            scheduleRow.put(COL_NAME_SCHEDULE, DBRequest.getUserGroup(groupid, context));
-            scheduleRow.put(COL_IS_GROUP, isGroupDB);
-            scheduleRow.put(COL_IS_MAIN, isMainDB);
+            if (isGroup)
+                scheduleRow.put(COL_NAME_SCHEDULE, DBRequest.getUserGroup(groupid, context));
+            else
+                scheduleRow.put(COL_NAME_SCHEDULE, DBHelper.getInstance(context).getTeachersHelper().getTeacherById(context,groupid));
+            scheduleRow.put(COL_IS_GROUP, isGroup);
+            scheduleRow.put(COL_IS_MAIN, isMain);
             scheduleRow.put(COL_LAST_REFRESH_DATE, lastRefresh);
             db.insert(TABLE_NAME, null, scheduleRow);
 
         }
 
-        public static void deleteUsedSchedule(Context context, int id) {
+        public static void deleteUsedSchedule(Context context, int isMain) {
             //TODO сначала удалить пары из бд, потом саму группу из используемых. для удаления пар воспользоваться методом
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
-            DBRequest.delete_byID(db, TABLE_NAME, COL_ID_SCHEDULE, id);
+            db.delete(TABLE_NAME, COL_IS_MAIN + "=" + isMain, null);
         }
 
         public static GroupsModel getMainGroupModel(Context context) {
@@ -793,9 +794,42 @@ public class DBHelper extends SQLiteOpenHelper {
 
             return groupsModelArrayList;
         }
+    }
+
+
+
+    public class ScheduleDatesHelper {
+
+       public static final String TABLE_NAME = "ScheduleDates";
+       public static final String COL_SCHEDULE_ID = "department_id";
+       public static final String COL_DATE = "date";
+       public static final String COL_IS_CANCELLED = "is_cancelled";
+
+
+
+        public void create(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_SCHEDULE_ID + " INTEGER," +
+                    COL_DATE + " TEXT," +
+                    COL_IS_CANCELLED + " INTEGER" +
+                    ");");
+
+        }
+
+
+        public void getScheduleDates(Context context,ArrayList<ScheduleDates> scheduleDates) {
+
+
+
+        }
 
 
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        this.close();
+        super.finalize();
+    }
 
 }

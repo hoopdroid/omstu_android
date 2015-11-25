@@ -155,6 +155,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 }
                 try {
                     scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
+
 //                    parsetoSqlite(scheddates);
                 } catch (JSONException e) {
                     //Поле оказалось нулевым?
@@ -178,8 +179,11 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         //TODO Parse Schedule to SQlite
         DBHelper dbHelper = DBHelper.getInstance(context);
         dbHelper.getSchedulesHelper().setSchedule(context, sched);
+    }
 
-
+    private void parseScheduleDates(ArrayList<ScheduleDates> scheduleDates){
+        DBHelper dbHelper = DBHelper.getInstance(context);
+        dbHelper.getScheduleDatesHelper().getScheduleDates(context,scheduleDates);
     }
 
     private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний

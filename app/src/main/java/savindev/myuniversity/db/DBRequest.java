@@ -42,7 +42,7 @@ public class DBRequest {
             Log.e("SQLITE EXCEPTION", e.toString(), e);
         }
 
-
+        db.close();
         return list;
     }
 
@@ -66,7 +66,7 @@ public class DBRequest {
         } catch (SQLiteException e) {
             Log.e("SQLITE DB EXCEPTION", e.toString(), e);
         }
-
+        db.close();
         return list;
     }
 
@@ -90,7 +90,7 @@ public class DBRequest {
                 cursor.close();
             }
         }
-
+        db.close();
         return hasTables;
 
 
@@ -123,6 +123,7 @@ public class DBRequest {
                 c.moveToNext();
             }
         }
+        db.close();
         return tables;
     }
 
@@ -142,7 +143,7 @@ public class DBRequest {
         } catch (SQLiteException e) {
             Log.e("DB EXCEPTION", e.toString(), e);
         }
-
+        sqLiteDatabase.close();
         return id;
     }
 
@@ -164,6 +165,7 @@ public class DBRequest {
             return false;
         }
         cursor.close();
+        database.close();
         return true;
     }
 
@@ -186,6 +188,7 @@ public class DBRequest {
             cursor.moveToNext();
         }
         cursor.close();
+        sqLiteDatabase.close();
         return groupName;
     }
 }
