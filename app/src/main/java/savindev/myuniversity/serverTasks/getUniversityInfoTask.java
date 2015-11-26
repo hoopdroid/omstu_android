@@ -35,14 +35,14 @@ import savindev.myuniversity.db.DBRequest;
  * факультетах, кафедрах, группах, преподавателях.
  * После запроса на сервер информация разбирается с помощью подклассов класса Parsers
  */
-public class getUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
+public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
     final private int TIMEOUT_MILLISEC = 5000;
     int errorCode = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     SharedPreferences settings;
 
-    public getUniversityInfoTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
+    public GetUniversityInfoTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
         super();
         this.context = context;
         this.mSwipeRefreshLayout = mSwipeRefreshLayout;

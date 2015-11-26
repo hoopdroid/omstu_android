@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/pair"
+        android:id="@+id/pairName"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_margin="6dp"

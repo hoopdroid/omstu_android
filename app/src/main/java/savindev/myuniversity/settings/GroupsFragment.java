@@ -28,7 +28,7 @@ import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
-import savindev.myuniversity.serverTasks.getUniversityInfoTask;
+import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 
 
 public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -66,7 +66,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
-        getUniversityInfoTask guit = new getUniversityInfoTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
+        GetUniversityInfoTask guit = new GetUniversityInfoTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
         guit.execute(); //Выполняем запрос на получение нужных расписаний
     }
 

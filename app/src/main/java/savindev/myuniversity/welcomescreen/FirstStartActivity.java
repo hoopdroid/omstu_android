@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -18,7 +17,7 @@ import android.widget.LinearLayout;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
-import savindev.myuniversity.serverTasks.getUniversityInfoTask;
+import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 
 public class FirstStartActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,7 +33,7 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
 
         //TODO когда база будет реагировать на даты, проверку убрать. пусть ищет обновления
 //        if(!DBRequest.isInitializationInfoThere(this)) {
-        getUniversityInfoTask guit = new getUniversityInfoTask(getBaseContext(), null);
+        GetUniversityInfoTask guit = new GetUniversityInfoTask(getBaseContext(), null);
             guit.execute();
 //        }
 

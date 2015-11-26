@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBRequest;
-import savindev.myuniversity.serverTasks.getUniversityInfoTask;
+import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 
 /**Фрагмент - лист с элементами настроек
  */
@@ -69,7 +69,7 @@ public class SettingsFragment extends Fragment{
 						if (MainActivity.isNetworkConnected(getActivity())) {
 							refreshItem.setActionView(R.layout.actionbar_progress);
 							refreshItem.setVisible(true);
-							getUniversityInfoTask guit = new getUniversityInfoTask(getActivity().getBaseContext(), null);
+							GetUniversityInfoTask guit = new GetUniversityInfoTask(getActivity().getBaseContext(), null);
 							guit.execute();
 							try {
 								if (guit.get(7, TimeUnit.SECONDS)) {

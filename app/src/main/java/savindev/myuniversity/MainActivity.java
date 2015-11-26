@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
-
     }
 
 
@@ -178,10 +176,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE); //Удалить активную группу
         settings.edit().remove("openGroup").apply();
         settings.edit().remove("openIsGroup").apply();
         settings.edit().remove("openGroupName").apply();
+        super.onDestroy();
     }
 }
