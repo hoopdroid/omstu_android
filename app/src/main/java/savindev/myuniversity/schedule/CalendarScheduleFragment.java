@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -70,24 +71,11 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     private int i;
 
 
-    void inialize() {
-        models = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 7; j++) {
-                for (int k = 0; k < 28; k++) {
-                    ScheduleModel model = new ScheduleModel(0, 0, 0, 0, 0, 0, Integer.toString(j), "1", "2", i + "." + k,
-                            "a", "b", "c", "d", "e", false);
-                    models.add(model);
-                }
-            }
-        }
-    }
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        calendar = new GregorianCalendar();  //Получение текущей даты для начала заполнения расписания
+        calendar.add(Calendar.DAY_OF_MONTH, -1); //Чтобы не пропускать день при работе в цикле
 
-        inialize();
-        i = 0;
         monthCount = 0;
 
         View header = LayoutInflater.from(getActivity()).inflate(R.layout.one_calendar_pair, scheduleList, false);
@@ -147,7 +135,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                     if (adapter.isHeader(position)) {
                         monthCount = monthCount + 1;
                         return glm.getSpanCount(); //новый месяц, ячейка с месяцем на всю строку
-                    } else if ((position-monthCount) % (pairCount+2) == 0 || (position-monthCount) % (pairCount+2) == pairCount + 1)
+                    } else if ((position - monthCount) % (pairCount + 2) == 0 || (position - monthCount) % (pairCount + 2) == pairCount + 1)
                         return 1;
                     else
                         return 2; //Ячейки с парами занимают в 2 раза больше места ячеек с датами
@@ -211,6 +199,9 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 }
             }
         }
+        calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        adapter.deleteData();
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -266,7 +257,6 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.calendar_schedule, menu);
 
-        usedList.add(DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()));
         //Если имеются используемые расписания
         if (usedList != null && !usedList.isEmpty() || main != null) {
             usedList.remove(null);
@@ -356,7 +346,7 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
         List<ScheduleModel> models;
 
         public boolean isHeader(int position) {
-            return (position == 0 || !models.get(position).getDate().substring(0,1).equals(models.get(position - 1).getDate().substring(0,1)));
+            return (position == 0 || !models.get(position).getDate().substring(0, 1).equals(models.get(position - 1).getDate().substring(0, 1)));
         }
 
         ScheduleAdapter(List<ScheduleModel> models, View header) {
@@ -387,9 +377,9 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
                 scheduleViewHolder.pair.setText(models.get(i).getDate());
                 return;
             }
-            if ((i-monthCount) % (pairCount+2) == 0) { //Если 1 - это день недели
+            if ((i - monthCount) % (pairCount + 2) == 0) { //Если 1 - это день недели
                 scheduleViewHolder.pair.setText(models.get(i).getDate().substring(0, 1));
-            } else if ((i-monthCount) % (pairCount+2) == pairCount + 1) { //Если последний - дата
+            } else if ((i - monthCount) % (pairCount + 2) == pairCount + 1) { //Если последний - дата
                 scheduleViewHolder.pair.setText(models.get(i).getDate().substring(1));
             } else // Иначе это пара
                 scheduleViewHolder.pair.setText(models.get(i).getName());
@@ -409,20 +399,30 @@ public class CalendarScheduleFragment extends Fragment implements OnClickListene
         public void add(ArrayList<ScheduleModel> data) {
             this.models.addAll(data);
         }
+
+        public void deleteData() {
+            models.clear();
+        }
     }
 
     //Реализует подгрузку данных при достижении конца списка
     public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleModel>> {
-        String mDate;
 
         @Override
         protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
-            ArrayList data = new ArrayList();
-            int j = i;
-            for (; i < j + params[0]; i++) {
-                if (i < models.size()) {
-                    data.add(models.get(i));
-                }
+            ArrayList<ScheduleModel> data = new ArrayList();
+            for (int i = 0; i < params[0]; i++) { //Добавить число записей, равное params[0]
+                calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
+                //TODO подумать, как нужно обрабатывать выходные дни
+                ArrayList<ScheduleModel> daySchedule;
+                String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+                if (day.length() < 2)
+                    day = "0" + day;
+                daySchedule = DBHelper.SchedulesHelper.getSchedules(getActivity(),
+                        "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH)+1) + day,
+                        currentID, isGroup);  //Получение расписания на день
+
+                data.addAll(daySchedule);
             }
 
             return data;

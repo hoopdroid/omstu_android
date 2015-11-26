@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -70,7 +69,6 @@ public class DailyScheduleFragment extends DialogFragment
 
         adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
         View view = null;
-        calendar = new GregorianCalendar();
         SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
         main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
@@ -159,7 +157,9 @@ public class DailyScheduleFragment extends DialogFragment
                 }
             }
         }
-        //calendar = new GregorianCalendar();
+        calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        adapter.deleteData();
         gst.execute(currentSchedule); //Выполняем запрос на обновление нужного расписания
     }
 
@@ -340,6 +340,10 @@ public class DailyScheduleFragment extends DialogFragment
 
         public void add(ArrayList<ScheduleModel> data) {
             this.models.addAll(data);
+        }
+
+        public void deleteData() {
+            models.clear();
         }
     }
 
