@@ -2,6 +2,7 @@ package savindev.myuniversity.welcomescreen;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -26,24 +27,22 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
     AuthorizationFragment authorizationFragment;
     LinearLayout buttons;
     ImageView icon;
+    static Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
 
-        //TODO когда база будет реагировать на даты, проверку убрать. пусть ищет обновления
-//        if(!DBRequest.isInitializationInfoThere(this)) {
-        GetUniversityInfoTask guit = new GetUniversityInfoTask(getBaseContext(), null);
-            guit.execute();
-//        }
+        new GetUniversityInfoTask(getBaseContext(), null).execute();
 
         setContentView(R.layout.activity_first_start);
-        buttons = (LinearLayout)findViewById(R.id.buttonsLayout);
-        icon = (ImageView)findViewById(R.id.icon);
+        buttons = (LinearLayout) findViewById(R.id.buttonsLayout);
+        icon = (ImageView) findViewById(R.id.icon);
         buttons.animate();
 
-        btnSignin = (Button)findViewById(R.id.btnSignin);
-        btnSkip = (Button)findViewById(R.id.btnSkip);
+        btnSignin = (Button) findViewById(R.id.btnSignin);
+        btnSkip = (Button) findViewById(R.id.btnSkip);
 
         btnSignin.setOnClickListener(this);
         btnSkip.setOnClickListener(this);
@@ -51,6 +50,10 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
     }
 
 
+    public static void stopActivity() {
+        if (activity != null)
+            activity.finish();
+    }
 
     @Override
     public void onClick(View v) {
@@ -117,4 +120,5 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
             }
 
         });
-    }}
+    }
+}

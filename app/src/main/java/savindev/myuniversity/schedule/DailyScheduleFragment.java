@@ -100,4 +100,6 @@ public class DailyScheduleFragment extends AbstractSchedule {
             }
         }
     }
+
+
 }

@@ -15,8 +15,9 @@
         android:theme="@style/AppTheme.Common">
         <activity
             android:name=".welcomescreen.FirstStartActivity"
-            android:label="@string/app_name"></activity>
-        <activity android:name=".MainActivity">
+            android:label="@string/app_name"/>
+        <activity android:name=".MainActivity"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,11 +27,10 @@
         <activity
             android:name=".settings.GroupsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.Common"/>
+            android:theme="@style/AppTheme.Common" />
         <activity
             android:name=".settings.Test"
-            android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.Common"/>
+            android:theme="@style/AppTheme.Common" />
     </application>
 
 </manifest>

@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -61,6 +64,7 @@ public abstract class AbstractSchedule extends DialogFragment
     protected GridLayoutManager glm;
     private boolean loading = true;
     protected boolean isLinear;
+    private int lastFirstVisiblePosition;
 
     protected View preInitializeData(LayoutInflater inflater, ViewGroup container) { //Объявление общей информации при загрузке фрагмента
         View view = null;
@@ -111,13 +115,11 @@ public abstract class AbstractSchedule extends DialogFragment
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                visibleItemCount = scheduleList.getLayoutManager().getChildCount();
+                totalItemCount = scheduleList.getLayoutManager().getItemCount();
                 if (isLinear) {
-                    visibleItemCount = llm.getChildCount();
-                    totalItemCount = llm.getItemCount();
                     pastVisiblesItems = llm.findFirstVisibleItemPosition();
                 } else {
-                    visibleItemCount = glm.getChildCount();
-                    totalItemCount = glm.getItemCount();
                     pastVisiblesItems = glm.findFirstVisibleItemPosition();
                 }
 
@@ -132,6 +134,11 @@ public abstract class AbstractSchedule extends DialogFragment
         });
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
+//        if (isLinear) {
+//            llm.scrollToPosition(lastFirstVisiblePosition);
+//        } else {
+//            glm.scrollToPosition(lastFirstVisiblePosition);
+//        }
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -173,7 +180,7 @@ public abstract class AbstractSchedule extends DialogFragment
                 startActivity(intent);
                 break;
             case R.id.set_id:
-                if (!DBRequest.isInitializationInfoThere(getActivity())) {
+                if (!DBRequest.isUniversityInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
                         GetUniversityInfoTask guit = new GetUniversityInfoTask(getActivity().getBaseContext(), null);
                         guit.execute();
@@ -190,7 +197,7 @@ public abstract class AbstractSchedule extends DialogFragment
                                 + "Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
                     }
                 }
-                if (!DBRequest.isInitializationInfoThere(getActivity())) {
+                if (!DBRequest.isUniversityInfoThere(getActivity())) {
                     intent = new Intent(getActivity(), GroupsActivity.class);
                     startActivity(intent);
                 }
@@ -258,6 +265,39 @@ public abstract class AbstractSchedule extends DialogFragment
         super.onDetach();
     }
 
+
+    //Нерабочий код - попытка сохранить позицию recyclerView при повороте
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable("recycle");
+            scheduleList.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+            lastFirstVisiblePosition = savedInstanceState.getInt("recycle_position");
+//            if (isLinear) {
+//                llm.scrollToPosition(lastFirstVisiblePosition);
+//            } else {
+//                glm.scrollToPosition(lastFirstVisiblePosition);
+//            }
+            int a = 3;
+            return;
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("recycle", scheduleList.getLayoutManager().onSaveInstanceState());
+//        int lastFirstVisiblePosition;
+        if (isLinear) {
+            lastFirstVisiblePosition = ((LinearLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        } else {
+            lastFirstVisiblePosition = ((GridLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        }
+        outState.putInt("recycle_position", lastFirstVisiblePosition);
+        int a = 3;
+    }
 
 
 }

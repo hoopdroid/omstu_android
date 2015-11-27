@@ -84,14 +84,13 @@ public class AuthorizationFragment extends Fragment {
             if (at.get(7, TimeUnit.SECONDS) == true) {
                 Intent i = new Intent(getActivity(), MainActivity.class);
                 startActivity(i);
-                getActivity().finish();
+//                this.getActivity().finish();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
 
     private boolean validateEmail() {
         String email = inputEmail.getText().toString().trim();

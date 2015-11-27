@@ -44,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
 
             Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
             startActivity(intent);
-            finish();
+            this.finish();
 
         } else {
+            FirstStartActivity.stopActivity();
 
             setContentView(R.layout.activity_main);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -59,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
 
             addfragment(R.string.drawer_schedule,new DailyScheduleFragment());
-
         }
 
     }

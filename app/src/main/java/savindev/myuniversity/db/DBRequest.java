@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Created by ilyas on 20.11.2015.
@@ -70,7 +69,7 @@ public class DBRequest {
         return list;
     }
 
-    public static boolean isInitializationInfoThere(Context context) {
+    public static boolean isUniversityInfoThere(Context context) {
 
         SQLiteDatabase db;
         ArrayList tables = getAllDBTables(context);
