@@ -1,10 +1,15 @@
 package savindev.myuniversity.schedule;
 
+import android.util.Log;
+
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 import savindev.myuniversity.serverTasks.Schedule;
 
@@ -45,5 +50,40 @@ public class DateUtil {
         }
 
         return  outputDate;
+    }
+
+
+    public static String formatDate(String inputDate){
+        String outputDate = "";
+
+        SimpleDateFormat fromUser = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        SimpleDateFormat standartFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+
+        try {
+
+            outputDate = standartFormat.format(fromUser.parse(inputDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return  outputDate;
+    }
+
+    public static String getDayWeek(String inputDate){
+
+        SimpleDateFormat dateformat=new SimpleDateFormat("dd.MM.yyyy");
+        Date date;
+        String dayFromDate="";
+        try {
+            date = dateformat.parse(inputDate);
+            DateFormat dayFormate=new SimpleDateFormat("EEEE",Locale.getDefault());
+            dayFromDate=dayFormate.format(date);
+
+
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return dayFromDate;
     }
 }

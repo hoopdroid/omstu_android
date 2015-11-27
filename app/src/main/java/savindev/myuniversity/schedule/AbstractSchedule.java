@@ -56,7 +56,7 @@ public abstract class AbstractSchedule extends DialogFragment
     private LoadMoreTask lmt;
     protected SwipeRefreshLayout mSwipeRefreshLayout;
     protected RecyclerView scheduleList;
-    protected boolean isGroup = true;
+    protected boolean isGroup ;
     protected int currentID = 0;
     protected String currentGroup = "";
     private GroupsModel main;

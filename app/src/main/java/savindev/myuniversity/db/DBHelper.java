@@ -756,6 +756,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db = dbHelper.getWritableDatabase();
             Cursor cursor;
             int selectionGroup, selectionTeacher;
+            String nameTeacher,nameGroup;
 
             try {
                 if (isGroup)
@@ -769,9 +770,13 @@ public class DBHelper extends SQLiteOpenHelper {
                     if (isGroup) {
                         selectionGroup = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));
                         selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));
+                        nameTeacher = dbHelper.getTeachersHelper().getTeacherById(context, cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID)));
+                        nameGroup =  dbHelper.getGroupsHelper().getGroupById(context, cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID)));
                     } else {
                         selectionGroup = cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));
                         selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));
+                        nameTeacher = dbHelper.getGroupsHelper().getGroupById(context, cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID)));
+                        nameGroup =  dbHelper.getTeachersHelper().getTeacherById(context, cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID)));
                     }
 
                     if (cursor.getInt(cursor.getColumnIndex(COL_IS_CANCELLED)) == 1)
@@ -792,8 +797,8 @@ public class DBHelper extends SQLiteOpenHelper {
                             dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME, cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
                             dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
                             cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)), cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
-                            dbHelper.getTeachersHelper().getTeacherById(context, cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID))),
-                            dbHelper.getGroupsHelper().getGroupById(context, cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID))),
+                            nameTeacher,
+                            nameGroup,
                             "1-250",
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
                             isCancelled
@@ -867,12 +872,15 @@ public class DBHelper extends SQLiteOpenHelper {
             db.delete(TABLE_NAME, COL_IS_MAIN + "=" + isMainDB, null);
         }
 
-        public static void deleteUsedSchedule(Context context, int groupId) {
-
+        public static void deleteUsedSchedule(Context context, int groupId,boolean isGroup) {
+            int isGroupDB=0;
+            if(isGroup)
+                isGroupDB=1;
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
-            db.delete(TABLE_NAME, COL_ID_SCHEDULE + "=" + groupId, null);
+            db.delete(TABLE_NAME, COL_ID_SCHEDULE + "=" + groupId + " AND " + COL_IS_GROUP + " = "+ isGroupDB, null);
+            //DBRequest.checkIsDataAlreadyInDBorNot(context,SchedulesHelper.TABLE_NAME,SchedulesHelper.COL_GROUP_ID,groupId,)
         }
 
         public static GroupsModel getMainGroupModel(Context context) {

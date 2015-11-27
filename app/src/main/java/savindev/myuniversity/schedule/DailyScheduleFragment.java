@@ -76,14 +76,19 @@ public class DailyScheduleFragment extends AbstractSchedule {
         }
         @Override
         public ScheduleViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.schedule_line, viewGroup, false);
+            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.schedule_line_test, viewGroup, false);
             return new ScheduleViewHolder(v);
         }
 
         @Override
         public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, int i) {
             scheduleViewHolder.pairNumber.setText(models.get(i).getN());
+            if(!isGroup)
+                scheduleViewHolder.pairHandler.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_multiple));
+            else
+                scheduleViewHolder.pairHandler.setImageDrawable(getResources().getDrawable(R.drawable.ic_account));
             scheduleViewHolder.pairTime.setText(models.get(i).getStartTime() + "-" + models.get(i).getEndTime());
+            scheduleViewHolder.pairDayWeek.setText(DateUtil.getDayWeek(DateUtil.formatDate(models.get(i).getDate())));
             scheduleViewHolder.pairName.setText(models.get(i).getName());
             if (models.get(i).getSubgroup() != 0)
                 scheduleViewHolder.pairName.setText(scheduleViewHolder.pairName.getText() + ", подгруппа " + models.get(i).getSubgroup());
@@ -91,12 +96,18 @@ public class DailyScheduleFragment extends AbstractSchedule {
             scheduleViewHolder.pairAuditory.setText(models.get(i).getClassroom());
             scheduleViewHolder.pairType.setText(models.get(i).getTipe());
             //scheduleViewHolder.pairDate.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault())+ ", "+models.get(i).getDate().substring(6,8)+" "+calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()));
-            scheduleViewHolder.pairDate.setText(models.get(i).getDate());
+            scheduleViewHolder.pairDate.setText(DateUtil.formatDate(models.get(i).getDate()));
+
+            if(models.get(i).getTeacher().equals("")){
+                scheduleViewHolder.teacherLayout.setVisibility(View.GONE);
+            }
+            else
+                scheduleViewHolder.teacherLayout.setVisibility(View.VISIBLE);
             if (i == 0 || !models.get(i).getDate().equals(models.get(i - 1).getDate())) {
                 scheduleViewHolder.pairDate.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
-                scheduleViewHolder.pairDate.setVisibility(View.VISIBLE);
+                scheduleViewHolder.pairDateLayout.setVisibility(View.VISIBLE);
             } else {
-                scheduleViewHolder.pairDate.setVisibility(View.GONE);
+                scheduleViewHolder.pairDateLayout.setVisibility(View.GONE);
             }
         }
     }

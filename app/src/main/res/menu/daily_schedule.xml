@@ -3,7 +3,7 @@
 
     <item android:id="@+id/transition"
         android:orderInCategory="100"
-        android:title="Календарь"
+        android:icon="@drawable/ic_calendar"
         app:showAsAction="always"/>
 
 

@@ -17,7 +17,7 @@ public class DBRequest {
     }
 
 
-    static ArrayList getList(Context context, String table, String selection, String findColumn, int valueColumn,String orderBy) {
+    public static ArrayList getList(Context context, String table, String selection, String findColumn, int valueColumn,String orderBy) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
@@ -45,7 +45,7 @@ public class DBRequest {
         return list;
     }
 
-    static ArrayList getList(Context context, String table, String selection) {
+    public static ArrayList getList(Context context, String table, String selection) {
 
         SQLiteDatabase db;
         DBHelper dbHelper = new DBHelper(context);
