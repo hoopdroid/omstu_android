@@ -1,10 +1,8 @@
 package savindev.myuniversity.serverTasks;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -24,7 +22,6 @@ import java.util.Date;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
-import savindev.myuniversity.db.DBRequest;
 
 
 /**
@@ -53,7 +50,6 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
         //Возвращать false, если изменений нет
         settings = context.getSharedPreferences("UserInfo", 0);
         String refreshDate = settings.getString("init_last_refresh", "20000101000000"); //дата последнего обновления
-//        refreshDate = "20151121212300";
         String uri;
         if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
             uri = context.getResources().getString(R.string.uri_test) + "getUniversityInfo?universityAcronym=" +
@@ -107,7 +103,6 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault());
                 String modified = obj.getString("LAST_REFRESH");
-//                modified = "20151121212300";
                 String date = settings.getString("init_last_refresh", ""); // Старая записанная дата обновления
                 if (!(date.equals(""))) { //Если хранящаяся дата не пуста
                     Date lastModifiedDate = null; //Полученная от сервера дата

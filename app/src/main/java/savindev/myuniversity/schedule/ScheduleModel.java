@@ -1,7 +1,10 @@
 package savindev.myuniversity.schedule;
 
-public class ScheduleModel {
+/**
+ * Класс-объект для пары
+ */
 
+public class ScheduleModel {
 
     private int idSchedule; //Напрямую из объекта в базе
     private int idPair;//Напрямую из объекта в базе
@@ -19,7 +22,6 @@ public class ScheduleModel {
 	private String classroom; //В формате корпус + "-" аудитория
 	private String type;//Напрямую из объекта в базе
 	private boolean isCancelled; //Напрямую из объекта в базе
-
 
     public ScheduleModel(int idSchedule, int idPair, int idGroup, int idTeacher, int idClassroom,
                          int subgroup, String n, String startTime, String endTime, String date, String name, String teacher,

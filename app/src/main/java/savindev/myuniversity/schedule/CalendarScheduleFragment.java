@@ -20,22 +20,24 @@ import java.util.List;
 
 import savindev.myuniversity.R;
 
-public class CalendarScheduleFragment extends AbstractSchedule {
+/**
+ * Класс, отображающий расписание на определенный срок в виде сетки с предметами. Имеет различные методы фильтрации предметов
+ * и возможность отображения подробностей для любого из них
+ */
 
+public class CalendarScheduleFragment extends AbstractSchedule {
 
     private LinearLayout filtersLayout, detailsLayout;
     private int monthCount;
     private int pairCount;
 
-
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = preInitializeData(inflater);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
+        View view = preInitializeData(inflater, container);
 
         if (view == null) {//Если данные существуют:
             monthCount = 0;
             SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-            view = inflater.inflate(R.layout.fragment_calendar_schedule, null);
+            view = inflater.inflate(R.layout.fragment_calendar_schedule, container, false);
             //        View header = LayoutInflater.from(getActivity()).inflate(R.layout.one_calendar_pair, scheduleList, false);
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
             isLinear = false;
@@ -134,7 +136,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 //            this.header = header;
             super(getActivity(), models);
         }
-
 
         public boolean isHeader(int position) {
             return (position == 0 || !models.get(position).getDate().substring(0, 1).equals(models.get(position - 1).getDate().substring(0, 1)));

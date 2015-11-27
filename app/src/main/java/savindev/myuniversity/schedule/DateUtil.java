@@ -1,17 +1,13 @@
 package savindev.myuniversity.schedule;
 
-import android.util.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 import savindev.myuniversity.serverTasks.Schedule;
 
-/**
- * Created by ilyas on 18.11.2015.
- */
 public class DateUtil {
 
     public DateUtil() {
@@ -19,7 +15,7 @@ public class DateUtil {
 
     public static String dateFormatIncrease(ArrayList<Schedule> schedule,int index,String previousValue){
         String dt = previousValue;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
         Calendar c = Calendar.getInstance();
         if(index>0){
             try {
@@ -38,8 +34,8 @@ public class DateUtil {
     public static String formatStandart(String inputDate){
         String outputDate = "";
 
-        SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat standartFormat = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat standartFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
 
         try {
 

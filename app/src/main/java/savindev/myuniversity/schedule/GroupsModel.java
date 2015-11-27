@@ -1,8 +1,9 @@
 package savindev.myuniversity.schedule;
 
 /**
- * Created by Katena on 05.11.2015.
+ * Класс-объект для используемых групп
  */
+
 public class GroupsModel {
 
     private int id;
@@ -10,8 +11,6 @@ public class GroupsModel {
     private String name;
     private String lastRefresh;
     private boolean selected;
-
-
 
     public GroupsModel(String name, int id, boolean isGroup, String lastRefresh) {
         this.name = name;
@@ -38,10 +37,6 @@ public class GroupsModel {
         return isGroup;
     }
 
-    public void setIsGroup(boolean isGroup) {
-        this.isGroup = isGroup;
-    }
-
     public String getName() {
         return name;
     }
@@ -49,6 +44,7 @@ public class GroupsModel {
     public void setName(String name) {
         this.name = name;
     }
+
     public String getLastRefresh() {
         return lastRefresh;
     }
@@ -69,15 +65,8 @@ public class GroupsModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         GroupsModel that = (GroupsModel) o;
-
-        if (id != that.id) return false;
-        if (isGroup != that.isGroup) return false;
-        if (selected != that.selected) return false;
-        if (!name.equals(that.name)) return false;
-        return lastRefresh.equals(that.lastRefresh);
-
+        return id == that.id && isGroup == that.isGroup && selected == that.selected && name.equals(that.name) && lastRefresh.equals(that.lastRefresh);
     }
 
     @Override

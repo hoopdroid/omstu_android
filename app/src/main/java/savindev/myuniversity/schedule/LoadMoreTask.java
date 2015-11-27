@@ -14,7 +14,10 @@ import java.util.GregorianCalendar;
 
 import savindev.myuniversity.db.DBHelper;
 
-//Реализует подгрузку данных при достижении конца списка
+/**
+ * Реализует подгрузку данных при достижении конца списка в расписании
+ */
+
 public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleModel>> {
     private GregorianCalendar calendar;
     private int currentID;
@@ -37,7 +40,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
 
     @Override
     protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
-        ArrayList<ScheduleModel> data = new ArrayList();
+        ArrayList<ScheduleModel> data = new ArrayList<>();
         for (int i = 0; i < params[0]; i++) { //Добавить число записей, равное params[0]
             calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
             //TODO подумать, как нужно обрабатывать выходные дни
@@ -51,7 +54,6 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
 
             data.addAll(daySchedule);
         }
-
         return data;
     }
 

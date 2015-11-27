@@ -10,6 +10,9 @@ import java.util.List;
 
 import savindev.myuniversity.R;
 
+/**
+ * Адаптер с общими методами для расписания-списка и расписания-сетки
+ */
 
 public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
 
@@ -47,8 +50,6 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
-
-
 
     @Override
     public int getItemCount() {

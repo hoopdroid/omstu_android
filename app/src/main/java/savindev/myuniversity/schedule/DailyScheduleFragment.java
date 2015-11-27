@@ -4,6 +4,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,23 +24,11 @@ public class DailyScheduleFragment extends AbstractSchedule {
     /**
      * Класс, отображающий расписание на определенный срок в виде списка предметов с параметрами
      */
-//    private ScheduleAdapter adapter;
-//    private ArrayList<GroupsModel> usedList;
-//    private GregorianCalendar calendar;
-//    private LoadMoreTask lmt;
-//    private SwipeRefreshLayout mSwipeRefreshLayout;
-//    private RecyclerView scheduleList;
-//    private boolean isGroup = true;
-//    private int currentID = 0;
-//    private String currentGroup = "";
-//    private GroupsModel main;
-//    private LinearLayoutManager llm;
-//    private Boolean loading = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = preInitializeData(inflater);
+        View view = preInitializeData(inflater, container);
 
         if (view == null) {//Если данные существуют:
             view = inflater.inflate(R.layout.fragment_daily_schedule, null);
@@ -88,8 +77,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
         @Override
         public ScheduleViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.schedule_line, viewGroup, false);
-            ScheduleViewHolder svh = new ScheduleViewHolder(v);
-            return svh;
+            return new ScheduleViewHolder(v);
         }
 
         @Override
@@ -105,13 +93,11 @@ public class DailyScheduleFragment extends AbstractSchedule {
             //scheduleViewHolder.pairDate.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault())+ ", "+models.get(i).getDate().substring(6,8)+" "+calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()));
             scheduleViewHolder.pairDate.setText(models.get(i).getDate());
             if (i == 0 || !models.get(i).getDate().equals(models.get(i - 1).getDate())) {
-                scheduleViewHolder.pairDate.setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                scheduleViewHolder.pairDate.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
                 scheduleViewHolder.pairDate.setVisibility(View.VISIBLE);
             } else {
                 scheduleViewHolder.pairDate.setVisibility(View.GONE);
             }
         }
     }
-
-
 }

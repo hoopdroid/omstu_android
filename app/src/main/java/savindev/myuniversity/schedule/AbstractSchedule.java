@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -38,6 +39,10 @@ import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
+/**
+ * Абстрактный класс, собирающий в себе общие методы для расписания-списка и расписания-сетки
+ * Содержит общую инициализацию, обработку пролистывания, кнопок, меню, обновления, отсоединения фрагмента
+ */
 
 public abstract class AbstractSchedule extends DialogFragment
         implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
@@ -57,11 +62,10 @@ public abstract class AbstractSchedule extends DialogFragment
     private boolean loading = true;
     protected boolean isLinear;
 
-    protected View preInitializeData(LayoutInflater inflater) { //Объявление общей информации при загрузке фрагмента
+    protected View preInitializeData(LayoutInflater inflater, ViewGroup container) { //Объявление общей информации при загрузке фрагмента
         View view = null;
         calendar = new GregorianCalendar();  //Получение текущей даты для начала заполнения расписания
         calendar.add(Calendar.DAY_OF_MONTH, -1); //Чтобы не пропускать день при работе в цикле
-//        adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
         SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
         main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
@@ -83,7 +87,7 @@ public abstract class AbstractSchedule extends DialogFragment
         }
 
         if (currentID == 0) { //Если данные не существуют:
-            view = inflater.inflate(R.layout.fragment_null_schedule, null); //Если данные не существуют, вывести информацию
+            view = inflater.inflate(R.layout.fragment_null_schedule, container, false); //Если данные не существуют, вывести информацию
             Button login = (Button) view.findViewById(R.id.log_id);
             Button settings = (Button) view.findViewById(R.id.set_id);
             Button update = (Button) view.findViewById(R.id.upd_id);
@@ -102,7 +106,7 @@ public abstract class AbstractSchedule extends DialogFragment
         lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, true);
         lmt.execute(14); //Вывод данных на ближайшие 14 дней
         //Реализация подгрузки данных при достижении конца списка
-        scheduleList.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        scheduleList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             int pastVisiblesItems, visibleItemCount, totalItemCount;
 
             @Override
@@ -132,7 +136,6 @@ public abstract class AbstractSchedule extends DialogFragment
         setHasOptionsMenu(true);
         setRetainInstance(true);
     }
-
 
     @Override
     public void onRefresh() {
@@ -204,7 +207,7 @@ public abstract class AbstractSchedule extends DialogFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
         //Если имеются используемые расписания
-        if (usedList != null && !usedList.isEmpty() || main != null) {
+        if (!(usedList == null || usedList.isEmpty())) {
             usedList.remove(null);
             Collections.sort(usedList, new Comparator<GroupsModel>() { //Отсортировать список по имени
                 @Override
@@ -247,8 +250,6 @@ public abstract class AbstractSchedule extends DialogFragment
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 
     @Override
     public void onDetach() {
