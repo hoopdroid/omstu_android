@@ -2,7 +2,6 @@ package savindev.myuniversity.welcomescreen;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -27,12 +26,10 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
     AuthorizationFragment authorizationFragment;
     LinearLayout buttons;
     ImageView icon;
-    static Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
 
         new GetUniversityInfoTask(getBaseContext(), null).execute();
 
@@ -47,12 +44,6 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
         btnSignin.setOnClickListener(this);
         btnSkip.setOnClickListener(this);
 
-    }
-
-
-    public static void stopActivity() {
-        if (activity != null)
-            activity.finish();
     }
 
     @Override
@@ -75,6 +66,7 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
                 editor.putBoolean("isFirstStart", false);
                 editor.commit();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                this.finish();
                 startActivity(intent);
                 break;
         }

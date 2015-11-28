@@ -83,6 +83,7 @@ public class AuthorizationFragment extends Fragment {
         try {
             if (at.get(7, TimeUnit.SECONDS) == true) {
                 Intent i = new Intent(getActivity(), MainActivity.class);
+                this.getActivity().finish();
                 startActivity(i);
 //                this.getActivity().finish();
             }

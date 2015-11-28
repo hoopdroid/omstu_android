@@ -1,7 +1,5 @@
 package savindev.myuniversity.schedule;
 
-import android.util.Log;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
 import savindev.myuniversity.serverTasks.Schedule;
 
@@ -81,7 +78,6 @@ public class DateUtil {
 
 
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return dayFromDate;

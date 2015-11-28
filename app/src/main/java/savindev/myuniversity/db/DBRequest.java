@@ -146,12 +146,12 @@ public class DBRequest {
         return id;
     }
 
-    public static void removeAllSchedules(Context context) {
-        DBHelper dbHelper = new DBHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(DBHelper.UsedSchedulesHelper.TABLE_NAME, null, null);
-
-    }
+//    public static void removeAllSchedules(Context context) {
+//        DBHelper dbHelper = new DBHelper(context);
+//        SQLiteDatabase db = dbHelper.getWritableDatabase();
+//        db.delete(DBHelper.UsedSchedulesHelper.TABLE_NAME, null, null);
+//
+//    }
 
     public static boolean checkIsDataAlreadyInDBorNot(Context context,String TableName,
                                                       String dbfield, int fieldValue,String dbfield2, String fieldValue2) {

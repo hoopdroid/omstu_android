@@ -28,10 +28,11 @@ import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
+import savindev.myuniversity.welcomescreen.NotInternetFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-   public static Toolbar toolbar;
+    public static Toolbar toolbar;
     String username;
     String email;
 
@@ -40,41 +41,41 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        if(settings.getBoolean("isFirstStart",true)) {
-
-            Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
-            startActivity(intent);
-            this.finish();
+        if (settings.getBoolean("isFirstStart", true)) {
+            if (isNetworkConnected(getApplication())) {
+                Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
+                this.finish();
+                startActivity(intent);
+            } else { //Если интернета нет - предложить запуститься еще раз
+                setContentView(R.layout.activity_main);
+                FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
+            }
 
         } else {
-            FirstStartActivity.stopActivity();
 
             setContentView(R.layout.activity_main);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
-
             getUserSettings();
             initDrawer();
-
             DBHelper dbHelper = DBHelper.getInstance(this);
-
-
-            addfragment(R.string.drawer_schedule,new DailyScheduleFragment());
+            addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
         }
 
     }
 
 
-   private void getUserSettings(){
+    private void getUserSettings() {
 
-       SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
 
-       username = settings.getString("UserFirstName","")+  " " +settings.getString("UserLastName","")+" "+DBRequest.getUserGroup(settings.getInt("UserGroup",0),getApplicationContext());
+        username = settings.getString("UserFirstName", "") + " " + settings.getString("UserLastName", "") + " " + DBRequest.getUserGroup(settings.getInt("UserGroup", 0), getApplicationContext());
 
-       email = settings.getString("email","no email");
+        email = settings.getString("email", "no email");
     }
 
-    void initDrawer(){
+    void initDrawer() {
 
         PrimaryDrawerItem itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_schedule).withSelectedIcon(R.drawable.ic_schedule_select);
         PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_navigation).withSelectedIcon(R.drawable.ic_navigation_select);
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
 
-                        addfragment(R.string.profile_text,new ProfileFragment());
+                        addfragment(R.string.profile_text, new ProfileFragment());
 
                         return false;
                     }
@@ -121,23 +122,23 @@ public class MainActivity extends AppCompatActivity {
                         switch (position) {
                             case 1:
 
-                                addfragment(R.string.drawer_schedule,new DailyScheduleFragment());
+                                addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
 
                                 break;
                             case 2:
-                                addfragment(R.string.drawer_navigator,new WelcomeFragment());
+                                addfragment(R.string.drawer_navigator, new WelcomeFragment());
                                 break;
                             case 3:
-                                addfragment(R.string.drawer_notes,new WelcomeFragment());
+                                addfragment(R.string.drawer_notes, new WelcomeFragment());
                                 break;
                             case 4:
-                                addfragment(R.string.drawer_news,new NewsFragment());
+                                addfragment(R.string.drawer_news, new NewsFragment());
                                 break;
                             case 5:
-                                addfragment(R.string.drawer_education,new WelcomeFragment());
+                                addfragment(R.string.drawer_education, new WelcomeFragment());
                                 break;
                             case 6:
-                                addfragment(R.string.drawer_settings,new SettingsFragment());
+                                addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
 
                         }
@@ -147,12 +148,12 @@ public class MainActivity extends AppCompatActivity {
                 .build();
     }
 
-    void addfragment(int title,Fragment fragment){
+    void addfragment(int title, Fragment fragment) {
 
         toolbar.setTitle(title);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
-        fragmentTransaction=fragmentManager
+        fragmentTransaction = fragmentManager
                 .beginTransaction();
         fragmentTransaction.replace(R.id.content_main, fragment);
         fragmentTransaction.commit();
@@ -170,8 +171,6 @@ public class MainActivity extends AppCompatActivity {
         } else
             return true;
     }
-
-
 
 
     @Override

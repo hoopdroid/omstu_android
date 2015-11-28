@@ -92,10 +92,11 @@ public class DailyScheduleFragment extends AbstractSchedule {
             scheduleViewHolder.pairName.setText(models.get(i).getName());
             if (models.get(i).getSubgroup() != 0)
                 scheduleViewHolder.pairName.setText(scheduleViewHolder.pairName.getText() + ", подгруппа " + models.get(i).getSubgroup());
+            if (models.get(i).isCancelled())
+                scheduleViewHolder.pairName.setText(scheduleViewHolder.pairName.getText() + " (отм.)");
             scheduleViewHolder.pairTeacher.setText(models.get(i).getTeacher());
             scheduleViewHolder.pairAuditory.setText(models.get(i).getClassroom());
             scheduleViewHolder.pairType.setText(models.get(i).getTipe());
-            //scheduleViewHolder.pairDate.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault())+ ", "+models.get(i).getDate().substring(6,8)+" "+calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()));
             scheduleViewHolder.pairDate.setText(DateUtil.formatDate(models.get(i).getDate()));
 
             if(models.get(i).getTeacher().equals("")){

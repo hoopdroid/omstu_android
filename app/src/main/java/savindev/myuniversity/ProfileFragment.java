@@ -2,12 +2,12 @@ package savindev.myuniversity;
 
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import savindev.myuniversity.db.DBHelper;
-import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 
@@ -63,7 +62,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent i = new Intent(getActivity(), FirstStartActivity.class);
-                                deleteUserPreferences();//TODO удаление расписаний пользователя,ибо при новом запуске к существующему добавляется еще одно
+                                deleteUserPreferences();
                                 dbHelper.getUsedSchedulesHelper().deleteMainSchedule(getActivity());
                                 startActivity(i);
                                 getActivity().finish();

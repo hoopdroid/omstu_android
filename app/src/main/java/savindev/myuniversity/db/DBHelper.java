@@ -756,7 +756,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db = dbHelper.getWritableDatabase();
             Cursor cursor;
             int selectionGroup, selectionTeacher;
-            String nameTeacher,nameGroup;
+            String nameTeacher, nameGroup;
 
             try {
                 if (isGroup)
@@ -771,12 +771,12 @@ public class DBHelper extends SQLiteOpenHelper {
                         selectionGroup = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));
                         selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));
                         nameTeacher = dbHelper.getTeachersHelper().getTeacherById(context, cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID)));
-                        nameGroup =  dbHelper.getGroupsHelper().getGroupById(context, cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID)));
+                        nameGroup = dbHelper.getGroupsHelper().getGroupById(context, cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID)));
                     } else {
                         selectionGroup = cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID));
                         selectionTeacher = cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID));
                         nameTeacher = dbHelper.getGroupsHelper().getGroupById(context, cursor.getInt(cursor.getColumnIndex(COL_GROUP_ID)));
-                        nameGroup =  dbHelper.getTeachersHelper().getTeacherById(context, cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID)));
+                        nameGroup = dbHelper.getTeachersHelper().getTeacherById(context, cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID)));
                     }
 
                     if (cursor.getInt(cursor.getColumnIndex(COL_IS_CANCELLED)) == 1)
@@ -784,19 +784,20 @@ public class DBHelper extends SQLiteOpenHelper {
                     else
                         isCancelled = false;
 
-
+                    int idPair = cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID));
                     ScheduleModel scheduleModel = new ScheduleModel(
 
                             cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),
-                            cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID)),
+                            idPair,
                             selectionGroup,
                             selectionTeacher,
                             cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID)),
                             cursor.getInt(cursor.getColumnIndex(COL_SUBGROUP_NUMBER)),
-                            dbHelper.getPairsHelper().getPairNumber(context, cursor.getColumnIndex(COL_PAIR_ID)),
-                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME, cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
-                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID))),
-                            cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)), cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
+                            dbHelper.getPairsHelper().getPairNumber(context, idPair),
+                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME, idPair),
+                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, idPair),
+                            cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)),
+                            cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
                             nameTeacher,
                             nameGroup,
                             "1-250",
@@ -872,14 +873,14 @@ public class DBHelper extends SQLiteOpenHelper {
             db.delete(TABLE_NAME, COL_IS_MAIN + "=" + isMainDB, null);
         }
 
-        public static void deleteUsedSchedule(Context context, int groupId,boolean isGroup) {
-            int isGroupDB=0;
-            if(isGroup)
-                isGroupDB=1;
+        public static void deleteUsedSchedule(Context context, int groupId, boolean isGroup) {
+            int isGroupDB = 0;
+            if (isGroup)
+                isGroupDB = 1;
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
-            db.delete(TABLE_NAME, COL_ID_SCHEDULE + "=" + groupId + " AND " + COL_IS_GROUP + " = "+ isGroupDB, null);
+            db.delete(TABLE_NAME, COL_ID_SCHEDULE + "=" + groupId + " AND " + COL_IS_GROUP + " = " + isGroupDB, null);
             //DBRequest.checkIsDataAlreadyInDBorNot(context,SchedulesHelper.TABLE_NAME,SchedulesHelper.COL_GROUP_ID,groupId,)
         }
 

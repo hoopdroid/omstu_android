@@ -13,15 +13,15 @@ public class ScheduleModel {
     private int idClassroom;//Напрямую из объекта в базе
     private int subgroup;//Напрямую из объекта в базе
     private String date;  //Дата проведения пары, напрямую из объекта
-	private String n;  //Номер пары можно получить по ее id из базы PAIRS
-	private String startTime; //Начало пары, из той же таблички
+    private String n;  //Номер пары можно получить по ее id из базы PAIRS
+    private String startTime; //Начало пары, из той же таблички
     private String endTime; //Конец пары, из той же таблички
-	private String name; //Напрямую из объекта (DISCIPLINE_NAME)
-	private String teacher; //Из соответствующей таблички по id
+    private String name; //Напрямую из объекта (DISCIPLINE_NAME)
+    private String teacher; //Из соответствующей таблички по id
     private String group; //Из соответствующей таблички по id
-	private String classroom; //В формате корпус + "-" аудитория
-	private String type;//Напрямую из объекта в базе
-	private boolean isCancelled; //Напрямую из объекта в базе
+    private String classroom; //В формате корпус + "-" аудитория
+    private String type;//Напрямую из объекта в базе
+    private boolean isCancelled; //Напрямую из объекта в базе
 
     public ScheduleModel(int idSchedule, int idPair, int idGroup, int idTeacher, int idClassroom,
                          int subgroup, String n, String startTime, String endTime, String date, String name, String teacher,
@@ -62,6 +62,10 @@ public class ScheduleModel {
 
     public String getTeacher() {
         return teacher;
+    }
+
+    public void setTeacher(String teacher) {
+        this.teacher = teacher;
     }
 
     public String getName() {
