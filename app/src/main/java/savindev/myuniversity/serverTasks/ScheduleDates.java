@@ -39,7 +39,7 @@ public class ScheduleDates { //Класс для парсинга дополни
         return ScheduleDates;
     }
 
-    private static class DATE { //Класс для парсинга дополнительных расписаний, по датам
+    public static class DATE { //Класс для парсинга дополнительных расписаний, по датам
 
         public final String DATE;
         public final boolean IS_CANCELED;

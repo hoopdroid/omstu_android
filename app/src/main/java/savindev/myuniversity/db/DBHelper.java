@@ -703,7 +703,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public void setSchedule(Context context, ArrayList<Schedule> schedule) {
 
             SQLiteDatabase sqliteDatabase;
-            DBHelper helper = new DBHelper(context);
+            DBHelper helper = DBHelper.getInstance(context);
             sqliteDatabase = helper.getWritableDatabase();
 
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
@@ -813,6 +813,38 @@ public class DBHelper extends SQLiteOpenHelper {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
             return scheduleModelArrayList;
+
+        }
+
+        public void refreshSchedulePair(Context context,int idSchedule,String date,boolean isDeleted,boolean isCancelled){
+           /*
+
+            Сначала по первому классу вне вносишь (или удаляешь, если isDelete). Потом работаешь со вторым классом.
+           Если запись для такой id schedule и такой даты существует, обновляешь.
+            Если нет - создаешь новую, при этом по id schedule можно получить всю недостающую
+            А третьим этапом удаляешь все записи, устаревшие больше недели назад
+            */
+
+
+            int isCancelledDB=0,isDeletedDB=0;
+            if(isCancelled)
+                isCancelledDB=1;
+
+            SQLiteDatabase db;
+            DBHelper dbHelper = DBHelper.getInstance(context);
+            db = dbHelper.getWritableDatabase();
+            if(isDeleted)
+                db.delete(TABLE_NAME, COL_SCHEDULE_ID+"="+idSchedule+" AND "+ COL_SCHEDULE_DATE+"="+date, null);
+
+
+
+            //   Cursor cursor;
+
+
+          //  db.rawQuery("UPDATE " + TABLE_NAME + " SET  "+COL_IS_CANCELLED + "=" +isCancelledDB + " WHERE " + COL_SCHEDULE_DATE + " = " + date +
+             //       " AND " + COL_SCHEDULE_ID + " = " + idSchedule + " ORDER BY " + COL_PAIR_ID, null);
+
+
 
         }
 
@@ -965,7 +997,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public class ScheduleDatesHelper {
 
         protected static final String TABLE_NAME = "ScheduleDates";
-        protected static final String COL_SCHEDULE_ID = "department_id";
+        protected static final String COL_SCHEDULE_ID = "schedule_id";
         protected static final String COL_DATE = "date";
         protected static final String COL_IS_CANCELLED = "is_cancelled";
 
@@ -985,8 +1017,30 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
+        public void setScheduleDates(Context context, ArrayList<ScheduleDates> scheduleDates){
 
-    }
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = DBHelper.getInstance(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+            for (int i = 0; i < scheduleDates.size(); i++) {
+
+                            for(int j=0;j<scheduleDates.get(j).DATES.size();j++) {
+                                ContentValues scheduleDatesRow = new ContentValues();
+                                scheduleDatesRow.put(COL_SCHEDULE_ID, scheduleDates.get(i).ID_SCHEDULE);
+                                scheduleDatesRow.put(COL_DATE,scheduleDates.get(j).DATES.get(j).DATE);
+                                scheduleDatesRow.put(COL_IS_CANCELLED,scheduleDates.get(j).DATES.get(j).IS_CANCELED);
+                                sqliteDatabase.insert(TABLE_NAME, null, scheduleDatesRow);
+                            }
+
+                        }
+
+
+            }
+
+        }
+
+
 
     @Override
     protected void finalize() throws Throwable {

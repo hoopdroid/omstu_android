@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
             initDrawer();
             DBHelper dbHelper = DBHelper.getInstance(this);
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
+
+            dbHelper.getSchedulesHelper().refreshSchedulePair(this,27883,"20151113",true,false);
         }
 
     }
