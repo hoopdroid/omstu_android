@@ -702,7 +702,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public void setSchedule(Context context, ArrayList<Schedule> schedule) {
 
             SQLiteDatabase sqliteDatabase;
-            DBHelper helper = DBHelper.getInstance(context);
+            DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
 
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
