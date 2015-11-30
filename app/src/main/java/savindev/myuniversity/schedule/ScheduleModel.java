@@ -22,6 +22,7 @@ public class ScheduleModel {
     private String classroom; //В формате корпус + "-" аудитория
     private String type;//Напрямую из объекта в базе
     private boolean isCancelled; //Напрямую из объекта в базе
+    private CellType cellType;
 
     public ScheduleModel(int idSchedule, int idPair, int idGroup, int idTeacher, int idClassroom,
                          int subgroup, String n, String startTime, String endTime, String date, String name, String teacher,
@@ -42,6 +43,12 @@ public class ScheduleModel {
         this.type = type;
         this.isCancelled = isCancelled;
         this.date = date;
+        this.cellType = CellType.PAIR;
+    }
+
+    public ScheduleModel(CellType cellType, String value) { //конструктор с использованием типа ячейки, для расписания-сетки
+        this.cellType = cellType;
+        this.date = value;
     }
 
     public boolean isCancelled() {
@@ -110,6 +117,14 @@ public class ScheduleModel {
 
     public String getDate() {
         return date;
+    }
+
+    public void setCellType(CellType cellType) {
+        this.cellType = cellType;
+    }
+
+    public CellType getCellType() {
+        return cellType;
     }
 }
 

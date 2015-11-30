@@ -815,7 +815,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public void deleteSchedule(Context context, int idSchedule, boolean isGroup) {
+        public static void deleteSchedule(Context context, int idSchedule, boolean isGroup) {
 
             int isGroupDB = 0;
             if (isGroup)
