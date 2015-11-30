@@ -7,9 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -152,7 +149,17 @@ public abstract class AbstractSchedule extends DialogFragment
         calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         adapter.deleteData();
-        gst.execute(new GroupsModel(null, currentID, isGroup)); //Выполняем запрос на обновление нужного расписания
+        GroupsModel model = null; //Достать активную группу для обновления. Нельзя создавать новую модель, т.к. нужна дата
+        if (currentID == main.getId() && isGroup == main.isGroup())
+            model = main;
+        else
+            for (GroupsModel m : usedList) {
+                if (currentID == m.getId() && isGroup == m.isGroup()) {
+                    model = m;
+                    break;
+                }
+            }
+        gst.execute(model); //Выполняем запрос на обновление нужного расписания
     }
 
     //Перехватчик широковещательных сообщений. Продолжение onRefresh: когда обновление завершилось, обновить ScheduleView
@@ -267,37 +274,37 @@ public abstract class AbstractSchedule extends DialogFragment
 
 
     //Нерабочий код - попытка сохранить позицию recyclerView при повороте
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
+//    @Override
+//    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+//        super.onViewStateRestored(savedInstanceState);
+//
+//        if (savedInstanceState != null) {
+//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable("recycle");
+//            scheduleList.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+//            lastFirstVisiblePosition = savedInstanceState.getInt("recycle_position");
+////            if (isLinear) {
+////                llm.scrollToPosition(lastFirstVisiblePosition);
+////            } else {
+////                glm.scrollToPosition(lastFirstVisiblePosition);
+////            }
+//            int a = 3;
+//            return;
+//        }
+//    }
 
-        if (savedInstanceState != null) {
-            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable("recycle");
-            scheduleList.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-            lastFirstVisiblePosition = savedInstanceState.getInt("recycle_position");
-//            if (isLinear) {
-//                llm.scrollToPosition(lastFirstVisiblePosition);
-//            } else {
-//                glm.scrollToPosition(lastFirstVisiblePosition);
-//            }
-            int a = 3;
-            return;
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("recycle", scheduleList.getLayoutManager().onSaveInstanceState());
-//        int lastFirstVisiblePosition;
-        if (isLinear) {
-            lastFirstVisiblePosition = ((LinearLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-        } else {
-            lastFirstVisiblePosition = ((GridLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-        }
-        outState.putInt("recycle_position", lastFirstVisiblePosition);
-        int a = 3;
-    }
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putParcelable("recycle", scheduleList.getLayoutManager().onSaveInstanceState());
+////        int lastFirstVisiblePosition;
+//        if (isLinear) {
+//            lastFirstVisiblePosition = ((LinearLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+//        } else {
+//            lastFirstVisiblePosition = ((GridLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+//        }
+//        outState.putInt("recycle_position", lastFirstVisiblePosition);
+//        int a = 3;
+//    }
 
 
 }

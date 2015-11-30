@@ -156,7 +156,6 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 try {
                     scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
                     parseScheduleDates(scheddates);
-
                 } catch (JSONException e) {
                     //Поле оказалось нулевым?
                     e.printStackTrace();
@@ -181,20 +180,18 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         dbHelper.getSchedulesHelper().setSchedule(context, sched);
     }
 
-    private void parseScheduleDates(ArrayList<ScheduleDates> scheduleDates){
+    private void parseScheduleDates(ArrayList<ScheduleDates> scheduleDates) {
         DBHelper dbHelper = DBHelper.getInstance(context);
-        dbHelper.getScheduleDatesHelper().setScheduleDates(context,scheduleDates);
+        dbHelper.getScheduleDatesHelper().setScheduleDates(context, scheduleDates);
     }
 
     private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний
         for (GroupsModel model : params) {
-            if (DBHelper.UsedSchedulesHelper.getGroupsModelList(context).contains(model)) {
+            if (DBHelper.UsedSchedulesHelper.getGroupsModelList(context).contains(model) ||
+                    DBHelper.UsedSchedulesHelper.getMainGroupModel(context) != null &&
+                            DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) {
+                DBHelper.UsedSchedulesHelper.updateRefreshDate(context, model.getId(), model.isGroup(), lastResresh);
                 //Если уже имеется - обновить дату
-                //TODO обновить дату при появлении метода в БД
-            } else if (DBHelper.UsedSchedulesHelper.getMainGroupModel(context) != null &&
-                    DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) {
-                //Если уже имеется - обновить дату
-                //TODO обновить дату при появлении метода в БД
             } else {
                 //Не имеется, добавить
                 DBHelper.UsedSchedulesHelper.setUsedSchedule(context, model.getId(), model.isGroup(), false, lastResresh);

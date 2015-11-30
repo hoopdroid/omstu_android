@@ -124,7 +124,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public class UniversityInfoHelper { // [CR] либо класс сделать приватным, либо убрать геттеры для классов. правильнее - первое
 
-        // [CR] почему внутренние переменные публичные?
 
         protected static final String TABLE_NAME = "UniversityInfo";
         protected static final String COL_FULLNAME = "fullname";
@@ -816,11 +815,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public void deleteSchedule(Context context,int idSchedule,boolean isGroup){
+        public void deleteSchedule(Context context, int idSchedule, boolean isGroup) {
 
-            int isGroupDB=0;
-            if(isGroup)
-                isGroupDB=1;
+            int isGroupDB = 0;
+            if (isGroup)
+                isGroupDB = 1;
 
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
@@ -828,15 +827,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
             //Delete Schedule
 
-            db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE+"="+idSchedule+
-                    " AND "+dbHelper.getUsedSchedulesHelper().COL_IS_GROUP+"="+isGroupDB, null);
-            if(isGroup)
-                db.delete(TABLE_NAME, COL_GROUP_ID+"="+idSchedule, null);
+            db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
+                    " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + isGroupDB, null);
+            if (isGroup)
+                db.delete(TABLE_NAME, COL_GROUP_ID + "=" + idSchedule, null);
             else
-                db.delete(TABLE_NAME, COL_TEACHER_ID+"="+idSchedule, null);
+                db.delete(TABLE_NAME, COL_TEACHER_ID + "=" + idSchedule, null);
         }
-
-
 
 
     }
@@ -982,33 +979,25 @@ public class DBHelper extends SQLiteOpenHelper {
             return groupsModelArrayList;
         }
 
-        public void updateRefreshDate(Context context,int idSchedule,boolean isGroup,String newLastRefresh){
+        public static void updateRefreshDate(Context context, int idSchedule, boolean isGroup, String newLastRefresh) {
 
             int isGroupDB = 0;
-            if(isGroup)
-                isGroupDB=1;
+            if (isGroup)
+                isGroupDB = 1;
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
-
-
             ContentValues cv = new ContentValues();
-            cv.put(COL_LAST_REFRESH_DATE,newLastRefresh);
-            db.update(TABLE_NAME, cv, COL_ID_SCHEDULE+"="+idSchedule+" AND "+COL_IS_GROUP+"="+isGroupDB, null);
-
-
+            cv.put(COL_LAST_REFRESH_DATE, newLastRefresh);
+            db.update(TABLE_NAME, cv, COL_ID_SCHEDULE + "=" + idSchedule + " AND " + COL_IS_GROUP + "=" + isGroupDB, null);
         }
-
     }
 
-
     public class ScheduleDatesHelper {
-
         protected static final String TABLE_NAME = "ScheduleDates";
         protected static final String COL_SCHEDULE_ID = "schedule_id";
         protected static final String COL_DATE = "date";
         protected static final String COL_IS_CANCELLED = "is_cancelled";
-
 
         public void create(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
@@ -1019,36 +1008,25 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-
         public void getScheduleDates(Context context, ArrayList<ScheduleDates> scheduleDates) {
-
-
         }
 
-        public void setScheduleDates(Context context, ArrayList<ScheduleDates> scheduleDates){
-
+        public void setScheduleDates(Context context, ArrayList<ScheduleDates> scheduleDates) {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = DBHelper.getInstance(context);
             sqliteDatabase = helper.getWritableDatabase();
 
             for (int i = 0; i < scheduleDates.size(); i++) {
-
-                            for(int j=0;j<scheduleDates.get(j).DATES.size();j++) {
-                                ContentValues scheduleDatesRow = new ContentValues();
-                                scheduleDatesRow.put(COL_SCHEDULE_ID, scheduleDates.get(i).ID_SCHEDULE);
-                                scheduleDatesRow.put(COL_DATE,scheduleDates.get(j).DATES.get(j).DATE);
-                                scheduleDatesRow.put(COL_IS_CANCELLED,scheduleDates.get(j).DATES.get(j).IS_CANCELED);
-                                sqliteDatabase.insert(TABLE_NAME, null, scheduleDatesRow);
-                            }
-
-                        }
-
-
+                for (int j = 0; j < scheduleDates.get(j).DATES.size(); j++) {
+                    ContentValues scheduleDatesRow = new ContentValues();
+                    scheduleDatesRow.put(COL_SCHEDULE_ID, scheduleDates.get(i).ID_SCHEDULE);
+                    scheduleDatesRow.put(COL_DATE, scheduleDates.get(j).DATES.get(j).DATE);
+                    scheduleDatesRow.put(COL_IS_CANCELLED, scheduleDates.get(j).DATES.get(j).IS_CANCELED);
+                    sqliteDatabase.insert(TABLE_NAME, null, scheduleDatesRow);
+                }
             }
-
         }
-
-
+    }
 
     @Override
     protected void finalize() throws Throwable {
