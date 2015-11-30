@@ -123,6 +123,7 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
                 init = UniversityInfo.fromJson(content);
                 parsetoSqlite(init);
                 settings.edit().putString("init_last_refresh", modified).apply(); //Если не совпадают, занести новую дату
+                String a = settings.getString("init_last_refresh", "123");
                 Log.d("DOWNLOADING DATA", "SUCCESS");
                 break;
             case "ERROR":   //Неопознанная ошибка
