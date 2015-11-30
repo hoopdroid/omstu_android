@@ -104,7 +104,7 @@ public abstract class AbstractSchedule extends DialogFragment
 
     public void postInitializeData() {
         scheduleList.setAdapter(adapter);
-        lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, true);
+        lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
         lmt.execute(14); //Вывод данных на ближайшие 14 дней
         //Реализация подгрузки данных при достижении конца списка
         scheduleList.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -166,7 +166,7 @@ public abstract class AbstractSchedule extends DialogFragment
     BroadcastReceiver broadcastReceiverUpdate = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, true);
+            lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
             lmt.execute(14);
         }
     };

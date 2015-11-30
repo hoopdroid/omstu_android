@@ -3,7 +3,9 @@ package savindev.myuniversity.schedule;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,7 +33,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private int monthCount;
     private int pairCount;
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
 
         if (view == null) {//Если данные существуют:
@@ -61,6 +63,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             //*2 + 2: *2 - каждая пара занимает двойной размер, +2 - дополнительные поля нормального размера на дату и день недели
             glm = new GridLayoutManager(getActivity(), pairCount * 2 + 2); //2 поля на дату и день недели
             scheduleList.setLayoutManager(glm);
+            adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
             glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() { //Установка длины ячейки
                 @Override
                 public int getSpanSize(int position) {
@@ -68,13 +71,24 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 //                        monthCount = monthCount + 1;
 //                        return glm.getSpanCount(); //новый месяц, ячейка с месяцем на всю строку
 //                    } else
-                    if ((position - monthCount) % (pairCount + 2) == 0 || (position - monthCount) % (pairCount + 2) == pairCount + 1)
-                        return 1;
-                    else
-                        return 2; //Ячейки с парами занимают в 2 раза больше места ячеек с датами
+//                    if ((position - monthCount) % (pairCount + 2) == 0 || (position - monthCount) % (pairCount + 2) == pairCount + 1)
+//                        return 1;
+//                    else
+//                    return 2; //Ячейки с парами занимают в 2 раза больше места ячеек с датами
+                    switch (adapter.getItemViewType(position)) {
+                        case ScheduleAdapter.VIEW_PAIR:
+                            return 2;
+                        case ScheduleAdapter.VIEW_DATE:
+                            return 1;
+                        case ScheduleAdapter.VIEW_DAY:
+                            return 1;
+                        case ScheduleAdapter.VIEW_MONTH:
+                            return glm.getSpanCount();
+                        default:
+                            return 0;
+                    }
                 }
             });
-            adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
             postInitializeData();
         }
         return view;
@@ -126,6 +140,11 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     }
 
     public class ScheduleAdapter extends savindev.myuniversity.schedule.ScheduleAdapter {
+        public static final int VIEW_DATE = 1;
+        public static final int VIEW_DAY = 2;
+        public static final int VIEW_MONTH = 3;
+        public static final int VIEW_PAIR = 4;
+
         //        private static final int ITEM_VIEW_TYPE_HEADER = 0;
 //        private static final int ITEM_VIEW_TYPE_ITEM = 1;
 //        private final View header;
@@ -137,8 +156,25 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             super(getActivity(), models);
         }
 
-        public boolean isHeader(int position) {
-            return (position == 0 || !models.get(position).getDate().substring(0, 1).equals(models.get(position - 1).getDate().substring(0, 1)));
+//        public boolean isHeader(int position) {
+//            return (position == 0 || !models.get(position).getDate().substring(0, 1).equals(models.get(position - 1).getDate().substring(0, 1)));
+//        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (models.get(position) == null)
+                return VIEW_PAIR;
+            switch (models.get(position).getCellType()) {
+                case PAIR:
+                    return VIEW_PAIR;
+                case DAY:
+                    return VIEW_DAY;
+                case DATE:
+                    return VIEW_DATE;
+                case MONTH:
+                    return VIEW_MONTH;
+            }
+            return 0;
         }
 
         @Override
@@ -152,17 +188,74 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
         @Override
         public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, int i) {
-            if (isHeader(i)) {
-                scheduleViewHolder.pairName.setText(models.get(i).getDate());
-                return;
-            }
-            if ((i - monthCount) % (pairCount + 2) == 0) { //Если 1 - это день недели
-                scheduleViewHolder.pairName.setText(models.get(i).getDate().substring(0, 1));
-            } else if ((i - monthCount) % (pairCount + 2) == pairCount + 1) { //Если последний - дата
-                scheduleViewHolder.pairName.setText(models.get(i).getDate().substring(1));
-            } else // Иначе это пара
-                scheduleViewHolder.pairName.setText(models.get(i).getName());
+//            if (isHeader(i)) {
+//                scheduleViewHolder.pairName.setText(models.get(i).getDate());
+//                return;
+//            }
+//            if ((i - monthCount) % (pairCount + 2) == 0) { //Если 1 - это день недели
+//                scheduleViewHolder.pairName.setText(models.get(i).getDate().substring(0, 1));
+//            } else if ((i - monthCount) % (pairCount + 2) == pairCount + 1) { //Если последний - дата
+//                scheduleViewHolder.pairName.setText(models.get(i).getDate().substring(1));
+//            } else {// Иначе это пара
+            if (models.get(i) == null) {// Окно, точно пара
+                scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
+            } else
+                switch (models.get(i).getCellType()) {    //Заполнение ячейки в соответствии с ее типом
+                    case DAY:
+                        scheduleViewHolder.pairName.setText(models.get(i).getDate());
+                        scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
+                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        break;
+                    case DATE:
+                        scheduleViewHolder.pairName.setText(models.get(i).getDate());
+                        scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
+                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        break;
+                    case PAIR:
+                        scheduleViewHolder.pairName.setText(models.get(i).getName());
+                        scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
+                        scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
+                        break;
+                    case MONTH:
+                        scheduleViewHolder.pairName.setText(month(models.get(i).getDate()));
+                        scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
+                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        break;
+                }
 
+//            }
+
+        }
+
+        private String month(String date) {
+            int d =  Integer.parseInt(date);
+            switch (d) {
+                case 0:
+                    return "Январь";
+                case 1:
+                    return "Февраль";
+                case 2:
+                    return "Март";
+                case 3:
+                    return "Апрель";
+                case 4:
+                    return "Май";
+                case 5:
+                    return "Июнь";
+                case 6:
+                    return "Июль";
+                case 7:
+                    return "Август";
+                case 8:
+                    return "Сентябрь";
+                case 9:
+                    return "Октябрь";
+                case 10:
+                    return "Ноябрь";
+                case 11:
+                    return "Декабрь";
+            }
+            return null;
         }
 
 //        @Override
