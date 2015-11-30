@@ -146,6 +146,8 @@ public class DBRequest {
         return id;
     }
 
+
+
 //    public static void removeAllSchedules(Context context) {
 //        DBHelper dbHelper = new DBHelper(context);
 //        SQLiteDatabase db = dbHelper.getWritableDatabase();

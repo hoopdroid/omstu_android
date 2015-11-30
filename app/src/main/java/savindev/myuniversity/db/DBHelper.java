@@ -816,37 +816,29 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public void refreshSchedulePair(Context context,int idSchedule,String date,boolean isDeleted,boolean isCancelled){
-           /*
+        public void deleteSchedule(Context context,int idSchedule,boolean isGroup){
 
-            Сначала по первому классу вне вносишь (или удаляешь, если isDelete). Потом работаешь со вторым классом.
-           Если запись для такой id schedule и такой даты существует, обновляешь.
-            Если нет - создаешь новую, при этом по id schedule можно получить всю недостающую
-            А третьим этапом удаляешь все записи, устаревшие больше недели назад
-            */
-
-
-            int isCancelledDB=0,isDeletedDB=0;
-            if(isCancelled)
-                isCancelledDB=1;
+            int isGroupDB=0;
+            if(isGroup)
+                isGroupDB=1;
 
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
-            if(isDeleted)
-                db.delete(TABLE_NAME, COL_SCHEDULE_ID+"="+idSchedule+" AND "+ COL_SCHEDULE_DATE+"="+date, null);
 
+            //Delete Schedule
 
-
-            //   Cursor cursor;
-
-
-          //  db.rawQuery("UPDATE " + TABLE_NAME + " SET  "+COL_IS_CANCELLED + "=" +isCancelledDB + " WHERE " + COL_SCHEDULE_DATE + " = " + date +
-             //       " AND " + COL_SCHEDULE_ID + " = " + idSchedule + " ORDER BY " + COL_PAIR_ID, null);
-
-
-
+            db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE+"="+idSchedule+
+                    " AND "+dbHelper.getUsedSchedulesHelper().COL_IS_GROUP+"="+isGroupDB, null);
+            if(isGroup)
+                db.delete(TABLE_NAME, COL_SCHEDULE_ID+"="+idSchedule+
+                    " AND "+COL_GROUP_ID+"="+idSchedule, null);
+            else
+                db.delete(TABLE_NAME, COL_SCHEDULE_ID+"="+idSchedule+
+                        " AND "+COL_TEACHER_ID+"="+idSchedule, null);
         }
+
+
 
 
     }
@@ -991,6 +983,24 @@ public class DBHelper extends SQLiteOpenHelper {
 
             return groupsModelArrayList;
         }
+
+        public void updateRefreshDate(Context context,int idSchedule,boolean isGroup,String newLastRefresh){
+
+            int isGroupDB = 0;
+            if(isGroup)
+                isGroupDB=1;
+            SQLiteDatabase db;
+            DBHelper dbHelper = DBHelper.getInstance(context);
+            db = dbHelper.getWritableDatabase();
+
+
+            ContentValues cv = new ContentValues();
+            cv.put(COL_LAST_REFRESH_DATE,newLastRefresh);
+            db.update(TABLE_NAME, cv, COL_ID_SCHEDULE+"="+idSchedule+" AND "+COL_IS_GROUP+"="+isGroupDB, null);
+
+
+        }
+
     }
 
 

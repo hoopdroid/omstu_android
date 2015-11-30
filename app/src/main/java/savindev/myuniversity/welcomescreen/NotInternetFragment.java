@@ -15,7 +15,7 @@ public class NotInternetFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_not_internet, container, false);
+        View view = inflater.inflate(R.layout.fragment_no_internet, container, false);
         view.findViewById(R.id.reload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
