@@ -170,6 +170,21 @@ public class DBRequest {
         return true;
     }
 
+    public static boolean checkIsDataAlreadyInDBorNot(Context context,String TableName,
+                                                      String dbfield, int fieldValue) {
+        DBHelper dbHelper = DBHelper.getInstance(context);
+        SQLiteDatabase database=dbHelper.getReadableDatabase();
+        String Query = "SELECT * FROM " + TableName + " WHERE " + dbfield + " = " + fieldValue;
+        Cursor cursor = database.rawQuery(Query, null);
+        if(cursor.getCount() <= 0){
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+       // dbHelper.close();
+        return true;
+    }
+
     public static void delete_byID(SQLiteDatabase db, String table, String select, int id) {
         db.delete(table, select + "=" + id, null);
     }

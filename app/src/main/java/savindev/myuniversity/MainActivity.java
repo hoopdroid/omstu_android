@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
 
           //  dbHelper.getSchedulesHelper().deleteSchedule(this,140,true);
-          //  dbHelper.getSchedulesHelper().deleteSchedule(this,10479,false);
+           //  dbHelper.getSchedulesHelper().deleteSchedule(this,10485,false);
+             //dbHelper.getSchedulesHelper().deleteSchedule(this,10488,false);
         }
 
     }

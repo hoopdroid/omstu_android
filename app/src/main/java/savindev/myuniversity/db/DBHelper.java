@@ -144,6 +144,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
+        public int getDaysInWeek() {
+
+            int daysinweek = 0;
+
+            SQLiteDatabase sqliteDatabase = getWritableDatabase();
+            Cursor cursor;
+
+                cursor = sqliteDatabase.rawQuery("SELECT " + COL_DAYS_IN_WEEK + " FROM " + TABLE_NAME, null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+                    daysinweek = cursor.getInt(cursor.getColumnIndex(COL_DAYS_IN_WEEK));
+
+                    cursor.moveToNext();
+
+                }
+
+                return daysinweek;
+
+        }
+
         public String getUniversityFullName(Cursor cursor) {
             return cursor.getString(cursor.getColumnIndex(COL_FULLNAME));
         }
@@ -656,6 +678,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static class SchedulesHelper {
 
         public static final String TABLE_NAME = "Schedules";
+        public static final String COL_ID = "_id";
         public static final String COL_SCHEDULE_ID = "schedule_id";
         public static final String COL_PAIR_ID = "pair_id";
         public static final String COL_GROUP_ID = "group_id";
@@ -670,6 +693,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void create(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     COL_SCHEDULE_ID + " INTEGER," +
                     COL_PAIR_ID + " INTEGER," +
                     COL_GROUP_ID + " INTEGER," +
@@ -815,26 +839,48 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public void deleteSchedule(Context context, int idSchedule, boolean isGroup) {
-
+        public static void deleteSchedule(Context context, int idSchedule, boolean isGroup) {
+            String selection=COL_TEACHER_ID,selection2=COL_GROUP_ID;
             int isGroupDB = 0;
-            if (isGroup)
+            if (isGroup){
                 isGroupDB = 1;
+                selection=COL_GROUP_ID;
+                selection=COL_TEACHER_ID;}
 
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
 
-            //Delete Schedule
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,isGroup);
+            int a =5;
 
-            db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
+             for(int i=0;i<idList.size();i++){
+
+
+                    db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
                     " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + isGroupDB, null);
-            if (isGroup)
-                db.delete(TABLE_NAME, COL_GROUP_ID + "=" + idSchedule, null);
-            else
-                db.delete(TABLE_NAME, COL_TEACHER_ID + "=" + idSchedule, null);
+
+                    db.delete(TABLE_NAME, selection + "=" + idSchedule +" AND " + selection2 +"!="+idList.get(i), null);
+
+
+             }
+
+
         }
 
+        public static boolean equalsTeachAndGroups(Context context,DBHelper dbHelper,SQLiteDatabase database,String TableName,
+                                                          String dbfieldGroup, int fieldIdGroup,String dbfieldTeacher,int fieldIdTeacher) {
+
+            String Query = "SELECT * FROM " + TableName + " WHERE " + dbfieldGroup + " = " + fieldIdGroup+" AND "+ dbfieldTeacher + "="+fieldIdTeacher;
+            Cursor cursor = database.rawQuery(Query, null);
+            if(cursor.getCount() <= 0){
+                cursor.close();
+                return false;
+            }
+            cursor.close();
+
+            return true;
+        }
 
     }
 
@@ -991,6 +1037,35 @@ public class DBHelper extends SQLiteOpenHelper {
             cv.put(COL_LAST_REFRESH_DATE, newLastRefresh);
             db.update(TABLE_NAME, cv, COL_ID_SCHEDULE + "=" + idSchedule + " AND " + COL_IS_GROUP + "=" + isGroupDB, null);
         }
+
+        public static ArrayList<Integer> getIdSchedules(Context context,boolean isGroup) {
+            int isGroupDB =1;
+            if(isGroup)isGroupDB=0;
+            ArrayList<Integer> idList = new ArrayList<>();
+
+            SQLiteDatabase db;
+            DBHelper dbHelper = new DBHelper(context);
+            db = dbHelper.getReadableDatabase();
+
+            Cursor cursor;
+            try {
+                cursor = db.rawQuery("SELECT "+COL_ID_SCHEDULE+" FROM " + TABLE_NAME+" WHERE "+COL_IS_GROUP +"="+isGroupDB, null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+
+                    idList.add(cursor.getInt(cursor.getColumnIndex(COL_ID_SCHEDULE)));
+                    cursor.moveToNext();
+                }
+
+            } catch (SQLiteException e) {
+                Log.e("SQLITE DB EXCEPTION", e.toString(), e);
+            }
+
+            return idList;
+        }
+
     }
 
     public class ScheduleDatesHelper {
