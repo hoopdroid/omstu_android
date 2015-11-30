@@ -831,11 +831,9 @@ public class DBHelper extends SQLiteOpenHelper {
             db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE+"="+idSchedule+
                     " AND "+dbHelper.getUsedSchedulesHelper().COL_IS_GROUP+"="+isGroupDB, null);
             if(isGroup)
-                db.delete(TABLE_NAME, COL_SCHEDULE_ID+"="+idSchedule+
-                    " AND "+COL_GROUP_ID+"="+idSchedule, null);
+                db.delete(TABLE_NAME, COL_GROUP_ID+"="+idSchedule, null);
             else
-                db.delete(TABLE_NAME, COL_SCHEDULE_ID+"="+idSchedule+
-                        " AND "+COL_TEACHER_ID+"="+idSchedule, null);
+                db.delete(TABLE_NAME, COL_TEACHER_ID+"="+idSchedule, null);
         }
 
 
