@@ -839,34 +839,55 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public static void deleteSchedule(Context context, int idSchedule, boolean isGroup) {
-            String selection=COL_TEACHER_ID,selection2=COL_GROUP_ID;
-            int isGroupDB = 0;
-            if (isGroup){
-                isGroupDB = 1;
-                selection=COL_GROUP_ID;
-                selection=COL_TEACHER_ID;}
+        public static void deleteGroupSchedule(Context context, int idSchedule) {
+
 
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
 
-            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,isGroup);
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,true);
+
+                db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
+                        " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 1, null);
+
+                db.delete(TABLE_NAME, COL_GROUP_ID + "=" + idSchedule, null);
+
+
+
+
+            int t =5;
+
+        }
+
+        public static void deleteTeacherchedule(Context context, int idSchedule) {
+
+
+            SQLiteDatabase db;
+            DBHelper dbHelper = DBHelper.getInstance(context);
+            db = dbHelper.getWritableDatabase();
+
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,false);
             int a =5;
 
-             for(int i=0;i<idList.size();i++){
+            for(int i=0;i<idList.size();i++){
 
 
-                    db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
-                    " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + isGroupDB, null);
+                db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
+                        " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 0, null);
 
-                    db.delete(TABLE_NAME, selection + "=" + idSchedule +" AND " + selection2 +"!="+idList.get(i), null);
+                db.delete(TABLE_NAME, COL_TEACHER_ID + "=" + idSchedule +" AND " + COL_GROUP_ID +"!="+idList.get(i), null);
+                int t =5;
+
+            }
 
 
-             }
+            //clearDB(context,COL_TEACHER_ID,true);
 
 
         }
+
+
 
         public static boolean equalsTeachAndGroups(Context context,DBHelper dbHelper,SQLiteDatabase database,String TableName,
                                                           String dbfieldGroup, int fieldIdGroup,String dbfieldTeacher,int fieldIdTeacher) {
@@ -881,6 +902,17 @@ public class DBHelper extends SQLiteOpenHelper {
 
             return true;
         }
+
+        public static  void clearDB(Context context,String selection,boolean isGroup) {
+            SQLiteDatabase db;
+            DBHelper dbHelper = new DBHelper(context);
+            db = dbHelper.getWritableDatabase();
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,isGroup);
+            for (int i = 0 ;i<idList.size();i++)
+            db.delete(TABLE_NAME, selection +"!="+idList.get(i), null);
+
+        }
+
 
     }
 

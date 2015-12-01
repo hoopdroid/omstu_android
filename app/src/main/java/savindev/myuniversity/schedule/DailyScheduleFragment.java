@@ -87,7 +87,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 scheduleViewHolder.pairHandler.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_multiple));
             else
                 scheduleViewHolder.pairHandler.setImageDrawable(getResources().getDrawable(R.drawable.ic_account));
-            scheduleViewHolder.pairTime.setText(models.get(i).getStartTime() + "-" + models.get(i).getEndTime());
+            scheduleViewHolder.pairTime.setText(models.get(i).getStartTime() + "-\n" + models.get(i).getEndTime());
             scheduleViewHolder.pairDayWeek.setText(DateUtil.getDayWeek(DateUtil.formatDate(models.get(i).getDate())));
             scheduleViewHolder.pairName.setText(models.get(i).getName());
             if (models.get(i).getSubgroup() != 0)
