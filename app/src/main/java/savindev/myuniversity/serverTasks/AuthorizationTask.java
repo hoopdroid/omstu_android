@@ -55,7 +55,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
 
         //Первый запрос
         String uri;
-        if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
+        if (context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("test", false)) {
             uri = context.getResources().getString(R.string.uri_test) + "getSalt?universityAcronym=" +
                     context.getResources().getString(R.string.university) + "&login=" + login; //Строка запроса на получение соли по логину
         } else {

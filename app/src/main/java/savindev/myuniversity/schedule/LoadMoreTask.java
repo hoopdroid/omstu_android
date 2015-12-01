@@ -48,8 +48,12 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
         for (int i = 0; i < params[0]; i++) { //Добавить число записей, равное params[0]
             oldMonth = calendar.get(Calendar.MONTH); //Предыдущее состояние календаря для определения месяца
             calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
-            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-                break; //Нет в воскресенье пар
+            int dayCount = new DBHelper(context).getUniversityInfoHelper().getDaysInWeek();
+            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || //Воскресенье, =1, точно нет пар
+                    calendar.get(Calendar.DAY_OF_WEEK) > dayCount+1 ) //Суббота =7, если 6-дневка выходного быть не должно
+                break;
+//            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+//                break; //Нет в воскресенье пар
             //TODO обрабатывать в зависимости от пяти-шести-дневки
             ArrayList<ScheduleModel> daySchedule;
             String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));

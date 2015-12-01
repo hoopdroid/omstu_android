@@ -9,13 +9,17 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +34,17 @@ import savindev.myuniversity.R;
 public class CalendarScheduleFragment extends AbstractSchedule {
 
     private LinearLayout filtersLayout, detailsLayout;
-    private int monthCount;
-    private int pairCount;
+    private ArrayList<String> filterType, filterName;
+    private SparseBooleanArray chosenType, chosenName;
+    private ListView pairNames, pairTypes;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
 
         if (view == null) {//Если данные существуют:
-            monthCount = 0;
+            int monthCount = 0;
             SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
             view = inflater.inflate(R.layout.fragment_calendar_schedule, container, false);
-            //        View header = LayoutInflater.from(getActivity()).inflate(R.layout.one_calendar_pair, scheduleList, false);
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
             isLinear = false;
 
@@ -58,8 +62,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             }
 
             scheduleList = (RecyclerView) view.findViewById(R.id.calendarSchedule);
-            //TODO получить из базы число пар за день  int pairCount = DBHelper.getPairCount(context);
-            pairCount = 5;
+            int pairCount = 5; //TODO получать число пар за день
             //*2 + 2: *2 - каждая пара занимает двойной размер, +2 - дополнительные поля нормального размера на дату и день недели
             glm = new GridLayoutManager(getActivity(), pairCount * 2 + 2); //2 поля на дату и день недели
             scheduleList.setLayoutManager(glm);
@@ -67,14 +70,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() { //Установка длины ячейки
                 @Override
                 public int getSpanSize(int position) {
-//                    if (adapter.isHeader(position)) {
-//                        monthCount = monthCount + 1;
-//                        return glm.getSpanCount(); //новый месяц, ячейка с месяцем на всю строку
-//                    } else
-//                    if ((position - monthCount) % (pairCount + 2) == 0 || (position - monthCount) % (pairCount + 2) == pairCount + 1)
-//                        return 1;
-//                    else
-//                    return 2; //Ячейки с парами занимают в 2 раза больше места ячеек с датами
                     switch (adapter.getItemViewType(position)) {
                         case ScheduleAdapter.VIEW_PAIR:
                             return 2;
@@ -90,8 +85,52 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 }
             });
             postInitializeData();
+
+            pairNames = (ListView) view.findViewById(R.id.pairNames);
+            pairTypes = (ListView) view.findViewById(R.id.pairTypes);
+            initializeFiltersLists(); //TODO оба листа заполнять методами в БД
         }
         return view;
+    }
+
+    private void initializeFiltersLists() {
+        filterType = new ArrayList<>();
+        filterName = new ArrayList<>();
+        filterType.add("Лекция");
+        filterType.add("КСР");
+        filterType.add("Лабораторная");
+        filterType.add("Практика");
+        filterName.add("Интеллектуальн.системы и технологии");
+        filterName.add("Администрирование вс");
+        filterName.add("Микропроцессорные системы");
+        filterName.add("Методы и сред.проект.ис и технол.");
+        filterName.add("Инструментальные средства ис");
+        filterName.add("Программир.аппаратн.средств эвм");
+
+        pairNames.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, filterName));
+        pairTypes.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, filterType));
+        for (int i = 0; i < filterName.size(); i++) {
+            pairNames.setItemChecked(i, true);
+        }
+        for (int i = 0; i < filterType.size(); i++) {
+            pairTypes.setItemChecked(i, true);
+        }
+        pairNames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                chosenName = ((ListView) parent).getCheckedItemPositions();
+                adapter.notifyDataSetChanged();
+            }
+        });
+        pairTypes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                chosenType = ((ListView) parent).getCheckedItemPositions();
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -105,7 +144,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         FragmentTransaction ft;
         switch (item.getItemId()) {
             case R.id.cs_filters:
-                userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
                 if (userInfo.getBoolean("openFilters", true)) {
                     userInfo.edit().putBoolean("openFilters", false).apply();
                     filtersLayout.setVisibility(View.GONE); //Скрыть фильтры
@@ -115,7 +154,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 }
                 break;
             case R.id.cs_detail:
-                userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
                 if (userInfo.getBoolean("openDetails", true)) {
                     userInfo.edit().putBoolean("openDetails", false).apply();
                     detailsLayout.setVisibility(View.GONE); //Скрыть подробности
@@ -126,7 +165,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 break;
             case R.id.transition:
                 //Переход на листовой вид
-                userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
                 userInfo.edit().putInt("openGroup", currentID).apply(); //Запись по id. потом по нему открывать расписание
                 userInfo.edit().putString("openGroupName", currentGroup).apply();
                 userInfo.edit().putBoolean("openIsGroup", isGroup).apply();
@@ -145,20 +184,9 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         public static final int VIEW_MONTH = 3;
         public static final int VIEW_PAIR = 4;
 
-        //        private static final int ITEM_VIEW_TYPE_HEADER = 0;
-//        private static final int ITEM_VIEW_TYPE_ITEM = 1;
-//        private final View header;
         ScheduleAdapter(List<ScheduleModel> models) {
-            //            if (header == null) {
-//                throw new IllegalArgumentException("header may not be null");
-//            }
-//            this.header = header;
             super(getActivity(), models);
         }
-
-//        public boolean isHeader(int position) {
-//            return (position == 0 || !models.get(position).getDate().substring(0, 1).equals(models.get(position - 1).getDate().substring(0, 1)));
-//        }
 
         @Override
         public int getItemViewType(int position) {
@@ -179,24 +207,12 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
         @Override
         public ScheduleViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-//            if (viewType == ITEM_VIEW_TYPE_HEADER) {
-//                return new ScheduleViewHolder(header);
-//            }
             View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.one_calendar_pair, viewGroup, false);
             return new ScheduleViewHolder(v);
         }
 
         @Override
         public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, int i) {
-//            if (isHeader(i)) {
-//                scheduleViewHolder.pairName.setText(models.get(i).getDate());
-//                return;
-//            }
-//            if ((i - monthCount) % (pairCount + 2) == 0) { //Если 1 - это день недели
-//                scheduleViewHolder.pairName.setText(models.get(i).getDate().substring(0, 1));
-//            } else if ((i - monthCount) % (pairCount + 2) == pairCount + 1) { //Если последний - дата
-//                scheduleViewHolder.pairName.setText(models.get(i).getDate().substring(1));
-//            } else {// Иначе это пара
             if (models.get(i) == null) {// Окно, точно пара
                 scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
             } else
@@ -212,6 +228,32 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
                         break;
                     case PAIR:
+                        boolean name = false, type = false; //Проверка на фильтрацию
+                        if (chosenType != null) {//Первый вызов до формирования chosenType
+                            for (int j = 0; j < chosenType.size(); j++) { //Выделен ли такой тип
+                                if (chosenType.valueAt(j) && models.get(i).getType().equals(filterType.get(chosenType.keyAt(j)))) { //Если имеется такая запись в выделенных
+                                    type = true;
+                                    break;
+                                }
+                            }
+                            if (!type) { //Если нет - сделать поле невидимым и прекратить обработку
+                                scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
+                                break;
+                            }
+                        }
+                        if (chosenName != null) {
+                            for (int j = 0; j < chosenName.size(); j++) { //Выделено ли такое имя
+                                if (chosenName.valueAt(j) && models.get(i).getName().equals(filterName.get(chosenName.keyAt(j)))) { //Если имеется такая запись в выделенных
+                                    name = true;
+                                    break;
+                                }
+                            }
+                            if (!name) { //Если нет - сделать поле невидимым и прекратить обработку
+                                scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
+                                break;
+                            }
+                        }
+                        //Если проверка на фильтрацию пройдена, показать пару
                         scheduleViewHolder.pairName.setText(models.get(i).getName());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
                         scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
@@ -222,13 +264,10 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
                         break;
                 }
-
-//            }
-
         }
 
         private String month(String date) {
-            int d =  Integer.parseInt(date);
+            int d = Integer.parseInt(date);
             switch (d) {
                 case 0:
                     return "Январь";
@@ -257,13 +296,5 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             }
             return null;
         }
-
-//        @Override
-//        public int getItemViewType(int position) {
-//            return isHeader(position) ? ITEM_VIEW_TYPE_HEADER : ITEM_VIEW_TYPE_ITEM;
-//        }
-
     }
-
-
 }

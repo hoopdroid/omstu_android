@@ -55,7 +55,7 @@ public class ScheduleModel {
         return isCancelled;
     }
 
-    public String getTipe() {
+    public String getType() {
         return type;
     }
 

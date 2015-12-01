@@ -67,14 +67,14 @@ public abstract class AbstractSchedule extends DialogFragment
         View view = null;
         calendar = new GregorianCalendar();  //Получение текущей даты для начала заполнения расписания
         calendar.add(Calendar.DAY_OF_MONTH, -1); //Чтобы не пропускать день при работе в цикле
-        SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        SharedPreferences setting = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
         usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
         main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
 
-        if (userInfo.contains("openGroup")) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
-            currentID = userInfo.getInt("openGroup", 0);
-            isGroup = userInfo.getBoolean("openIsGroup", true);
-            currentGroup = userInfo.getString("openGroupName", "");
+        if (setting.contains("openGroup")) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
+            currentID = setting.getInt("openGroup", 0);
+            isGroup = setting.getBoolean("openIsGroup", true);
+            currentGroup = setting.getString("openGroupName", "");
         } else if (main != null) { //Проверка на наличие главной группы авторизованного
             currentID = main.getId();
             isGroup = main.isGroup();
@@ -242,7 +242,7 @@ public abstract class AbstractSchedule extends DialogFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SharedPreferences userInfo;
+        SharedPreferences settings;
         FragmentTransaction ft;
         switch (item.getItemId()) {
             case 100:
@@ -251,10 +251,10 @@ public abstract class AbstractSchedule extends DialogFragment
                 break; //Для вывода бокового меню
             default:
                 //Отобразить новую выбранную группу
-                userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-                userInfo.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()).apply(); //Запись по id. потом по нему открывать расписание
-                userInfo.edit().putString("openGroupName", usedList.get(item.getItemId() - 101).getName()).apply();
-                userInfo.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
+                settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+                settings.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()).apply(); //Запись по id. потом по нему открывать расписание
+                settings.edit().putString("openGroupName", usedList.get(item.getItemId() - 101).getName()).apply();
+                settings.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
                 ft = getFragmentManager().beginTransaction();
                 if (isLinear)
                     ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();

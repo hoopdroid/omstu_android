@@ -47,7 +47,8 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         for (int i = 0; i < params.length; i++) {
             JSONObject obj = new JSONObject();
             try {
-                obj.put("LAST_REFRESH", params[i].getLastRefresh());
+//                obj.put("LAST_REFRESH", params[i].getLastRefresh());
+                obj.put("LAST_REFRESH", "20000101000000");
                 if (params[i].isGroup()) {
                     obj.put("ID_GROUP", params[i].getId());
                     GROUPS.put(obj);

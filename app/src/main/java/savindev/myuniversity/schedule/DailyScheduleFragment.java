@@ -51,15 +51,15 @@ public class DailyScheduleFragment extends AbstractSchedule {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SharedPreferences userInfo;
+        SharedPreferences settings;
         FragmentTransaction ft;
         switch (item.getItemId()) {
             case R.id.transition:
                 //Переход на календарный вид
-                userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-                userInfo.edit().putInt("openGroup", currentID).apply(); //Запись по id. потом по нему открывать расписание
-                userInfo.edit().putString("openGroupName", currentGroup).apply();
-                userInfo.edit().putBoolean("openIsGroup", isGroup).apply();
+                settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+                settings.edit().putInt("openGroup", currentID).apply(); //Запись по id. потом по нему открывать расписание
+                settings.edit().putString("openGroupName", currentGroup).apply();
+                settings.edit().putBoolean("openIsGroup", isGroup).apply();
                 ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new CalendarScheduleFragment()).commit();
                 break;
@@ -96,7 +96,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 scheduleViewHolder.pairName.setText(scheduleViewHolder.pairName.getText() + " (отм.)");
             scheduleViewHolder.pairTeacher.setText(models.get(i).getTeacher());
             scheduleViewHolder.pairAuditory.setText(models.get(i).getClassroom());
-            scheduleViewHolder.pairType.setText(models.get(i).getTipe());
+            scheduleViewHolder.pairType.setText(models.get(i).getType());
             scheduleViewHolder.pairDate.setText(DateUtil.formatDate(models.get(i).getDate()));
 
             if(models.get(i).getTeacher().equals("")){

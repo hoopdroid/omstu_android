@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.view.MenuItemCompat;
@@ -33,7 +32,6 @@ import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 
 public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     ExpandableListView list;
-    SharedPreferences sPref;
     ExpListAdapter adapter;
     MenuItem refreshItem;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -47,7 +45,6 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         View view = inflater.inflate(R.layout.fragment_groups_settings, container, false);
         list = (ExpandableListView) view.findViewById(R.id.list);
 
-        sPref = getActivity().getSharedPreferences("item_list", Context.MODE_PRIVATE);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         parse();

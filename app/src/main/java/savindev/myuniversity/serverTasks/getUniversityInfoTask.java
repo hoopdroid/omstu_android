@@ -34,7 +34,6 @@ import savindev.myuniversity.db.DBHelper;
  */
 public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
-    final private int TIMEOUT_MILLISEC = 5000;
     int errorCode = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     SharedPreferences settings;
@@ -47,11 +46,12 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
+        final int TIMEOUT_MILLISEC = 5000;
         //Возвращать false, если изменений нет
-        settings = context.getSharedPreferences("UserInfo", 0);
+        settings = context.getSharedPreferences("settings", 0);
         String refreshDate = settings.getString("init_last_refresh", "20000101000000"); //дата последнего обновления
         String uri;
-        if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
+        if (settings.getBoolean("test", false)) {
             uri = context.getResources().getString(R.string.uri_test) + "getUniversityInfo?universityAcronym=" +
                     context.getResources().getString(R.string.university) + "&lastRefresh=" + refreshDate;
         } else {
@@ -74,8 +74,7 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);
             }
-            String reply = "";
-            reply = buffer.toString();
+            String reply = buffer.toString();
             if (reply.isEmpty()) { //Если после всех операций все равно пустой
                 return false;
             }
@@ -85,7 +84,9 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
             return false;
         }
         finally {
-            urlConnection.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
         }
 
         return true;
@@ -93,9 +94,7 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     private void parseReply(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-        UniversityInfo init = null;
-        JSONObject obj = null;
-        obj = new JSONObject(reply);
+        JSONObject obj = new JSONObject(reply);
         sw:    switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
                 //Сверка полученной и хранящейся даты: если полученная меньше, данных нет
@@ -120,10 +119,9 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
                 }
 
                 JSONObject content = obj.getJSONObject("CONTENT");
-                init = UniversityInfo.fromJson(content);
+                UniversityInfo init = UniversityInfo.fromJson(content);
                 parsetoSqlite(init);
                 settings.edit().putString("init_last_refresh", modified).apply(); //Если не совпадают, занести новую дату
-                String a = settings.getString("init_last_refresh", "123");
                 Log.d("DOWNLOADING DATA", "SUCCESS");
                 break;
             case "ERROR":   //Неопознанная ошибка

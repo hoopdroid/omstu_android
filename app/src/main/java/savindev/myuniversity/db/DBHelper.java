@@ -148,6 +148,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             int daysinweek = 0;
 
+            //а не Readable?
             SQLiteDatabase sqliteDatabase = getWritableDatabase();
             Cursor cursor;
 
@@ -852,12 +853,6 @@ public class DBHelper extends SQLiteOpenHelper {
                         " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 1, null);
 
                 db.delete(TABLE_NAME, COL_GROUP_ID + "=" + idSchedule, null);
-
-
-
-
-            int t =5;
-
         }
 
         public static void deleteTeacherchedule(Context context, int idSchedule) {
@@ -868,7 +863,6 @@ public class DBHelper extends SQLiteOpenHelper {
             db = dbHelper.getWritableDatabase();
 
             ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,false);
-            int a =5;
 
             for(int i=0;i<idList.size();i++){
 
@@ -877,8 +871,6 @@ public class DBHelper extends SQLiteOpenHelper {
                         " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 0, null);
 
                 db.delete(TABLE_NAME, COL_TEACHER_ID + "=" + idSchedule +" AND " + COL_GROUP_ID +"!="+idList.get(i), null);
-                int t =5;
-
             }
 
 
