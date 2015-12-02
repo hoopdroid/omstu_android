@@ -44,45 +44,32 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         String body = null; //Тело запроса
         JSONArray GROUPS = new JSONArray(); //Составление json для отправки в post
         JSONArray TEACHERS = new JSONArray();
-        for (int i = 0; i < params.length; i++) {
+        for (GroupsModel param : params) {
             JSONObject obj = new JSONObject();
             try {
-//                obj.put("LAST_REFRESH", params[i].getLastRefresh());
-                obj.put("LAST_REFRESH", "20000101000000");
-                if (params[i].isGroup()) {
-                    obj.put("ID_GROUP", params[i].getId());
+                obj.put("LAST_REFRESH", param.getLastRefresh());
+                if (param.isGroup()) {
+                    obj.put("ID_GROUP", param.getId());
                     GROUPS.put(obj);
                 } else {
-                    obj.put("ID_TEACHER", params[i].getId());
+                    obj.put("ID_TEACHER", param.getId());
                     TEACHERS.put(obj);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
-
         JSONObject obj = new JSONObject();
         try {
             obj.put("GROUPS", (GROUPS.length() == 0) ? JSONObject.NULL : GROUPS);
             obj.put("TEACHERS", (TEACHERS.length() == 0) ? JSONObject.NULL : TEACHERS);
-//        if (GROUPS.length() == 0) {
-//            obj.put("GROUPS", JSONObject.NULL);
-//        } else {
-//            obj.put("GROUPS", GROUPS);
-//        }
-//        if (TEACHERS.length() == 0) {
-//            obj.put("TEACHERS", JSONObject.NULL);
-//        } else {
-//            obj.put("TEACHERS", TEACHERS);
-//        }
-
             body = obj.toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
         String uri = context.getResources().getString(R.string.uri) + "getSchedule";
         HttpURLConnection urlConnection = null;
+
         try {
             URL url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -90,7 +77,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             urlConnection.setDoOutput(true); //Отправка json
             OutputStream output = urlConnection.getOutputStream();
-            output.write(body.getBytes("UTF-8"));
+            output.write(body != null ? body.getBytes("UTF-8") : new byte[0]);
             output.close();
             errorCode = urlConnection.getResponseCode();
 
@@ -98,7 +85,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             if (inputStream == null) {
                 inputStream = urlConnection.getInputStream();
             }
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -115,7 +102,9 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             e.printStackTrace();
             return -1;
         } finally {
-            urlConnection.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
         }
         return 1;
     }
@@ -145,8 +134,8 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
                 String lastResresh = obj.getString("LAST_REFRESH"); //дата обновления, в таблицу дат
-                ArrayList<Schedule> sched = null;
-                ArrayList<ScheduleDates> scheddates = null;
+                ArrayList<Schedule> sched;
+                ArrayList<ScheduleDates> scheddates;
                 try {
                     sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
                     parsetoSqlite(sched);

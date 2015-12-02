@@ -66,7 +66,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         if (result == null) {
             return false;
         }
-        String salt = "";
+        String salt;
         try {
             salt = parseSalt(result); // Разбор результата
         } catch (JSONException e) {
@@ -104,7 +104,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
             urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -118,12 +118,14 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             e.printStackTrace();
             return null;
         } finally {
-            urlConnection.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
         }
         return reply;
     }
 
-    private static final String md5(final String s) {
+    private static String md5(final String s) {
         final String MD5 = "MD5";
         try {
             // Create MD5 Hash
@@ -149,7 +151,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     }
 
     private String parseSalt(String result) throws JSONException {
-        JSONObject obj = null;
+        JSONObject obj;
         obj = new JSONObject(result);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
@@ -171,7 +173,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     }
 
     private boolean parseContent(String result) throws JSONException {
-        JSONObject obj = null;
+        JSONObject obj;
         obj = new JSONObject(result);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
@@ -189,11 +191,10 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 editor.putString("password", passwordHash);
                 editor.putInt("UserId", content.getInt("ID_USER"));
                 editor.apply();
-                DBHelper dbHelper = DBHelper.getInstance(context);
 
-                dbHelper.getUsedSchedulesHelper().setUsedSchedule(context, groupId, true, true, "20000101000000"); //запись нового основного в таблицу
+                DBHelper.UsedSchedulesHelper.setUsedSchedule(context, groupId, true, true, "20000101000000"); //запись нового основного в таблицу
 
-                ArrayList<GroupsModel> models = dbHelper.getUsedSchedulesHelper().getGroupsModelList(context); //Получить список id не-основных активных расписаний
+                ArrayList<GroupsModel> models = DBHelper.UsedSchedulesHelper.getGroupsModelList(context); //Получить список id не-основных активных расписаний
                 forbreak:
                 {
                     for (GroupsModel model : models) { //Проверить, если ли среди них id группы авторизовавшегося - основной
@@ -204,7 +205,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                     //Получить расписание для этой группы, если ранее оно не было получено
 
                     GetScheduleTask gst = new GetScheduleTask(context, null);
-                    gst.execute(dbHelper.getUsedSchedulesHelper().getMainGroupModel(context));
+                    gst.execute(DBHelper.UsedSchedulesHelper.getMainGroupModel(context));
                 }
 
 

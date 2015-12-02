@@ -86,7 +86,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 return false;
             }
         });
-        refreshItem = (MenuItem) menu.findItem(R.id.download_pb);
+        refreshItem = menu.findItem(R.id.download_pb);
         refreshItem.setActionView(R.layout.actionbar_progress);
         refreshItem.setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
@@ -107,11 +107,11 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         DBHelper dbHelper = DBHelper.getInstance(getActivity().getBaseContext());
         ArrayList<String> faculty = dbHelper.getFacultiesHelper().getFaculties(getActivity());
         ArrayList<String> departments = dbHelper.getDepartmentsHelper().getDepartments(getActivity());
-        ArrayList<String> parents = new ArrayList<String>(); //Список родителей, состоит из факультетов и кафедр
+        ArrayList<String> parents = new ArrayList<>(); //Список родителей, состоит из факультетов и кафедр
         parents.addAll(faculty);
         parents.addAll(departments);
         //Создаем лист с группами
-        ArrayList<ArrayList<GroupsModel>> models = new ArrayList<ArrayList<GroupsModel>>();
+        ArrayList<ArrayList<GroupsModel>> models = new ArrayList<>();
         for (int i = 0; i < faculty.size(); i++) {
             models.add(dbHelper.getGroupsHelper().getGroups(getActivity(), faculty.get(i)));
         }
@@ -135,7 +135,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 refreshItem.setActionView(R.layout.actionbar_progress); //Показать загрузку данных
                 refreshItem.setVisible(true);
                 for (GroupsModel model : addList) {
-                    model.setLastRefresh("20000101000000"); //Установка даты последнего обновления - нет обновлений
+                    model.setLastRefresh(getActivity().getResources().getString(R.string.unix)); //Установка даты последнего обновления - нет обновлений
                 }
                 gst.execute(addList.toArray(new GroupsModel[addList.size()])); //Выполняем запрос на получение нужных расписаний
                 try {  //TODO сделать красивое отображение загрузки

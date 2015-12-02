@@ -59,7 +59,7 @@ public class Schedule { //Класс для парсинга основных р
     }
 
     public static ArrayList<Schedule> fromJson(final JSONArray array) {
-        final ArrayList<Schedule> schedule = new ArrayList<Schedule>();
+        final ArrayList<Schedule> schedule = new ArrayList<>();
         for (int index = 0; index < array.length(); ++index) {
             try {
                 final Schedule sched = fromJson(array.getJSONObject(index));

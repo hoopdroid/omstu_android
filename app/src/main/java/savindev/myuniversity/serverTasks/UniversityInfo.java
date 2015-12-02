@@ -106,7 +106,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<SEMESTER> fromJson(final JSONArray array) {
-            final ArrayList<SEMESTER> SEMESTERS = new ArrayList<SEMESTER>();
+            final ArrayList<SEMESTER> SEMESTERS = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final SEMESTER semester = fromJson(array.getJSONObject(index));
@@ -143,7 +143,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<PAIR> fromJson(final JSONArray array) {
-            final ArrayList<PAIR> PAIRS = new ArrayList<PAIR>();
+            final ArrayList<PAIR> PAIRS = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final PAIR pair = fromJson(array.getJSONObject(index));
@@ -178,7 +178,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<FACULTY> fromJson(final JSONArray array) {
-            final ArrayList<FACULTY> FACULTIES = new ArrayList<FACULTY>();
+            final ArrayList<FACULTY> FACULTIES = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final FACULTY faculty = fromJson(array.getJSONObject(index));
@@ -221,7 +221,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<DEPARTMENT> fromJson(final JSONArray array) {
-            final ArrayList<DEPARTMENT> DEPARTMENTS = new ArrayList<DEPARTMENT>();
+            final ArrayList<DEPARTMENT> DEPARTMENTS = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final DEPARTMENT department = fromJson(array.getJSONObject(index));
@@ -257,7 +257,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<GROUP> fromJson(final JSONArray array) {
-            final ArrayList<GROUP> GROUPS = new ArrayList<GROUP>();
+            final ArrayList<GROUP> GROUPS = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final GROUP group = fromJson(array.getJSONObject(index));
@@ -303,7 +303,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<TEACHER> fromJson(final JSONArray array) {
-            final ArrayList<TEACHER> TEACHERS = new ArrayList<TEACHER>();
+            final ArrayList<TEACHER> TEACHERS = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final TEACHER teacher = fromJson(array.getJSONObject(index));
@@ -335,7 +335,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<CAMPUS> fromJson(final JSONArray array) {
-            final ArrayList<CAMPUS> CAMPUSES = new ArrayList<CAMPUS>();
+            final ArrayList<CAMPUS> CAMPUSES = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final CAMPUS campus = fromJson(array.getJSONObject(index));
@@ -384,7 +384,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<CLASSROOM> fromJson(final JSONArray array) {
-            final ArrayList<CLASSROOM> CLASSROOMS = new ArrayList<CLASSROOM>();
+            final ArrayList<CLASSROOM> CLASSROOMS = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final CLASSROOM classroom = fromJson(array.getJSONObject(index));
@@ -433,7 +433,7 @@ public class UniversityInfo {
         }
 
         public static ArrayList<BUILDING> fromJson(final JSONArray array) {
-            final ArrayList<BUILDING> BUILDINGS = new ArrayList<BUILDING>();
+            final ArrayList<BUILDING> BUILDINGS = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final BUILDING building = fromJson(array.getJSONObject(index));

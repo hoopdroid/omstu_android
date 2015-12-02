@@ -59,7 +59,7 @@ public class ScheduleDates { //Класс для парсинга дополни
         }
 
         public static ArrayList<DATE> fromJson(final JSONArray array) {
-            final ArrayList<DATE> dates = new ArrayList<DATE>();
+            final ArrayList<DATE> dates = new ArrayList<>();
             for (int index = 0; index < array.length(); ++index) {
                 try {
                     final DATE data = fromJson(array.getJSONObject(index));

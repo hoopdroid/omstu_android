@@ -37,6 +37,7 @@
     <string name="uri">http://178.74.102.58:1342/MyUniversity/api/v1.0/</string>
     <string name="uri_test">http://178.74.102.58:4586/MyUniversity/api/v1.0/</string>
     <string name="uri_log">http://178.74.102.58:4586-1342/MyUniversity/api/v1.0/</string>
+    <string name="unix">19700101000000</string>
 
     <string name="university">OMGUPS</string>
 

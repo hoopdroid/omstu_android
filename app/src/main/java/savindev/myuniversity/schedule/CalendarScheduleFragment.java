@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private ArrayList<String> filterType, filterName;
     private SparseBooleanArray chosenType, chosenName;
     private ListView pairNames, pairTypes;
+    private TextView number, time, name, teacher, auditory, type;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
@@ -89,9 +91,31 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             pairNames = (ListView) view.findViewById(R.id.pairNames);
             pairTypes = (ListView) view.findViewById(R.id.pairTypes);
             initializeFiltersLists(); //TODO оба листа заполнять методами в БД
+
+            number = (TextView) view.findViewById(R.id.detailNumber);
+            time = (TextView) view.findViewById(R.id.detailTime);
+            name = (TextView) view.findViewById(R.id.detailName);
+            teacher = (TextView) view.findViewById(R.id.detailTeacher);
+            auditory = (TextView) view.findViewById(R.id.detailAuditory);
+            type = (TextView) view.findViewById(R.id.detailType);
+//            scheduleList.addOnItemTouchListener(
+//                    new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
+//                        @Override
+//                        public void onItemClick(@NonNull Card card, int position) {
+//                            fillDetailsLayout(adapter.models.get(position));
+//                        }
+//
+//                        @Override
+//                        public void onItemLongClick(@NonNull Card card, int position) {
+//
+//                        }
+//                    })
+//            );
         }
         return view;
     }
+
+
 
     private void initializeFiltersLists() {
         filterType = new ArrayList<>();
@@ -115,6 +139,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         for (int i = 0; i < filterType.size(); i++) {
             pairTypes.setItemChecked(i, true);
         }
+        chosenType = pairTypes.getCheckedItemPositions();
+        chosenName = pairNames.getCheckedItemPositions();
         pairNames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v,
@@ -205,14 +231,28 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             return 0;
         }
 
+//        @Override
+//        public ScheduleViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+//            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.one_calendar_pair, viewGroup, false);
+//            return new ScheduleViewHolder(v);
+//        }
+
         @Override
-        public ScheduleViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.one_calendar_pair, viewGroup, false);
+        public ScheduleViewHolder onCreateViewHolder(final ViewGroup parent, final int position) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.one_calendar_pair, parent, false);
+            parent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int a = 3;
+                    fillDetailsLayout(models.get(position));
+                }
+            });
+//            parent.setOnLongClickListener();
             return new ScheduleViewHolder(v);
         }
 
         @Override
-        public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, int i) {
+        public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, final int i) {
             if (models.get(i) == null) {// Окно, точно пара
                 scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
             } else
@@ -228,30 +268,9 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
                         break;
                     case PAIR:
-                        boolean name = false, type = false; //Проверка на фильтрацию
-                        if (chosenType != null) {//Первый вызов до формирования chosenType
-                            for (int j = 0; j < chosenType.size(); j++) { //Выделен ли такой тип
-                                if (chosenType.valueAt(j) && models.get(i).getType().equals(filterType.get(chosenType.keyAt(j)))) { //Если имеется такая запись в выделенных
-                                    type = true;
-                                    break;
-                                }
-                            }
-                            if (!type) { //Если нет - сделать поле невидимым и прекратить обработку
-                                scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
-                                break;
-                            }
-                        }
-                        if (chosenName != null) {
-                            for (int j = 0; j < chosenName.size(); j++) { //Выделено ли такое имя
-                                if (chosenName.valueAt(j) && models.get(i).getName().equals(filterName.get(chosenName.keyAt(j)))) { //Если имеется такая запись в выделенных
-                                    name = true;
-                                    break;
-                                }
-                            }
-                            if (!name) { //Если нет - сделать поле невидимым и прекратить обработку
-                                scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
-                                break;
-                            }
+                        if (!checkedPairFilters(models.get(i))) {
+                            scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
+                            break;
                         }
                         //Если проверка на фильтрацию пройдена, показать пару
                         scheduleViewHolder.pairName.setText(models.get(i).getName());
@@ -264,6 +283,32 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
                         break;
                 }
+        }
+
+        private boolean checkedPairFilters(ScheduleModel model) {
+            type:
+            {
+                if (chosenType != null) //Первый вызов до формирования chosenType
+                    for (int j = 0; j < chosenType.size(); j++) { //Выделен ли такой тип
+                        if (chosenType.valueAt(j) && model.getType().equals(filterType.get(chosenType.keyAt(j)))) {//Если имеется такая запись в выделенных
+                            int a = 3;
+                            break type;
+                        }
+                    }
+                return false;
+            }
+            name:
+            {
+                if (chosenName != null)
+                    for (int j = 0; j < chosenName.size(); j++) { //Выделено ли такое имя
+                        if (chosenName.valueAt(j) && model.getName().equals(filterName.get(chosenName.keyAt(j)))) {//Если имеется такая запись в выделенных
+                            int a = 3;
+                            break name;
+                        }
+                    }
+                return false;
+            }
+            return true;
         }
 
         private String month(String date) {
@@ -296,5 +341,25 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             }
             return null;
         }
+    }
+
+    private void fillDetailsLayout(final ScheduleModel model) {
+        number.setText(model.getN());
+        time.setText(model.getDate() + ", " + model.getStartTime() + "-" + model.getEndTime());
+        name.setText(model.getName());
+        teacher.setText(model.getTeacher());
+        auditory.setText(model.getClassroom());
+        type.setText(model.getType());
+        //По нажатию переход на списочный вид
+//        detailsLayout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                SharedPreferences.Editor e = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE).edit();
+//                e.putString("positionDate", model.getDate());
+//                e.putString("positionN", model.getN());
+//                FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+//                ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
+//            }
+//        });
     }
 }
