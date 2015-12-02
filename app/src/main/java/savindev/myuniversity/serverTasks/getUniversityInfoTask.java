@@ -49,7 +49,7 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
         final int TIMEOUT_MILLISEC = 5000;
         //Возвращать false, если изменений нет
         settings = context.getSharedPreferences("settings", 0);
-        String refreshDate = settings.getString("init_last_refresh", "20000101000000"); //дата последнего обновления
+        String refreshDate = settings.getString("init_last_refresh", context.getResources().getString(R.string.unix)); //дата последнего обновления
         String uri;
         if (settings.getBoolean("test", false)) {
             uri = context.getResources().getString(R.string.uri_test) + "getUniversityInfo?universityAcronym=" +
@@ -67,7 +67,7 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
             urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
@@ -95,7 +95,7 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
     private void parseReply(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
         JSONObject obj = new JSONObject(reply);
-        sw:    switch (obj.get("STATE").toString()) {//определение типа полученного результата
+        switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
                 //Сверка полученной и хранящейся даты: если полученная меньше, данных нет
                 //Если полученная дата больше, записать новые данные и новую дату
@@ -104,17 +104,15 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
                 String modified = obj.getString("LAST_REFRESH");
                 String date = settings.getString("init_last_refresh", ""); // Старая записанная дата обновления
                 if (!(date.equals(""))) { //Если хранящаяся дата не пуста
-                    Date lastModifiedDate = null; //Полученная от сервера дата
-                    Date oldModifiedDate = null;
                     try {
-                        lastModifiedDate = formatter.parse(modified); //Дата с сервера
-                        oldModifiedDate = formatter.parse(date); //Дата с файла
+                        Date lastModifiedDate = formatter.parse(modified); //Дата с сервера
+                        Date oldModifiedDate = formatter.parse(date); //Дата с файла
+                        if (lastModifiedDate.getTime() == (oldModifiedDate.getTime())) {
+                            errorCode = 1; //1 - изменения не требуются
+                            break;
+                        }
                     } catch (ParseException e) {
                         e.printStackTrace();
-                    }
-                    if (lastModifiedDate.getTime() == (oldModifiedDate.getTime())) {
-                        errorCode = 1; //1 - изменения не требуются
-                        break sw;
                     }
                 }
 
