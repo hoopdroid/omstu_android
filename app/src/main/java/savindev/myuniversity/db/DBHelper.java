@@ -741,14 +741,18 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public Set<String> getGroupLessons(Context context,int idGroup){
+        public Set<String> getGroupLessons(Context context,int idGroup,boolean isGroup){
 
+            String selectionDB=COL_GROUP_ID;
+            if(!isGroup){
+                selectionDB=COL_TEACHER_ID;
+            }
             SortedSet<String> lessons = new TreeSet<>();
             DBHelper dbHelper = new DBHelper(context);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             try {
-                String selectQuery = "SELECT " + COL_DISCIPLINE_NAME + " FROM " + TABLE_NAME+" WHERE "+COL_GROUP_ID+" = "+idGroup;
+                String selectQuery = "SELECT " + COL_DISCIPLINE_NAME + " FROM " + TABLE_NAME+" WHERE "+selectionDB+" = "+idGroup;
                 Cursor c = db.rawQuery(selectQuery, null);
                 c.moveToFirst();
                 while (!c.isAfterLast()){
@@ -765,14 +769,18 @@ public class DBHelper extends SQLiteOpenHelper {
             return lessons;
         }
 
-        public Set<String> getGroupLessonsTypes(Context context,int idGroup){
+        public Set<String> getGroupLessonsTypes(Context context,int idGroup,boolean isGroup){
 
+            String selectionDB=COL_GROUP_ID;
+            if(!isGroup){
+                selectionDB=COL_TEACHER_ID;
+            }
             SortedSet<String> lessons = new TreeSet<>();
             DBHelper dbHelper = new DBHelper(context);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             try {
-                String selectQuery = "SELECT " + COL_DISCIPLINE_TYPE + " FROM " + TABLE_NAME+" WHERE "+COL_GROUP_ID+" = "+idGroup;
+                String selectQuery = "SELECT " + COL_DISCIPLINE_TYPE + " FROM " + TABLE_NAME+" WHERE "+selectionDB+" = "+idGroup;
                 Cursor c = db.rawQuery(selectQuery, null);
                 c.moveToFirst();
                 while (!c.isAfterLast()){

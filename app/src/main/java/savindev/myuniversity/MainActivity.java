@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
             DBHelper dbHelper = DBHelper.getInstance(this);
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
 
-            Log.d("LESSONS 23z",dbHelper.getSchedulesHelper().getGroupLessonsTypes(this, 137).toString());
+            //Log.d("LESSONS 23z",dbHelper.getSchedulesHelper().getGroupLessons(this, 137,true).toString());
+           // Log.d("LESSONS altman",dbHelper.getSchedulesHelper().getGroupLessons(this, 10485,false).toString());
         }
 
     }
