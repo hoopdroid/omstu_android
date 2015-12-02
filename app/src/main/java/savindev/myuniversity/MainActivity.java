@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -62,9 +63,7 @@ public class MainActivity extends AppCompatActivity {
             DBHelper dbHelper = DBHelper.getInstance(this);
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
 
-          //  dbHelper.getSchedulesHelper().deleteSchedule(this,140,true);
-           //  dbHelper.getSchedulesHelper().deleteSchedule(this,10485,false);
-             //dbHelper.getSchedulesHelper().deleteSchedule(this,10488,false);
+            Log.d("LESSONS 23z",dbHelper.getSchedulesHelper().getGroupLessonsTypes(this, 137).toString());
         }
 
     }
@@ -116,8 +115,7 @@ public class MainActivity extends AppCompatActivity {
                         itemNotes,
                         itemNews,
                         itemEducation,
-                        itemSettings,
-                        new SecondaryDrawerItem()
+                        itemSettings
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override

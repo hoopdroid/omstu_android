@@ -14,6 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
@@ -37,7 +40,6 @@ public class DBHelper extends SQLiteOpenHelper {
     private DepartmentsHelper departmentsHelper;
     private UsedSchedulesHelper usedSchedulesHelper;
     private SchedulesHelper schedulesHelper;
-    private ScheduleDatesHelper scheduleDatesHelper;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -51,7 +53,7 @@ public class DBHelper extends SQLiteOpenHelper {
         departmentsHelper = new DepartmentsHelper();
         usedSchedulesHelper = new UsedSchedulesHelper();
         schedulesHelper = new SchedulesHelper();
-        scheduleDatesHelper = new ScheduleDatesHelper();
+
 
     }
 
@@ -72,7 +74,6 @@ public class DBHelper extends SQLiteOpenHelper {
         departmentsHelper.create(db);
         usedSchedulesHelper.create(db);
         schedulesHelper.create(db);
-        scheduleDatesHelper.create(db);
     }
 
     @Override
@@ -117,9 +118,6 @@ public class DBHelper extends SQLiteOpenHelper {
         return schedulesHelper;
     }
 
-    public ScheduleDatesHelper getScheduleDatesHelper() {
-        return scheduleDatesHelper;
-    }
 
 
     public class UniversityInfoHelper { // [CR] либо класс сделать приватным, либо убрать геттеры для классов. правильнее - первое
@@ -148,8 +146,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             int daysinweek = 0;
 
-            //а не Readable?
-            SQLiteDatabase sqliteDatabase = getWritableDatabase();
+            SQLiteDatabase sqliteDatabase = getReadableDatabase();
             Cursor cursor;
 
                 cursor = sqliteDatabase.rawQuery("SELECT " + COL_DAYS_IN_WEEK + " FROM " + TABLE_NAME, null);
@@ -425,6 +422,25 @@ public class DBHelper extends SQLiteOpenHelper {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.PairsHelper.TABLE_NAME, DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
                 }
             }
+        }
+
+        public int getPairsInDay(Context context){
+            int maxPair=0;
+
+            SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+
+            try {
+                String selectQuery = "SELECT " + COL_PAIR_NUMBER + " FROM " + TABLE_NAME;
+                Cursor c = sqLiteDatabase.rawQuery(selectQuery, null);
+                if (c.moveToLast()) {
+                    maxPair = c.getInt(c.getColumnIndex(COL_PAIR_NUMBER));
+                }
+                c.close();
+            } catch (SQLiteException e) {
+                Log.e("DB EXCEPTION", e.toString(), e);
+            }
+
+            return maxPair;
         }
 
         public String getPairNumber(Context context, int pairId) {
@@ -722,6 +738,55 @@ public class DBHelper extends SQLiteOpenHelper {
             dt = sdf.format(c.getTime());  // dt is now the new date
             Log.d("AFTER", dt);
             return dt;
+        }
+
+
+        public Set<String> getGroupLessons(Context context,int idGroup){
+
+            SortedSet<String> lessons = new TreeSet<>();
+            DBHelper dbHelper = new DBHelper(context);
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            try {
+                String selectQuery = "SELECT " + COL_DISCIPLINE_NAME + " FROM " + TABLE_NAME+" WHERE "+COL_GROUP_ID+" = "+idGroup;
+                Cursor c = db.rawQuery(selectQuery, null);
+                c.moveToFirst();
+                while (!c.isAfterLast()){
+
+                    lessons.add(c.getString(c.getColumnIndex(COL_DISCIPLINE_NAME)));
+                    c.moveToNext();
+
+                }
+                c.close();
+            } catch (SQLiteException e) {
+                Log.e("DB EXCEPTION", e.toString(), e);
+            }
+
+            return lessons;
+        }
+
+        public Set<String> getGroupLessonsTypes(Context context,int idGroup){
+
+            SortedSet<String> lessons = new TreeSet<>();
+            DBHelper dbHelper = new DBHelper(context);
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            try {
+                String selectQuery = "SELECT " + COL_DISCIPLINE_TYPE + " FROM " + TABLE_NAME+" WHERE "+COL_GROUP_ID+" = "+idGroup;
+                Cursor c = db.rawQuery(selectQuery, null);
+                c.moveToFirst();
+                while (!c.isAfterLast()){
+
+                    lessons.add(c.getString(c.getColumnIndex(COL_DISCIPLINE_TYPE)));
+                    c.moveToNext();
+
+                }
+                c.close();
+            } catch (SQLiteException e) {
+                Log.e("DB EXCEPTION", e.toString(), e);
+            }
+
+            return lessons;
         }
 
         public void setSchedule(Context context, ArrayList<Schedule> schedule) {
@@ -1090,41 +1155,6 @@ public class DBHelper extends SQLiteOpenHelper {
             return idList;
         }
 
-    }
-
-    public class ScheduleDatesHelper {
-        protected static final String TABLE_NAME = "ScheduleDates";
-        protected static final String COL_SCHEDULE_ID = "schedule_id";
-        protected static final String COL_DATE = "date";
-        protected static final String COL_IS_CANCELLED = "is_cancelled";
-
-        public void create(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
-                    COL_SCHEDULE_ID + " INTEGER," +
-                    COL_DATE + " TEXT," +
-                    COL_IS_CANCELLED + " INTEGER" +
-                    ");");
-
-        }
-
-        public void getScheduleDates(Context context, ArrayList<ScheduleDates> scheduleDates) {
-        }
-
-        public void setScheduleDates(Context context, ArrayList<ScheduleDates> scheduleDates) {
-            SQLiteDatabase sqliteDatabase;
-            DBHelper helper = DBHelper.getInstance(context);
-            sqliteDatabase = helper.getWritableDatabase();
-
-            for (int i = 0; i < scheduleDates.size(); i++) {
-                for (int j = 0; j < scheduleDates.get(j).DATES.size(); j++) {
-                    ContentValues scheduleDatesRow = new ContentValues();
-                    scheduleDatesRow.put(COL_SCHEDULE_ID, scheduleDates.get(i).ID_SCHEDULE);
-                    scheduleDatesRow.put(COL_DATE, scheduleDates.get(j).DATES.get(j).DATE);
-                    scheduleDatesRow.put(COL_IS_CANCELLED, scheduleDates.get(j).DATES.get(j).IS_CANCELED);
-                    sqliteDatabase.insert(TABLE_NAME, null, scheduleDatesRow);
-                }
-            }
-        }
     }
 
     @Override
