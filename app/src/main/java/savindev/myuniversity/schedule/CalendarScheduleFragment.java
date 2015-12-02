@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
 
 /**
  * Класс, отображающий расписание на определенный срок в виде сетки с предметами. Имеет различные методы фильтрации предметов
@@ -45,7 +46,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
         if (view == null) {//Если данные существуют:
             int monthCount = 0;
-            SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+            SharedPreferences userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
             view = inflater.inflate(R.layout.fragment_calendar_schedule, container, false);
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
             isLinear = false;
@@ -64,7 +65,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             }
 
             scheduleList = (RecyclerView) view.findViewById(R.id.calendarSchedule);
-            int pairCount = 5; //TODO получать число пар за день
+            int pairCount = DBHelper.getInstance(getActivity()).getPairsHelper().getPairsInDay(getActivity());
             //*2 + 2: *2 - каждая пара занимает двойной размер, +2 - дополнительные поля нормального размера на дату и день недели
             glm = new GridLayoutManager(getActivity(), pairCount * 2 + 2); //2 поля на дату и день недели
             scheduleList.setLayoutManager(glm);
@@ -90,7 +91,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
             pairNames = (ListView) view.findViewById(R.id.pairNames);
             pairTypes = (ListView) view.findViewById(R.id.pairTypes);
-            initializeFiltersLists(); //TODO оба листа заполнять методами в БД
+            initializeFiltersLists();
 
             number = (TextView) view.findViewById(R.id.detailNumber);
             time = (TextView) view.findViewById(R.id.detailTime);
@@ -118,18 +119,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
 
     private void initializeFiltersLists() {
-        filterType = new ArrayList<>();
-        filterName = new ArrayList<>();
-        filterType.add("Лекция");
-        filterType.add("КСР");
-        filterType.add("Лабораторная");
-        filterType.add("Практика");
-        filterName.add("Интеллектуальн.системы и технологии");
-        filterName.add("Администрирование вс");
-        filterName.add("Микропроцессорные системы");
-        filterName.add("Методы и сред.проект.ис и технол.");
-        filterName.add("Инструментальные средства ис");
-        filterName.add("Программир.аппаратн.средств эвм");
+        filterType = new ArrayList<>(DBHelper.getInstance(getActivity()).getSchedulesHelper().getGroupLessonsTypes(getActivity(), currentID, isGroup));
+        filterName = new ArrayList<>(DBHelper.getInstance(getActivity()).getSchedulesHelper().getGroupLessons(getActivity(), currentID, isGroup));
 
         pairNames.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, filterName));
         pairTypes.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, filterType));

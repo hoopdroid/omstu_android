@@ -152,7 +152,7 @@ public class SettingsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.settings, menu);
-        refreshItem = (MenuItem) menu.findItem(R.id.download_pb);
+        refreshItem = menu.findItem(R.id.download_pb);
         refreshItem.setActionView(R.layout.actionbar_progress);
         refreshItem.setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
@@ -163,8 +163,7 @@ public class SettingsFragment extends Fragment {
         if (guit != null) //завершение запроса, если он активен
             guit.cancel(false);
         ft = getFragmentManager().beginTransaction(); //отсоединение фрагмента с настройками, чтобы в actionBar не было лишних элементов
-        if (!ft.isEmpty())
-            ft.remove(groups).commit();
+        ft.remove(groups).commit();
         super.onDestroy();
     }
 

@@ -111,6 +111,11 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     @Override
     protected void onPostExecute(Integer data) {
+        if (errorCode == 1) { //Новые данные отсутствуют
+            mSwipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(context, "Нет новых данных", Toast.LENGTH_LONG).show();
+            return;
+        }
         if (mSwipeRefreshLayout != null) { //Если вызывалось из фрагмента расписания
             mSwipeRefreshLayout.setRefreshing(false); //Завершить показывать прогресс
             if (data > 0) { //Имеется новое содержимое, обновить данные
@@ -123,11 +128,10 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
     }
 
 
-    private boolean replyParse(String reply) throws JSONException {
+    private void replyParse(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
         if (errorCode != 200) {
             //TODO обрабатывать коды возврата
-            return false;
         }
         JSONObject obj = new JSONObject(reply);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
@@ -160,8 +164,10 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 Log.i("myuniversity", "Ошибка WARNING от сервера, запрос GetScheduleTask, текст:"
                         + obj.get("CONTENT"));
                 break;
+            case "NOT_FOUND": //Нет новых данных
+                errorCode = 1;
+                break;
         }
-        return false;
     }
 
     private void parsetoSqlite(ArrayList<Schedule> sched) {

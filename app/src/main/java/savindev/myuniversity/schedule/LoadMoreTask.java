@@ -52,9 +52,6 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
             if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || //Воскресенье, =1, точно нет пар
                     calendar.get(Calendar.DAY_OF_WEEK) > dayCount+1 ) //Суббота =7, если 6-дневка выходного быть не должно
                 break;
-//            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-//                break; //Нет в воскресенье пар
-            //TODO обрабатывать в зависимости от пяти-шести-дневки
             ArrayList<ScheduleModel> daySchedule;
             String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
             if (day.length() < 2)
@@ -105,11 +102,19 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
         ArrayList<ScheduleModel> schedule = new ArrayList<>();
         //Добавить окна
         int i = 0;
-        int pairCount = 5; //TODO получать число пар за день
+        int pairCount = DBHelper.getInstance(context).getPairsHelper().getPairsInDay(context);
+        String pairNum = "";
         for (; i < pairs.size(); i++) { //окна до последней пары
-            if (!pairs.get(i).getN().equals(Integer.toString(i + 1))) {//Если номер пары не совпадает с позицией - заткнуть дырку пустотой
-                pairs.add(i, null);
+            if (pairs.get(i).getN().equals(pairNum)) {//Номер пары совпадает с предыдущим, пару не записывать
+                pairs.remove(i);
+                i--;
+                continue; //TODO нормальное действие с парой-дублем
             }
+            if (Integer.parseInt(pairs.get(i).getN()) != (i + 1)) {//Если номер пары не совпадает с позицией - заткнуть дырку пустотой
+                pairs.add(i, null);
+                continue;
+            }
+            pairNum = pairs.get(i).getN();
         }
         for (; i < pairCount; i++) //окна от последней пары и до конца дня
             pairs.add(i, null);

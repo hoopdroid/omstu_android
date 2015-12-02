@@ -22,7 +22,6 @@ import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.schedule.ScheduleModel;
 import savindev.myuniversity.serverTasks.Schedule;
-import savindev.myuniversity.serverTasks.ScheduleDates;
 import savindev.myuniversity.serverTasks.UniversityInfo;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -807,16 +806,18 @@ public class DBHelper extends SQLiteOpenHelper {
             String previousValue = "";
             Date beginDate = null;
             Date endDate = null;
+            boolean firstPair;
 
-            for (int index = 1; index < schedule.size(); index++) {
+            for (int index = 0; index < schedule.size(); index++) {
                 if (!schedule.get(index).IS_DELETED) {
                     //TODO test all variants of work dataalreadyornot function)) {
                     try {
+                        firstPair = true;
                         beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
                         endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
                         previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
-                        while (beginDate.compareTo(endDate) <= 0) { // если дата начала пары раньше конца семестра
-
+                        while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // если дата начала пары раньше конца семестра
+                            firstPair = false;
                             ContentValues scheduleRow = new ContentValues();
                             scheduleRow.put(SchedulesHelper.COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
                             scheduleRow.put(SchedulesHelper.COL_PAIR_ID, schedule.get(index).ID_PAIR);

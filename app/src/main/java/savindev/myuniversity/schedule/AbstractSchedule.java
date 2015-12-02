@@ -146,9 +146,6 @@ public abstract class AbstractSchedule extends DialogFragment
         // начинаем показывать прогресс
         mSwipeRefreshLayout.setRefreshing(true);
         GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
-        calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
-        calendar.add(Calendar.DAY_OF_YEAR, -1);
-        adapter.deleteData();
         GroupsModel model = null; //Достать активную группу для обновления. Нельзя создавать новую модель, т.к. нужна дата
         if (currentID == main.getId() && isGroup == main.isGroup())
             model = main;
@@ -166,6 +163,9 @@ public abstract class AbstractSchedule extends DialogFragment
     BroadcastReceiver broadcastReceiverUpdate = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+            adapter.deleteData();
             lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
             lmt.execute(14);
         }

@@ -130,6 +130,9 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
                 Log.i("myuniversity", "Ошибка WARNING от сервера, запрос GetInitializationInfoTask, текст:"
                         + obj.get("CONTENT"));
                 break;
+            case "NOT_FOUND": //Нет новых данных
+                errorCode = 1;
+                break;
         }
 
 
