@@ -182,8 +182,9 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
     }
 
     private void parseScheduleDates(ArrayList<ScheduleDates> scheduleDates) {
+
         DBHelper dbHelper = DBHelper.getInstance(context);
-        dbHelper.getScheduleDatesHelper().setScheduleDates(context, scheduleDates);
+
     }
 
     private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний
