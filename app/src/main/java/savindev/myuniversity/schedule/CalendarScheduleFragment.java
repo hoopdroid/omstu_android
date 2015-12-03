@@ -99,19 +99,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             teacher = (TextView) view.findViewById(R.id.detailTeacher);
             auditory = (TextView) view.findViewById(R.id.detailAuditory);
             type = (TextView) view.findViewById(R.id.detailType);
-//            scheduleList.addOnItemTouchListener(
-//                    new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-//                        @Override
-//                        public void onItemClick(@NonNull Card card, int position) {
-//                            fillDetailsLayout(adapter.models.get(position));
-//                        }
-//
-//                        @Override
-//                        public void onItemLongClick(@NonNull Card card, int position) {
-//
-//                        }
-//                    })
-//            );
         }
         return view;
     }
@@ -222,28 +209,15 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             return 0;
         }
 
-//        @Override
-//        public ScheduleViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-//            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.one_calendar_pair, viewGroup, false);
-//            return new ScheduleViewHolder(v);
-//        }
-
         @Override
         public ScheduleViewHolder onCreateViewHolder(final ViewGroup parent, final int position) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.one_calendar_pair, parent, false);
-            parent.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int a = 3;
-                    fillDetailsLayout(models.get(position));
-                }
-            });
 //            parent.setOnLongClickListener();
             return new ScheduleViewHolder(v);
         }
 
         @Override
-        public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, final int i) {
+        public void onBindViewHolder(final ScheduleViewHolder scheduleViewHolder, final int i) {
             if (models.get(i) == null) {// Окно, точно пара
                 scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
             } else
@@ -267,6 +241,13 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         scheduleViewHolder.pairName.setText(models.get(i).getName());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
                         scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
+                        scheduleViewHolder.cv.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
+                                   fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()));
+                            }
+                        });
                         break;
                     case MONTH:
                         scheduleViewHolder.pairName.setText(month(models.get(i).getDate()));
@@ -342,15 +323,15 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         auditory.setText(model.getClassroom());
         type.setText(model.getType());
         //По нажатию переход на списочный вид
-//        detailsLayout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                SharedPreferences.Editor e = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE).edit();
-//                e.putString("positionDate", model.getDate());
-//                e.putString("positionN", model.getN());
-//                FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
-//                ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
-//            }
-//        });
+        detailsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor e = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE).edit();
+                e.putString("positionDate", model.getDate());
+                e.putString("positionN", model.getN()).apply();
+                FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
+            }
+        });
     }
 }

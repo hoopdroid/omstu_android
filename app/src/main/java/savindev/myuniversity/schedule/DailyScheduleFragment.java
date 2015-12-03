@@ -39,6 +39,16 @@ public class DailyScheduleFragment extends AbstractSchedule {
             isLinear = true;
             scheduleList.setLayoutManager(llm);
             postInitializeData();
+
+            SharedPreferences settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE); //Если с календарного фрагмента, перевести на позицию
+            if (settings.contains("positionDate")) {
+                String date = settings.getString("positionDate", "");
+                String n = settings.getString("positionN", "");
+                //TODO обработать переход на нужную позицию
+                SharedPreferences.Editor e = settings.edit();
+                e.remove("positionDate");
+                e.remove("positionN").apply();
+            }
         }
         return view;
     }

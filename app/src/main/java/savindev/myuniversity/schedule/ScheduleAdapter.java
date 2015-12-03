@@ -1,6 +1,7 @@
 package savindev.myuniversity.schedule;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,6 +32,7 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
         protected ImageView pairHandler;
         protected RelativeLayout pairDateLayout;
         protected RelativeLayout teacherLayout;
+        protected CardView cv;
 
         ScheduleViewHolder(View itemView) {
             super(itemView);
@@ -45,6 +47,7 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
             pairDateLayout = (RelativeLayout) itemView.findViewById(R.id.pairDateLayout);
             teacherLayout = (RelativeLayout) itemView.findViewById(R.id.teacherLayout);
             pairDayWeek = (TextView) itemView.findViewById(R.id.pairDayWeek);
+            cv = (CardView) itemView.findViewById(R.id.cv);
         }
     }
 
