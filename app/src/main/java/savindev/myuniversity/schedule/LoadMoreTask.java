@@ -51,7 +51,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
             int dayCount = new DBHelper(context).getUniversityInfoHelper().getDaysInWeek();
             if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || //Воскресенье, =1, точно нет пар
                     calendar.get(Calendar.DAY_OF_WEEK) > dayCount+1 ) //Суббота =7, если 6-дневка выходного быть не должно
-                break;
+                continue;
             ArrayList<ScheduleModel> daySchedule;
             String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
             if (day.length() < 2)

@@ -1,15 +1,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal" >
-
+        android:orientation="horizontal">
 
 
         <android.support.v4.widget.SwipeRefreshLayout
@@ -17,57 +16,29 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            tools:context=".MainActivity" >
+            tools:context=".MainActivity">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/calendarSchedule"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" >
-            </android.support.v7.widget.RecyclerView>
+                android:layout_centerHorizontal="true" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
-        <LinearLayout
-            android:id="@+id/filtersLayout"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:orientation="vertical" >
-
-
-            <ListView
-                android:id="@+id/pairTypes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:choiceMode="multipleChoice">
-            </ListView>
-
-            <Space
-                android:layout_width="20px"
-                android:layout_height="20px" />
-
-            <ListView
-                android:id="@+id/pairNames"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:choiceMode="multipleChoice">
-            </ListView>
-
-        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/detailll"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/detailNumber"
@@ -80,7 +51,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/detailTime"
@@ -91,12 +62,12 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:orientation="vertical" >
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/detailName"
@@ -116,7 +87,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="vertical" >
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/detailAuditory"

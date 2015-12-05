@@ -53,7 +53,7 @@ public abstract class AbstractSchedule extends DialogFragment
     private LoadMoreTask lmt;
     protected SwipeRefreshLayout mSwipeRefreshLayout;
     protected RecyclerView scheduleList;
-    protected boolean isGroup ;
+    protected boolean isGroup;
     protected int currentID = 0;
     protected String currentGroup = "";
     private GroupsModel main;
@@ -145,29 +145,38 @@ public abstract class AbstractSchedule extends DialogFragment
     public void onRefresh() {
         // начинаем показывать прогресс
         mSwipeRefreshLayout.setRefreshing(true);
-        GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
-        GroupsModel model = null; //Достать активную группу для обновления. Нельзя создавать новую модель, т.к. нужна дата
-        if (currentID == main.getId() && isGroup == main.isGroup())
-            model = main;
-        else
-            for (GroupsModel m : usedList) {
-                if (currentID == m.getId() && isGroup == m.isGroup()) {
-                    model = m;
-                    break;
+        if (MainActivity.isNetworkConnected(getActivity())) { //Если есть интернет - попробовать обновить БД
+            GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
+            GroupsModel model = null; //Достать активную группу для обновления. Нельзя создавать новую модель, т.к. нужна дата
+            if (currentID == main.getId() && isGroup == main.isGroup())
+                model = main;
+            else
+                for (GroupsModel m : usedList) {
+                    if (currentID == m.getId() && isGroup == m.isGroup()) {
+                        model = m;
+                        break;
+                    }
                 }
-            }
-        gst.execute(model); //Выполняем запрос на обновление нужного расписания
+            gst.execute(model); //Выполняем запрос на обновление нужного расписания
+        } else { //Если нет - просто перезагрузить страничку
+            update();
+        }
+    }
+
+    private void update() {
+        mSwipeRefreshLayout.setRefreshing(false);
+        calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        adapter.deleteData();
+        lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
+        lmt.execute(14);
     }
 
     //Перехватчик широковещательных сообщений. Продолжение onRefresh: когда обновление завершилось, обновить ScheduleView
     BroadcastReceiver broadcastReceiverUpdate = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-            adapter.deleteData();
-            lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
-            lmt.execute(14);
+            update();
         }
     };
 

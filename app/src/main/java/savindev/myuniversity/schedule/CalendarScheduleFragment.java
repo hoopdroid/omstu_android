@@ -7,9 +7,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +25,9 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +47,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private SparseBooleanArray chosenType, chosenName;
     private ListView pairNames, pairTypes;
     private TextView number, time, name, teacher, auditory, type;
+    private View drawerView;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
@@ -48,20 +56,15 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             int monthCount = 0;
             SharedPreferences userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
             view = inflater.inflate(R.layout.fragment_calendar_schedule, container, false);
+            drawerView = inflater.inflate(R.layout.filters_drawer, container, false);
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
             isLinear = false;
 
-            filtersLayout = (LinearLayout) view.findViewById(R.id.filtersLayout);
             detailsLayout = (LinearLayout) view.findViewById(R.id.detailll);
             if (userInfo.getBoolean("openDetails", true)) {
                 detailsLayout.setVisibility(View.VISIBLE); //Скрыть подробности
             } else {
                 detailsLayout.setVisibility(View.GONE); //Показать подробности
-            }
-            if (userInfo.getBoolean("openFilters", true)) {
-                filtersLayout.setVisibility(View.VISIBLE); //Скрыть подробности
-            } else {
-                filtersLayout.setVisibility(View.GONE); //Показать подробности
             }
 
             scheduleList = (RecyclerView) view.findViewById(R.id.calendarSchedule);
@@ -89,8 +92,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             });
             postInitializeData();
 
-            pairNames = (ListView) view.findViewById(R.id.pairNames);
-            pairTypes = (ListView) view.findViewById(R.id.pairTypes);
+            pairNames = (ListView) drawerView.findViewById(R.id.pairNames);
+            pairTypes = (ListView) drawerView.findViewById(R.id.pairTypes);
             initializeFiltersLists();
 
             number = (TextView) view.findViewById(R.id.detailNumber);
@@ -102,7 +105,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         }
         return view;
     }
-
 
 
     private void initializeFiltersLists() {
@@ -135,6 +137,11 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 adapter.notifyDataSetChanged();
             }
         });
+
+        Toolbar toolbar = (Toolbar) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView();
+        ActionBarDrawerToggle toggle = null;
+        Drawer drawer = new DrawerBuilder().withActivity(getActivity()).withToolbar(toolbar)
+                .withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).build();
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -147,16 +154,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         SharedPreferences userInfo;
         FragmentTransaction ft;
         switch (item.getItemId()) {
-            case R.id.cs_filters:
-                userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
-                if (userInfo.getBoolean("openFilters", true)) {
-                    userInfo.edit().putBoolean("openFilters", false).apply();
-                    filtersLayout.setVisibility(View.GONE); //Скрыть фильтры
-                } else {
-                    userInfo.edit().putBoolean("openFilters", true).apply();
-                    filtersLayout.setVisibility(View.VISIBLE); //Показать фильтры
-                }
-                break;
             case R.id.cs_detail:
                 userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
                 if (userInfo.getBoolean("openDetails", true)) {
@@ -245,7 +242,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                             @Override
                             public void onClick(View v) {
                                 if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
-                                   fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()));
+                                    fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()));
                             }
                         });
                         break;

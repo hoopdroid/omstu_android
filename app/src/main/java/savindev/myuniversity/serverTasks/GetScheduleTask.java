@@ -111,20 +111,13 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     @Override
     protected void onPostExecute(Integer data) {
-        if (errorCode == 1) { //Новые данные отсутствуют
-            mSwipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, "Нет новых данных", Toast.LENGTH_LONG).show();
-            return;
-        }
-        if (mSwipeRefreshLayout != null) { //Если вызывалось из фрагмента расписания
-            mSwipeRefreshLayout.setRefreshing(false); //Завершить показывать прогресс
-            if (data > 0) { //Имеется новое содержимое, обновить данные
-                context.sendBroadcast(new Intent("FINISH_UPDATE")); //Отправить запрос на обновление
-            }
+        if (data > 0 && errorCode != 1) { //Имеется новое содержимое, обновить данные
+            Toast.makeText(context, "Расписание обновлено!", Toast.LENGTH_LONG).show();
         }
         if (data == -1)
             Toast.makeText(context, "Не удалось получить расписание" + '\n'
                     + "Проверьте соединение с сервером", Toast.LENGTH_LONG).show();
+        context.sendBroadcast(new Intent("FINISH_UPDATE")); //Отправить запрос на обновление
     }
 
 
@@ -132,6 +125,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         //здесь разбор json и раскладка в sqlite
         if (errorCode != 200) {
             //TODO обрабатывать коды возврата
+            return;
         }
         JSONObject obj = new JSONObject(reply);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
