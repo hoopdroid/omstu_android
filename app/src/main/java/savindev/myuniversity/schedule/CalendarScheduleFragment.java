@@ -111,8 +111,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         filterType = new ArrayList<>(DBHelper.getInstance(getActivity()).getSchedulesHelper().getGroupLessonsTypes(getActivity(), currentID, isGroup));
         filterName = new ArrayList<>(DBHelper.getInstance(getActivity()).getSchedulesHelper().getGroupLessons(getActivity(), currentID, isGroup));
 
-        pairNames.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, filterName));
-        pairTypes.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, filterType));
+        pairNames.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.list_filters, filterName));
+        pairTypes.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.list_filters, filterType));
         for (int i = 0; i < filterName.size(); i++) {
             pairNames.setItemChecked(i, true);
         }
