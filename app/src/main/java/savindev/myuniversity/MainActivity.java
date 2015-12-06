@@ -99,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
 
-                        addfragment(R.string.profile_text, new ProfileFragment());
+                       Intent i = new Intent(getApplicationContext(),ProfileActivity.class);
+                        startActivity(i);
 
                         return false;
                     }
