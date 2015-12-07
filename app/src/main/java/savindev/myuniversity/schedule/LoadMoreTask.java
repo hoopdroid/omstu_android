@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.TreeMap;
 
 import savindev.myuniversity.db.DBHelper;
 
@@ -21,7 +22,7 @@ import savindev.myuniversity.db.DBHelper;
  * Реализует подгрузку данных при достижении конца списка в расписании
  */
 
-public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleModel>> {
+public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCalendar, Integer>> {
     private GregorianCalendar calendar;
     private int oldMonth;
     private int currentID;
@@ -29,7 +30,9 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
     private Context context;
     private ScheduleAdapter adapter;
     private RecyclerView scheduleList;
-    boolean isLinear;
+    private boolean isLinear;
+    private ArrayList<ScheduleModel> data;
+    private boolean isFinished = false;
 
     public LoadMoreTask(Context context, GregorianCalendar calendar, int currentID, boolean isGroup,
                         ScheduleAdapter adapter, RecyclerView scheduleList, boolean isLinear) {
@@ -43,14 +46,16 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
     }
 
     @Override
-    protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
-        ArrayList<ScheduleModel> data = new ArrayList<>();
+    protected TreeMap<GregorianCalendar, Integer> doInBackground(Integer... params) {
+        int oldDataSize = adapter.getItemCount();
+        data = new ArrayList<>(); //Лист, используемый для адаптера
+        TreeMap<GregorianCalendar, Integer> positions = new TreeMap<>(); //Возвращает позиции для элементов
         for (int i = 0; i < params[0]; i++) { //Добавить число записей, равное params[0]
             oldMonth = calendar.get(Calendar.MONTH); //Предыдущее состояние календаря для определения месяца
             calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
             int dayCount = new DBHelper(context).getUniversityInfoHelper().getDaysInWeek();
             if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || //Воскресенье, =1, точно нет пар
-                    calendar.get(Calendar.DAY_OF_WEEK) > dayCount+1 ) //Суббота =7, если 6-дневка выходного быть не должно
+                    calendar.get(Calendar.DAY_OF_WEEK) > dayCount + 1) //Суббота =7, если 6-дневка выходного быть не должно
                 continue;
             ArrayList<ScheduleModel> daySchedule;
             String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
@@ -59,6 +64,10 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
             daySchedule = DBHelper.SchedulesHelper.getSchedules(context,
                     "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH) + 1) + day,
                     currentID, isGroup);  //Получение расписания на день
+
+            if (daySchedule == null)
+                return positions;   //null - семестр уже закончился
+
             Collections.sort(daySchedule, new Comparator<ScheduleModel>() { //Сортировка сначала по отмененным, потом по началу пары
                 @Override
                 public int compare(ScheduleModel lhs, ScheduleModel rhs) {
@@ -74,9 +83,10 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
             if (!isLinear) {//Переформировывать только для сетки
                 daySchedule = toGridView(daySchedule, i == 0);
             }
+            positions.put((GregorianCalendar) calendar.clone(), data.size() + 1 + oldDataSize);
             data.addAll(daySchedule);
         }
-        return data;
+        return positions;
     }
 
     private ArrayList<ScheduleModel> groupPacking(ArrayList<ScheduleModel> pairs) { //Решение проблемы со множеством групп в одно время у преподавателей
@@ -150,7 +160,10 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
     }
 
     @Override
-    protected void onPostExecute(ArrayList<ScheduleModel> data) {
+    protected void onPostExecute(TreeMap<GregorianCalendar, Integer> positions) {
+        if (isFinished) //Если уже заходили, не выполнять повторно
+            return; //Костыль, нужен для пролистывания к позиции
+        isFinished = true;
         if (data == null || data.isEmpty()) {
             Toast.makeText(context, "Данные закончились", Toast.LENGTH_SHORT).show();
             return;
