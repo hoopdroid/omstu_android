@@ -111,6 +111,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     @Override
     protected void onPostExecute(Integer data) {
+
         if (data > 0 && errorCode != 1) { //Имеется новое содержимое, обновить данные
             Toast.makeText(context, "Расписание обновлено!", Toast.LENGTH_LONG).show();
         }

@@ -50,7 +50,9 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnSignin:
-                SlideToDown();
+                //SlideToDown();
+                btnSignin.setVisibility(View.GONE);
+                btnSkip.setWidth(100);
                 ResizeIcon();
                 authorizationFragment = new AuthorizationFragment();
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();

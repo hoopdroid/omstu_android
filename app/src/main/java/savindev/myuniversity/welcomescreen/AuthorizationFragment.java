@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -48,8 +49,10 @@ public class AuthorizationFragment extends Fragment {
         inputPassword = (EditText) view.findViewById(R.id.input_password);
         signIn = (Button) view.findViewById(R.id.btn_sign_in);
 
+        inputEmail.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
         // TODO change vovik0134 to vovik0134@gmail.com inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
-        //inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
+        inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
 
         signIn.setOnClickListener(new View.OnClickListener() {

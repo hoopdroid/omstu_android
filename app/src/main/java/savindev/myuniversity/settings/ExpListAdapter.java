@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -116,6 +117,7 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
 
     static class ViewHolder {
         public TextView textView;
+        public ImageView eyeView;
     }
 
     @Override
@@ -124,15 +126,22 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         View view = null;
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(R.layout.child_view, null);
+        final ViewHolder holder = new ViewHolder();
+        holder.textView = (TextView) view.findViewById(R.id.textChild);
+        holder.eyeView = (ImageView) view.findViewById(R.id.eyeVisibility);
         if (mGroup.get(groupPosition).get(childPosition).isSelected()) {
-            view.setBackgroundColor(mContext.getResources().getColor(R.color.primary)); //Выделение ранее сохраненных групп
+            view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
+            holder.eyeView.setVisibility(View.VISIBLE);
+            holder.textView.setTextColor(Color.WHITE);
+            //Выделение ранее сохраненных групп
         }
         if (main != null && mGroup.get(groupPosition).get(childPosition).getId() == main.getId() &&
                 mGroup.get(groupPosition).get(childPosition).isGroup() == main.isGroup()) {
-            view.setBackgroundColor(Color.CYAN); //Выделение главной группы
+            view.setBackgroundColor(mContext.getResources().getColor(R.color.accent));
+            holder.eyeView.setVisibility(View.VISIBLE);
+            holder.textView.setTextColor(Color.WHITE); //Выделение главной группы
         }
-        final ViewHolder holder = new ViewHolder();
-        holder.textView = (TextView) view.findViewById(R.id.textChild);
+
 
         view.setOnClickListener(new OnClickListener() {
             @Override
@@ -141,10 +150,14 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
                         mGroup.get(groupPosition).get(childPosition).isGroup() == main.isGroup())) { //Выполнять только для не главной группы
                     if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {
                         view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
+                        holder.eyeView.setVisibility(View.VISIBLE);
+                        holder.textView.setTextColor(Color.WHITE);
                         mGroup.get(groupPosition).get(childPosition).setSelected(true);
                         addGroup(mGroup.get(groupPosition).get(childPosition));
                     } else {
                         view.setBackgroundColor(Color.WHITE);
+                        holder.eyeView.setVisibility(View.GONE);
+                        holder.textView.setTextColor(mContext.getResources().getColor(R.color.primary_text));
                         mGroup.get(groupPosition).get(childPosition).setSelected(false);
                         deleteGroup(mGroup.get(groupPosition).get(childPosition));
                     }

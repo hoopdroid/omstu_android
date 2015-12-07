@@ -1,17 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent" >
-
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="40dp"
+    android:layout_marginLeft="48dp">
     <TextView
         android:id="@+id/textChild"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_alignParentLeft="true"
+        android:layout_height="wrap_content"
         android:text="567"
-        android:textSize="25dp"
-        android:textColor="#000000"
-        android:focusable="false" />
+        android:textSize="16dp"
+        android:textColor="#212121"
+        android:focusable="false"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="8dp" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_eye"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        android:id="@+id/eyeVisibility"
+        android:layout_marginRight="24dp"
+        android:layout_marginTop="8dp" />
 
+</RelativeLayout>
 
 </RelativeLayout>

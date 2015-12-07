@@ -151,6 +151,9 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
         dbHelper.getGroupsHelper().setGroups(context,init);
         dbHelper.getFacultiesHelper().setFaculties(context,init);
         dbHelper.getDepartmentsHelper().setDepartments(context,init);
+        dbHelper.getCampusesHelper().setCampuses(init,context);
+        dbHelper.getClassroomsHelper().setClassrooms(init,context);
+        dbHelper.getBuildingsHelper().setBuildings(init,context);
 
     }
 
