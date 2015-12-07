@@ -24,9 +24,13 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import java.util.ArrayList;
+
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
+import savindev.myuniversity.schedule.ScheduleModel;
+import savindev.myuniversity.serverTasks.Schedule;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 import savindev.myuniversity.welcomescreen.NotInternetFragment;
@@ -62,9 +66,6 @@ public class MainActivity extends AppCompatActivity {
             initDrawer();
             DBHelper dbHelper = DBHelper.getInstance(this);
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
-
-            //Log.d("LESSONS 23z",dbHelper.getSchedulesHelper().getGroupLessons(this, 137,true).toString());
-           // Log.d("LESSONS altman",dbHelper.getSchedulesHelper().getGroupLessons(this, 10485,false).toString());
         }
 
     }

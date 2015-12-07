@@ -46,10 +46,8 @@
 
     <string-array name="settings_array">
         <item>Отображаемые расписания</item>
-        <item>Еще пункты</item>
-        <item>Синхронизация</item>
-        <item>Отображение</item>
-        <item>порт</item>
+        <item>Внешний вид</item>
+        <item>Настройки сервера(dev)</item>
     </string-array>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="large_text">
