@@ -84,6 +84,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
         ScheduleAdapter(List<ScheduleModel> models) {
             super(getActivity(), models);
         }
+
         @Override
         public ScheduleViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.schedule_line_test, viewGroup, false);
@@ -93,7 +94,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
         @Override
         public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, int i) {
             scheduleViewHolder.pairNumber.setText(models.get(i).getN());
-            if(!isGroup)
+            if (!isGroup)
                 scheduleViewHolder.pairHandler.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_multiple));
             else
                 scheduleViewHolder.pairHandler.setImageDrawable(getResources().getDrawable(R.drawable.ic_account));
@@ -109,10 +110,9 @@ public class DailyScheduleFragment extends AbstractSchedule {
             scheduleViewHolder.pairType.setText(models.get(i).getType());
             scheduleViewHolder.pairDate.setText(DateUtil.formatDate(models.get(i).getDate()));
 
-            if(models.get(i).getTeacher().equals("")){
+            if (models.get(i).getTeacher().equals("")) {
                 scheduleViewHolder.teacherLayout.setVisibility(View.GONE);
-            }
-            else
+            } else
                 scheduleViewHolder.teacherLayout.setVisibility(View.VISIBLE);
             if (i == 0 || !models.get(i).getDate().equals(models.get(i - 1).getDate())) {
                 scheduleViewHolder.pairDate.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
