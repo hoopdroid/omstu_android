@@ -23,6 +23,7 @@ import savindev.myuniversity.db.DBHelper;
 
 public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleModel>> {
     private GregorianCalendar calendar;
+    private int oldMonth;
     private int currentID;
     private boolean isGroup;
     private Context context;
@@ -39,6 +40,43 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
         this.adapter = adapter;
         this.scheduleList = scheduleList;
         this.isLinear = isLinear;
+    }
+
+    @Override
+    protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
+        ArrayList<ScheduleModel> data = new ArrayList<>();
+        for (int i = 0; i < params[0]; i++) { //Добавить число записей, равное params[0]
+            oldMonth = calendar.get(Calendar.MONTH); //Предыдущее состояние календаря для определения месяца
+            calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
+            int dayCount = new DBHelper(context).getUniversityInfoHelper().getDaysInWeek();
+            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || //Воскресенье, =1, точно нет пар
+                    calendar.get(Calendar.DAY_OF_WEEK) > dayCount+1 ) //Суббота =7, если 6-дневка выходного быть не должно
+                continue;
+            ArrayList<ScheduleModel> daySchedule;
+            String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+            if (day.length() < 2)
+                day = "0" + day;
+            daySchedule = DBHelper.SchedulesHelper.getSchedules(context,
+                    "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH) + 1) + day,
+                    currentID, isGroup);  //Получение расписания на день
+            Collections.sort(daySchedule, new Comparator<ScheduleModel>() { //Сортировка сначала по отмененным, потом по началу пары
+                @Override
+                public int compare(ScheduleModel lhs, ScheduleModel rhs) {
+                    if (lhs.getStartTime().equals(rhs.getStartTime()))
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                            return Boolean.compare(lhs.isCancelled(), rhs.isCancelled());
+                        }
+                    return lhs.getStartTime().compareTo(rhs.getStartTime());
+                }
+            });
+            if (!isGroup) //Сортировать только для преподавателей
+                daySchedule = groupPacking(daySchedule);
+            if (!isLinear) {//Переформировывать только для сетки
+                daySchedule = toGridView(daySchedule, i == 0);
+            }
+            data.addAll(daySchedule);
+        }
+        return data;
     }
 
     private ArrayList<ScheduleModel> groupPacking(ArrayList<ScheduleModel> pairs) { //Решение проблемы со множеством групп в одно время у преподавателей
@@ -60,34 +98,55 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, ArrayList<ScheduleMod
         return schedule;
     }
 
-    @Override
-    protected ArrayList<ScheduleModel> doInBackground(Integer... params) {
-        ArrayList<ScheduleModel> data = new ArrayList<>();
-        for (int i = 0; i < params[0]; i++) { //Добавить число записей, равное params[0]
-            calendar.add(Calendar.DAY_OF_MONTH, 1); //Каждый раз работа со следующим днем
-            //TODO подумать, как нужно обрабатывать выходные дни
-            ArrayList<ScheduleModel> daySchedule;
-            String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-            if (day.length() < 2)
-                day = "0" + day;
-            daySchedule = DBHelper.SchedulesHelper.getSchedules(context,
-                    "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH) + 1) + day,
-                    currentID, isGroup);  //Получение расписания на день
-            Collections.sort(daySchedule, new Comparator<ScheduleModel>() { //Сортировка сначала по отмененным, потом по началу пары
-                @Override
-                public int compare(ScheduleModel lhs, ScheduleModel rhs) {
-                    if (lhs.getStartTime().equals(rhs.getStartTime()))
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            return Boolean.compare(lhs.isCancelled(), rhs.isCancelled());
-                        }
-                    return lhs.getStartTime().compareTo(rhs.getStartTime());
-                }
-            });
-            if (!isGroup) //Сортировать только для преподавателей
-                daySchedule = groupPacking(daySchedule);
-            data.addAll(daySchedule);
+    private ArrayList<ScheduleModel> toGridView(ArrayList<ScheduleModel> pairs, boolean isFirst) { //переформирование для сетки
+        ArrayList<ScheduleModel> schedule = new ArrayList<>();
+        //Добавить окна
+        int i = 0;
+        int pairCount = DBHelper.getInstance(context).getPairsHelper().getPairsInDay(context);
+        String pairNum = "";
+        for (; i < pairs.size(); i++) { //окна до последней пары
+            if (pairs.get(i).getN().equals(pairNum)) {//Номер пары совпадает с предыдущим, пару не записывать
+                pairs.remove(i);
+                i--;
+                continue; //TODO нормальное действие с парой-дублем
+            }
+            if (Integer.parseInt(pairs.get(i).getN()) != (i + 1)) {//Если номер пары не совпадает с позицией - заткнуть дырку пустотой
+                pairs.add(i, null);
+                continue;
+            }
+            pairNum = pairs.get(i).getN();
         }
-        return data;
+        for (; i < pairCount; i++) //окна от последней пары и до конца дня
+            pairs.add(i, null);
+
+        //Добавить дату
+        pairs.add(0, new ScheduleModel(CellType.DAY, day()));
+        pairs.add(new ScheduleModel(CellType.DATE, calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH) + 1)));
+
+        //Добавить месяц
+        if (oldMonth != calendar.get(Calendar.MONTH)) //смена месяца
+            pairs.add(0, new ScheduleModel(CellType.MONTH, calendar.get(Calendar.MONTH) + ""));
+        return pairs;
+    }
+
+    private String day() { //По календарю отдает день недели
+        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.SUNDAY:
+                return "ВС";
+            case Calendar.MONDAY:
+                return "ПН";
+            case Calendar.TUESDAY:
+                return "ВТ";
+            case Calendar.WEDNESDAY:
+                return "СР";
+            case Calendar.THURSDAY:
+                return "ЧТ";
+            case Calendar.FRIDAY:
+                return "ПТ";
+            case Calendar.SATURDAY:
+                return "СБ";
+        }
+        return null;
     }
 
     @Override

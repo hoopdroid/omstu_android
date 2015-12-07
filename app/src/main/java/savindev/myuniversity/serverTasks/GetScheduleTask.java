@@ -44,44 +44,32 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         String body = null; //Тело запроса
         JSONArray GROUPS = new JSONArray(); //Составление json для отправки в post
         JSONArray TEACHERS = new JSONArray();
-        for (int i = 0; i < params.length; i++) {
+        for (GroupsModel param : params) {
             JSONObject obj = new JSONObject();
             try {
-                obj.put("LAST_REFRESH", params[i].getLastRefresh());
-                if (params[i].isGroup()) {
-                    obj.put("ID_GROUP", params[i].getId());
+                obj.put("LAST_REFRESH", param.getLastRefresh());
+                if (param.isGroup()) {
+                    obj.put("ID_GROUP", param.getId());
                     GROUPS.put(obj);
                 } else {
-                    obj.put("ID_TEACHER", params[i].getId());
+                    obj.put("ID_TEACHER", param.getId());
                     TEACHERS.put(obj);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
-
         JSONObject obj = new JSONObject();
         try {
             obj.put("GROUPS", (GROUPS.length() == 0) ? JSONObject.NULL : GROUPS);
             obj.put("TEACHERS", (TEACHERS.length() == 0) ? JSONObject.NULL : TEACHERS);
-//        if (GROUPS.length() == 0) {
-//            obj.put("GROUPS", JSONObject.NULL);
-//        } else {
-//            obj.put("GROUPS", GROUPS);
-//        }
-//        if (TEACHERS.length() == 0) {
-//            obj.put("TEACHERS", JSONObject.NULL);
-//        } else {
-//            obj.put("TEACHERS", TEACHERS);
-//        }
-
             body = obj.toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
         String uri = context.getResources().getString(R.string.uri) + "getSchedule";
         HttpURLConnection urlConnection = null;
+
         try {
             URL url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -89,7 +77,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             urlConnection.setDoOutput(true); //Отправка json
             OutputStream output = urlConnection.getOutputStream();
-            output.write(body.getBytes("UTF-8"));
+            output.write(body != null ? body.getBytes("UTF-8") : new byte[0]);
             output.close();
             errorCode = urlConnection.getResponseCode();
 
@@ -97,7 +85,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             if (inputStream == null) {
                 inputStream = urlConnection.getInputStream();
             }
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -114,38 +102,39 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             e.printStackTrace();
             return -1;
         } finally {
-            urlConnection.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
         }
         return 1;
     }
 
     @Override
     protected void onPostExecute(Integer data) {
-        if (mSwipeRefreshLayout != null) { //Если вызывалось из фрагмента расписания
-            mSwipeRefreshLayout.setRefreshing(false); //Завершить показывать прогресс
-            if (data > 0) { //Имеется новое содержимое, обновить данные
-                context.sendBroadcast(new Intent("FINISH_UPDATE")); //Отправить запрос на обновление
-            }
+
+        if (data > 0 && errorCode != 1) { //Имеется новое содержимое, обновить данные
+            Toast.makeText(context, "Расписание обновлено!", Toast.LENGTH_LONG).show();
         }
         if (data == -1)
             Toast.makeText(context, "Не удалось получить расписание" + '\n'
                     + "Проверьте соединение с сервером", Toast.LENGTH_LONG).show();
+        context.sendBroadcast(new Intent("FINISH_UPDATE")); //Отправить запрос на обновление
     }
 
 
-    private boolean replyParse(String reply) throws JSONException {
+    private void replyParse(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
         if (errorCode != 200) {
             //TODO обрабатывать коды возврата
-            return false;
+            return;
         }
         JSONObject obj = new JSONObject(reply);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
                 String lastResresh = obj.getString("LAST_REFRESH"); //дата обновления, в таблицу дат
-                ArrayList<Schedule> sched = null;
-                ArrayList<ScheduleDates> scheddates = null;
+                ArrayList<Schedule> sched;
+                ArrayList<ScheduleDates> scheddates;
                 try {
                     sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
                     parsetoSqlite(sched);
@@ -156,7 +145,6 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 try {
                     scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
                     parseScheduleDates(scheddates);
-
                 } catch (JSONException e) {
                     //Поле оказалось нулевым?
                     e.printStackTrace();
@@ -171,8 +159,10 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 Log.i("myuniversity", "Ошибка WARNING от сервера, запрос GetScheduleTask, текст:"
                         + obj.get("CONTENT"));
                 break;
+            case "NOT_FOUND": //Нет новых данных
+                errorCode = 1;
+                break;
         }
-        return false;
     }
 
     private void parsetoSqlite(ArrayList<Schedule> sched) {
@@ -181,20 +171,19 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         dbHelper.getSchedulesHelper().setSchedule(context, sched);
     }
 
-    private void parseScheduleDates(ArrayList<ScheduleDates> scheduleDates){
+    private void parseScheduleDates(ArrayList<ScheduleDates> scheduleDates) {
+
         DBHelper dbHelper = DBHelper.getInstance(context);
-        dbHelper.getScheduleDatesHelper().setScheduleDates(context,scheduleDates);
+
     }
 
     private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний
         for (GroupsModel model : params) {
-            if (DBHelper.UsedSchedulesHelper.getGroupsModelList(context).contains(model)) {
+            if (DBHelper.UsedSchedulesHelper.getGroupsModelList(context).contains(model) ||
+                    DBHelper.UsedSchedulesHelper.getMainGroupModel(context) != null &&
+                            DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) {
+                DBHelper.UsedSchedulesHelper.updateRefreshDate(context, model.getId(), model.isGroup(), lastResresh);
                 //Если уже имеется - обновить дату
-                //TODO обновить дату при появлении метода в БД
-            } else if (DBHelper.UsedSchedulesHelper.getMainGroupModel(context) != null &&
-                    DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) {
-                //Если уже имеется - обновить дату
-                //TODO обновить дату при появлении метода в БД
             } else {
                 //Не имеется, добавить
                 DBHelper.UsedSchedulesHelper.setUsedSchedule(context, model.getId(), model.isGroup(), false, lastResresh);

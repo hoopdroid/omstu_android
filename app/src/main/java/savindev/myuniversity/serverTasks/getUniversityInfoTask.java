@@ -34,7 +34,6 @@ import savindev.myuniversity.db.DBHelper;
  */
 public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
-    final private int TIMEOUT_MILLISEC = 5000;
     int errorCode = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     SharedPreferences settings;
@@ -47,11 +46,12 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
+        final int TIMEOUT_MILLISEC = 5000;
         //Возвращать false, если изменений нет
-        settings = context.getSharedPreferences("UserInfo", 0);
-        String refreshDate = settings.getString("init_last_refresh", "20000101000000"); //дата последнего обновления
+        settings = context.getSharedPreferences("settings", 0);
+        String refreshDate = settings.getString("init_last_refresh", context.getResources().getString(R.string.unix)); //дата последнего обновления
         String uri;
-        if (context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE).getBoolean("test", false)) {
+        if (settings.getBoolean("test", false)) {
             uri = context.getResources().getString(R.string.uri_test) + "getUniversityInfo?universityAcronym=" +
                     context.getResources().getString(R.string.university) + "&lastRefresh=" + refreshDate;
         } else {
@@ -67,15 +67,14 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
             urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);
             }
-            String reply = "";
-            reply = buffer.toString();
+            String reply = buffer.toString();
             if (reply.isEmpty()) { //Если после всех операций все равно пустой
                 return false;
             }
@@ -85,7 +84,9 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
             return false;
         }
         finally {
-            urlConnection.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
         }
 
         return true;
@@ -93,10 +94,8 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     private void parseReply(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-        UniversityInfo init = null;
-        JSONObject obj = null;
-        obj = new JSONObject(reply);
-        sw:    switch (obj.get("STATE").toString()) {//определение типа полученного результата
+        JSONObject obj = new JSONObject(reply);
+        switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
                 //Сверка полученной и хранящейся даты: если полученная меньше, данных нет
                 //Если полученная дата больше, записать новые данные и новую дату
@@ -105,22 +104,20 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
                 String modified = obj.getString("LAST_REFRESH");
                 String date = settings.getString("init_last_refresh", ""); // Старая записанная дата обновления
                 if (!(date.equals(""))) { //Если хранящаяся дата не пуста
-                    Date lastModifiedDate = null; //Полученная от сервера дата
-                    Date oldModifiedDate = null;
                     try {
-                        lastModifiedDate = formatter.parse(modified); //Дата с сервера
-                        oldModifiedDate = formatter.parse(date); //Дата с файла
+                        Date lastModifiedDate = formatter.parse(modified); //Дата с сервера
+                        Date oldModifiedDate = formatter.parse(date); //Дата с файла
+                        if (lastModifiedDate.getTime() == (oldModifiedDate.getTime())) {
+                            errorCode = 1; //1 - изменения не требуются
+                            break;
+                        }
                     } catch (ParseException e) {
                         e.printStackTrace();
-                    }
-                    if (lastModifiedDate.getTime() == (oldModifiedDate.getTime())) {
-                        errorCode = 1; //1 - изменения не требуются
-                        break sw;
                     }
                 }
 
                 JSONObject content = obj.getJSONObject("CONTENT");
-                init = UniversityInfo.fromJson(content);
+                UniversityInfo init = UniversityInfo.fromJson(content);
                 parsetoSqlite(init);
                 settings.edit().putString("init_last_refresh", modified).apply(); //Если не совпадают, занести новую дату
                 Log.d("DOWNLOADING DATA", "SUCCESS");
@@ -132,6 +129,9 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
             case "WARNING": //Определенная сервером ошибка
                 Log.i("myuniversity", "Ошибка WARNING от сервера, запрос GetInitializationInfoTask, текст:"
                         + obj.get("CONTENT"));
+                break;
+            case "NOT_FOUND": //Нет новых данных
+                errorCode = 1;
                 break;
         }
 
@@ -151,6 +151,9 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
         dbHelper.getGroupsHelper().setGroups(context,init);
         dbHelper.getFacultiesHelper().setFaculties(context,init);
         dbHelper.getDepartmentsHelper().setDepartments(context,init);
+        dbHelper.getCampusesHelper().setCampuses(init,context);
+        dbHelper.getClassroomsHelper().setClassrooms(init,context);
+        dbHelper.getBuildingsHelper().setBuildings(init,context);
 
     }
 

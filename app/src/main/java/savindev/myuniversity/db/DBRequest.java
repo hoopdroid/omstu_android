@@ -41,7 +41,7 @@ public class DBRequest {
             Log.e("SQLITE EXCEPTION", e.toString(), e);
         }
 
-        db.close();
+        dbHelper.close();
         return list;
     }
 
@@ -65,7 +65,7 @@ public class DBRequest {
         } catch (SQLiteException e) {
             Log.e("SQLITE DB EXCEPTION", e.toString(), e);
         }
-        db.close();
+        dbHelper.close();
         return list;
     }
 
@@ -89,7 +89,7 @@ public class DBRequest {
                 cursor.close();
             }
         }
-        db.close();
+        dbHelper.close();
         return hasTables;
 
 
@@ -122,7 +122,7 @@ public class DBRequest {
                 c.moveToNext();
             }
         }
-        db.close();
+        dbHelper.close();
         return tables;
     }
 
@@ -142,7 +142,7 @@ public class DBRequest {
         } catch (SQLiteException e) {
             Log.e("DB EXCEPTION", e.toString(), e);
         }
-        sqLiteDatabase.close();
+        dbHelper.close();
         return id;
     }
 
@@ -166,7 +166,22 @@ public class DBRequest {
             return false;
         }
         cursor.close();
-        database.close();
+        dbHelper.close();
+        return true;
+    }
+
+    public static boolean checkIsDataAlreadyInDBorNot(Context context,String TableName,
+                                                      String dbfield, int fieldValue) {
+        DBHelper dbHelper = DBHelper.getInstance(context);
+        SQLiteDatabase database=dbHelper.getReadableDatabase();
+        String Query = "SELECT * FROM " + TableName + " WHERE " + dbfield + " = " + fieldValue;
+        Cursor cursor = database.rawQuery(Query, null);
+        if(cursor.getCount() <= 0){
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+       // dbHelper.close();
         return true;
     }
 
@@ -189,7 +204,7 @@ public class DBRequest {
             cursor.moveToNext();
         }
         cursor.close();
-        sqLiteDatabase.close();
+        dbHelper.close();
         return groupName;
     }
 }

@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -62,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
             DBHelper dbHelper = DBHelper.getInstance(this);
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
 
-            //dbHelper.getSchedulesHelper().refreshSchedulePair(this,27883,"20151113",true,false);
-            dbHelper.getUsedSchedulesHelper().updateRefreshDate(this,197,true,"20151113");
+            //Log.d("LESSONS 23z",dbHelper.getSchedulesHelper().getGroupLessons(this, 137,true).toString());
+           // Log.d("LESSONS altman",dbHelper.getSchedulesHelper().getGroupLessons(this, 10485,false).toString());
         }
 
     }
@@ -98,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
 
-                        addfragment(R.string.profile_text, new ProfileFragment());
+                       Intent i = new Intent(getApplicationContext(),ProfileActivity.class);
+                        startActivity(i);
 
                         return false;
                     }
@@ -115,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
                         itemNotes,
                         itemNews,
                         itemEducation,
-                        itemSettings,
-                        new SecondaryDrawerItem()
+                        itemSettings
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -178,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE); //Удалить активную группу
+        SharedPreferences settings = getSharedPreferences("settings", Context.MODE_PRIVATE); //Удалить активную группу
         settings.edit().remove("openGroup").apply();
         settings.edit().remove("openIsGroup").apply();
         settings.edit().remove("openGroupName").apply();

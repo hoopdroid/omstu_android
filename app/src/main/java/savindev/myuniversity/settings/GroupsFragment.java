@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.view.MenuItemCompat;
@@ -33,7 +32,6 @@ import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 
 public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     ExpandableListView list;
-    SharedPreferences sPref;
     ExpListAdapter adapter;
     MenuItem refreshItem;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -47,7 +45,6 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         View view = inflater.inflate(R.layout.fragment_groups_settings, container, false);
         list = (ExpandableListView) view.findViewById(R.id.list);
 
-        sPref = getActivity().getSharedPreferences("item_list", Context.MODE_PRIVATE);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         parse();
@@ -89,7 +86,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 return false;
             }
         });
-        refreshItem = (MenuItem) menu.findItem(R.id.download_pb);
+        refreshItem = menu.findItem(R.id.download_pb);
         refreshItem.setActionView(R.layout.actionbar_progress);
         refreshItem.setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
@@ -110,11 +107,11 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         DBHelper dbHelper = DBHelper.getInstance(getActivity().getBaseContext());
         ArrayList<String> faculty = dbHelper.getFacultiesHelper().getFaculties(getActivity());
         ArrayList<String> departments = dbHelper.getDepartmentsHelper().getDepartments(getActivity());
-        ArrayList<String> parents = new ArrayList<String>(); //Список родителей, состоит из факультетов и кафедр
+        ArrayList<String> parents = new ArrayList<>(); //Список родителей, состоит из факультетов и кафедр
         parents.addAll(faculty);
         parents.addAll(departments);
         //Создаем лист с группами
-        ArrayList<ArrayList<GroupsModel>> models = new ArrayList<ArrayList<GroupsModel>>();
+        ArrayList<ArrayList<GroupsModel>> models = new ArrayList<>();
         for (int i = 0; i < faculty.size(); i++) {
             models.add(dbHelper.getGroupsHelper().getGroups(getActivity(), faculty.get(i)));
         }
@@ -138,7 +135,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 refreshItem.setActionView(R.layout.actionbar_progress); //Показать загрузку данных
                 refreshItem.setVisible(true);
                 for (GroupsModel model : addList) {
-                    model.setLastRefresh("20000101000000"); //Установка даты последнего обновления - нет обновлений
+                    model.setLastRefresh(getActivity().getResources().getString(R.string.unix)); //Установка даты последнего обновления - нет обновлений
                 }
                 gst.execute(addList.toArray(new GroupsModel[addList.size()])); //Выполняем запрос на получение нужных расписаний
                 try {  //TODO сделать красивое отображение загрузки
@@ -167,9 +164,12 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         if (!deleteList.isEmpty()) { //Если есть группы для удаления - удалить
             for (GroupsModel model : deleteList) {
-                DBHelper.UsedSchedulesHelper.deleteUsedSchedule(getActivity().getBaseContext(), model.getId(),model.isGroup());
+                if(model.isGroup())
+                    DBHelper.SchedulesHelper.deleteGroupSchedule(getActivity().getBaseContext(), model.getId());
+                else
+                    DBHelper.SchedulesHelper.deleteTeacherchedule(getActivity().getBaseContext(), model.getId());
+//                DBHelper.UsedSchedulesHelper.deleteUsedSchedule(getActivity().getBaseContext(), model.getId(),model.isGroup());
             }
-            //TODO удалять расписания из БД
         }
         adapter.deleteLists(); //Подчистить на случай повторного сохранения
     }

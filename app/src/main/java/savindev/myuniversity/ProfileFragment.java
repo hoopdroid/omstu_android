@@ -79,8 +79,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void deleteUserPreferences(){
-        SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        settings.edit().clear().apply();
+
+        SharedPreferences.Editor editor = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE).edit();
+        editor.remove("UserLastName");
+        editor.remove("UserFirstName");
+        editor.remove("UserMiddleName");
+        editor.remove("UserGroup");
+        editor.remove("email");
+        editor.remove("password");
+        editor.remove("UserId").commit();
     }
 
     @Override

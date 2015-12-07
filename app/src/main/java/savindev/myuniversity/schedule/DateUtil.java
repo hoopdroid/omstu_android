@@ -19,6 +19,7 @@ public class DateUtil {
         String dt = previousValue;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
         Calendar c = Calendar.getInstance();
+        if(schedule.get(index).SCHEDULE_INTERVAL>0){
         if(index>0){
             try {
                 c.setTime(sdf.parse(dt));
@@ -29,8 +30,11 @@ public class DateUtil {
             dt = sdf.format(c.getTime());  // dt is now the new date
             return  dt;}
 
+            else
+             return dt;
+        }
         else
-            return dt;
+            return previousValue;
     }
 
     public static String formatStandart(String inputDate){

@@ -7,9 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -56,7 +53,7 @@ public abstract class AbstractSchedule extends DialogFragment
     private LoadMoreTask lmt;
     protected SwipeRefreshLayout mSwipeRefreshLayout;
     protected RecyclerView scheduleList;
-    protected boolean isGroup ;
+    protected boolean isGroup;
     protected int currentID = 0;
     protected String currentGroup = "";
     private GroupsModel main;
@@ -70,14 +67,14 @@ public abstract class AbstractSchedule extends DialogFragment
         View view = null;
         calendar = new GregorianCalendar();  //Получение текущей даты для начала заполнения расписания
         calendar.add(Calendar.DAY_OF_MONTH, -1); //Чтобы не пропускать день при работе в цикле
-        SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        SharedPreferences setting = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
         usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
         main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
 
-        if (userInfo.contains("openGroup")) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
-            currentID = userInfo.getInt("openGroup", 0);
-            isGroup = userInfo.getBoolean("openIsGroup", true);
-            currentGroup = userInfo.getString("openGroupName", "");
+        if (setting.contains("openGroup")) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
+            currentID = setting.getInt("openGroup", 0);
+            isGroup = setting.getBoolean("openIsGroup", true);
+            currentGroup = setting.getString("openGroupName", "");
         } else if (main != null) { //Проверка на наличие главной группы авторизованного
             currentID = main.getId();
             isGroup = main.isGroup();
@@ -107,7 +104,7 @@ public abstract class AbstractSchedule extends DialogFragment
 
     public void postInitializeData() {
         scheduleList.setAdapter(adapter);
-        lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, true);
+        lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
         lmt.execute(14); //Вывод данных на ближайшие 14 дней
         //Реализация подгрузки данных при достижении конца списка
         scheduleList.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -148,19 +145,38 @@ public abstract class AbstractSchedule extends DialogFragment
     public void onRefresh() {
         // начинаем показывать прогресс
         mSwipeRefreshLayout.setRefreshing(true);
-        GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
+        if (MainActivity.isNetworkConnected(getActivity())) { //Если есть интернет - попробовать обновить БД
+            GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
+            GroupsModel model = null; //Достать активную группу для обновления. Нельзя создавать новую модель, т.к. нужна дата
+            if (currentID == main.getId() && isGroup == main.isGroup())
+                model = main;
+            else
+                for (GroupsModel m : usedList) {
+                    if (currentID == m.getId() && isGroup == m.isGroup()) {
+                        model = m;
+                        break;
+                    }
+                }
+            gst.execute(model); //Выполняем запрос на обновление нужного расписания
+        } else { //Если нет - просто перезагрузить страничку
+            update();
+        }
+    }
+
+    private void update() {
+        mSwipeRefreshLayout.setRefreshing(false);
         calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         adapter.deleteData();
-        gst.execute(new GroupsModel(null, currentID, isGroup)); //Выполняем запрос на обновление нужного расписания
+        lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
+        lmt.execute(14);
     }
 
     //Перехватчик широковещательных сообщений. Продолжение onRefresh: когда обновление завершилось, обновить ScheduleView
     BroadcastReceiver broadcastReceiverUpdate = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, true);
-            lmt.execute(14);
+            update();
         }
     };
 
@@ -235,7 +251,7 @@ public abstract class AbstractSchedule extends DialogFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SharedPreferences userInfo;
+        SharedPreferences settings;
         FragmentTransaction ft;
         switch (item.getItemId()) {
             case 100:
@@ -244,10 +260,10 @@ public abstract class AbstractSchedule extends DialogFragment
                 break; //Для вывода бокового меню
             default:
                 //Отобразить новую выбранную группу
-                userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-                userInfo.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()).apply(); //Запись по id. потом по нему открывать расписание
-                userInfo.edit().putString("openGroupName", usedList.get(item.getItemId() - 101).getName()).apply();
-                userInfo.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
+                settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+                settings.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()).apply(); //Запись по id. потом по нему открывать расписание
+                settings.edit().putString("openGroupName", usedList.get(item.getItemId() - 101).getName()).apply();
+                settings.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
                 ft = getFragmentManager().beginTransaction();
                 if (isLinear)
                     ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
@@ -267,37 +283,37 @@ public abstract class AbstractSchedule extends DialogFragment
 
 
     //Нерабочий код - попытка сохранить позицию recyclerView при повороте
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
+//    @Override
+//    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+//        super.onViewStateRestored(savedInstanceState);
+//
+//        if (savedInstanceState != null) {
+//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable("recycle");
+//            scheduleList.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+//            lastFirstVisiblePosition = savedInstanceState.getInt("recycle_position");
+////            if (isLinear) {
+////                llm.scrollToPosition(lastFirstVisiblePosition);
+////            } else {
+////                glm.scrollToPosition(lastFirstVisiblePosition);
+////            }
+//            int a = 3;
+//            return;
+//        }
+//    }
 
-        if (savedInstanceState != null) {
-            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable("recycle");
-            scheduleList.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-            lastFirstVisiblePosition = savedInstanceState.getInt("recycle_position");
-//            if (isLinear) {
-//                llm.scrollToPosition(lastFirstVisiblePosition);
-//            } else {
-//                glm.scrollToPosition(lastFirstVisiblePosition);
-//            }
-            int a = 3;
-            return;
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("recycle", scheduleList.getLayoutManager().onSaveInstanceState());
-//        int lastFirstVisiblePosition;
-        if (isLinear) {
-            lastFirstVisiblePosition = ((LinearLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-        } else {
-            lastFirstVisiblePosition = ((GridLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-        }
-        outState.putInt("recycle_position", lastFirstVisiblePosition);
-        int a = 3;
-    }
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putParcelable("recycle", scheduleList.getLayoutManager().onSaveInstanceState());
+////        int lastFirstVisiblePosition;
+//        if (isLinear) {
+//            lastFirstVisiblePosition = ((LinearLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+//        } else {
+//            lastFirstVisiblePosition = ((GridLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+//        }
+//        outState.putInt("recycle_position", lastFirstVisiblePosition);
+//        int a = 3;
+//    }
 
 
 }

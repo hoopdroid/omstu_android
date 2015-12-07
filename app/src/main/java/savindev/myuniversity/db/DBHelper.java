@@ -14,12 +14,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.schedule.ScheduleModel;
 import savindev.myuniversity.serverTasks.Schedule;
-import savindev.myuniversity.serverTasks.ScheduleDates;
 import savindev.myuniversity.serverTasks.UniversityInfo;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -37,7 +39,10 @@ public class DBHelper extends SQLiteOpenHelper {
     private DepartmentsHelper departmentsHelper;
     private UsedSchedulesHelper usedSchedulesHelper;
     private SchedulesHelper schedulesHelper;
-    private ScheduleDatesHelper scheduleDatesHelper;
+    private CampusesHelper campusesHelper;
+    private ClassroomsHelper classroomsHelper;
+    private BuildingsHelper buildingsHelper;
+
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -51,7 +56,10 @@ public class DBHelper extends SQLiteOpenHelper {
         departmentsHelper = new DepartmentsHelper();
         usedSchedulesHelper = new UsedSchedulesHelper();
         schedulesHelper = new SchedulesHelper();
-        scheduleDatesHelper = new ScheduleDatesHelper();
+        campusesHelper = new CampusesHelper();
+        classroomsHelper = new ClassroomsHelper();
+        buildingsHelper = new BuildingsHelper();
+
 
     }
 
@@ -72,7 +80,9 @@ public class DBHelper extends SQLiteOpenHelper {
         departmentsHelper.create(db);
         usedSchedulesHelper.create(db);
         schedulesHelper.create(db);
-        scheduleDatesHelper.create(db);
+        campusesHelper.create(db);
+        classroomsHelper.create(db);
+        buildingsHelper.create(db);
     }
 
     @Override
@@ -117,14 +127,23 @@ public class DBHelper extends SQLiteOpenHelper {
         return schedulesHelper;
     }
 
-    public ScheduleDatesHelper getScheduleDatesHelper() {
-        return scheduleDatesHelper;
+    public CampusesHelper getCampusesHelper() {
+        return campusesHelper;
     }
+
+    public ClassroomsHelper getClassroomsHelper() {
+        return classroomsHelper;
+    }
+
+    public BuildingsHelper getBuildingsHelper() {
+        return buildingsHelper;
+    }
+
+
 
 
     public class UniversityInfoHelper { // [CR] либо класс сделать приватным, либо убрать геттеры для классов. правильнее - первое
 
-        // [CR] почему внутренние переменные публичные?
 
         protected static final String TABLE_NAME = "UniversityInfo";
         protected static final String COL_FULLNAME = "fullname";
@@ -142,6 +161,28 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        }
+
+        public int getDaysInWeek() {
+
+            int daysinweek = 0;
+
+            SQLiteDatabase sqliteDatabase = getReadableDatabase();
+            Cursor cursor;
+
+                cursor = sqliteDatabase.rawQuery("SELECT " + COL_DAYS_IN_WEEK + " FROM " + TABLE_NAME, null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+                    daysinweek = cursor.getInt(cursor.getColumnIndex(COL_DAYS_IN_WEEK));
+
+                    cursor.moveToNext();
+
+                }
+
+                return daysinweek;
 
         }
 
@@ -405,6 +446,25 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
 
+        public int getPairsInDay(Context context){
+            int maxPair=0;
+
+            SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+
+            try {
+                String selectQuery = "SELECT " + COL_PAIR_NUMBER + " FROM " + TABLE_NAME;
+                Cursor c = sqLiteDatabase.rawQuery(selectQuery, null);
+                if (c.moveToLast()) {
+                    maxPair = c.getInt(c.getColumnIndex(COL_PAIR_NUMBER));
+                }
+                c.close();
+            } catch (SQLiteException e) {
+                Log.e("DB EXCEPTION", e.toString(), e);
+            }
+
+            return maxPair;
+        }
+
         public String getPairNumber(Context context, int pairId) {
 
             int number = 0;
@@ -657,6 +717,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static class SchedulesHelper {
 
         public static final String TABLE_NAME = "Schedules";
+        public static final String COL_ID = "_id";
         public static final String COL_SCHEDULE_ID = "schedule_id";
         public static final String COL_PAIR_ID = "pair_id";
         public static final String COL_GROUP_ID = "group_id";
@@ -671,6 +732,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void create(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     COL_SCHEDULE_ID + " INTEGER," +
                     COL_PAIR_ID + " INTEGER," +
                     COL_GROUP_ID + " INTEGER," +
@@ -700,26 +762,85 @@ public class DBHelper extends SQLiteOpenHelper {
             return dt;
         }
 
+
+        public Set<String> getGroupLessons(Context context,int idGroup,boolean isGroup){
+
+            String selectionDB=COL_GROUP_ID;
+            if(!isGroup){
+                selectionDB=COL_TEACHER_ID;
+            }
+            SortedSet<String> lessons = new TreeSet<>();
+            DBHelper dbHelper = new DBHelper(context);
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            try {
+                String selectQuery = "SELECT " + COL_DISCIPLINE_NAME + " FROM " + TABLE_NAME+" WHERE "+selectionDB+" = "+idGroup;
+                Cursor c = db.rawQuery(selectQuery, null);
+                c.moveToFirst();
+                while (!c.isAfterLast()){
+
+                    lessons.add(c.getString(c.getColumnIndex(COL_DISCIPLINE_NAME)));
+                    c.moveToNext();
+
+                }
+                c.close();
+            } catch (SQLiteException e) {
+                Log.e("DB EXCEPTION", e.toString(), e);
+            }
+
+            return lessons;
+        }
+
+        public Set<String> getGroupLessonsTypes(Context context,int idGroup,boolean isGroup){
+
+            String selectionDB=COL_GROUP_ID;
+            if(!isGroup){
+                selectionDB=COL_TEACHER_ID;
+            }
+            SortedSet<String> lessons = new TreeSet<>();
+            DBHelper dbHelper = new DBHelper(context);
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            try {
+                String selectQuery = "SELECT " + COL_DISCIPLINE_TYPE + " FROM " + TABLE_NAME+" WHERE "+selectionDB+" = "+idGroup;
+                Cursor c = db.rawQuery(selectQuery, null);
+                c.moveToFirst();
+                while (!c.isAfterLast()){
+
+                    lessons.add(c.getString(c.getColumnIndex(COL_DISCIPLINE_TYPE)));
+                    c.moveToNext();
+
+                }
+                c.close();
+            } catch (SQLiteException e) {
+                Log.e("DB EXCEPTION", e.toString(), e);
+            }
+
+            return lessons;
+        }
+
         public void setSchedule(Context context, ArrayList<Schedule> schedule) {
 
             SQLiteDatabase sqliteDatabase;
-            DBHelper helper = DBHelper.getInstance(context);
+            DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
 
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
             String previousValue = "";
             Date beginDate = null;
             Date endDate = null;
+            boolean firstPair;
 
-            for (int index = 1; index < schedule.size(); index++) {
+            for (int index = 0; index < schedule.size(); index++) {
                 if (!schedule.get(index).IS_DELETED) {
                     //TODO test all variants of work dataalreadyornot function)) {
                     try {
+                        firstPair = true;
                         beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
                         endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
                         previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
-                        while (beginDate.compareTo(endDate) <= 0) { // если дата начала пары раньше конца семестра
-
+                        while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // если дата начала пары раньше конца семестра
+                            firstPair = false;
                             ContentValues scheduleRow = new ContentValues();
                             scheduleRow.put(SchedulesHelper.COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
                             scheduleRow.put(SchedulesHelper.COL_PAIR_ID, schedule.get(index).ID_PAIR);
@@ -800,7 +921,7 @@ public class DBHelper extends SQLiteOpenHelper {
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
                             nameTeacher,
                             nameGroup,
-                            "1-250",
+                            dbHelper.getClassroomsHelper().getClassroom(context,cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID))),
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
                             isCancelled
 
@@ -816,29 +937,70 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public void deleteSchedule(Context context,int idSchedule,boolean isGroup){
+        public static void deleteGroupSchedule(Context context, int idSchedule) {
 
-            int isGroupDB=0;
-            if(isGroup)
-                isGroupDB=1;
 
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
 
-            //Delete Schedule
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,true);
 
-            db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE+"="+idSchedule+
-                    " AND "+dbHelper.getUsedSchedulesHelper().COL_IS_GROUP+"="+isGroupDB, null);
-            if(isGroup)
-                db.delete(TABLE_NAME, COL_SCHEDULE_ID+"="+idSchedule+
-                    " AND "+COL_GROUP_ID+"="+idSchedule, null);
-            else
-                db.delete(TABLE_NAME, COL_SCHEDULE_ID+"="+idSchedule+
-                        " AND "+COL_TEACHER_ID+"="+idSchedule, null);
+                db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
+                        " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 1, null);
+
+                db.delete(TABLE_NAME, COL_GROUP_ID + "=" + idSchedule, null);
+        }
+
+        public static void deleteTeacherchedule(Context context, int idSchedule) {
+
+
+            SQLiteDatabase db;
+            DBHelper dbHelper = DBHelper.getInstance(context);
+            db = dbHelper.getWritableDatabase();
+
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,false);
+
+            for(int i=0;i<idList.size();i++){
+
+
+                db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
+                        " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 0, null);
+
+                db.delete(TABLE_NAME, COL_TEACHER_ID + "=" + idSchedule +" AND " + COL_GROUP_ID +"!="+idList.get(i), null);
+            }
+
+
+            //clearDB(context,COL_TEACHER_ID,true);
+
+
         }
 
 
+
+        public static boolean equalsTeachAndGroups(Context context,DBHelper dbHelper,SQLiteDatabase database,String TableName,
+                                                          String dbfieldGroup, int fieldIdGroup,String dbfieldTeacher,int fieldIdTeacher) {
+
+            String Query = "SELECT * FROM " + TableName + " WHERE " + dbfieldGroup + " = " + fieldIdGroup+" AND "+ dbfieldTeacher + "="+fieldIdTeacher;
+            Cursor cursor = database.rawQuery(Query, null);
+            if(cursor.getCount() <= 0){
+                cursor.close();
+                return false;
+            }
+            cursor.close();
+
+            return true;
+        }
+
+        public static  void clearDB(Context context,String selection,boolean isGroup) {
+            SQLiteDatabase db;
+            DBHelper dbHelper = new DBHelper(context);
+            db = dbHelper.getWritableDatabase();
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,isGroup);
+            for (int i = 0 ;i<idList.size();i++)
+            db.delete(TABLE_NAME, selection +"!="+idList.get(i), null);
+
+        }
 
 
     }
@@ -984,71 +1146,224 @@ public class DBHelper extends SQLiteOpenHelper {
             return groupsModelArrayList;
         }
 
-        public void updateRefreshDate(Context context,int idSchedule,boolean isGroup,String newLastRefresh){
+        public static void updateRefreshDate(Context context, int idSchedule, boolean isGroup, String newLastRefresh) {
 
             int isGroupDB = 0;
-            if(isGroup)
-                isGroupDB=1;
+            if (isGroup)
+                isGroupDB = 1;
             SQLiteDatabase db;
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
-
-
             ContentValues cv = new ContentValues();
-            cv.put(COL_LAST_REFRESH_DATE,newLastRefresh);
-            db.update(TABLE_NAME, cv, COL_ID_SCHEDULE+"="+idSchedule+" AND "+COL_IS_GROUP+"="+isGroupDB, null);
+            cv.put(COL_LAST_REFRESH_DATE, newLastRefresh);
+            db.update(TABLE_NAME, cv, COL_ID_SCHEDULE + "=" + idSchedule + " AND " + COL_IS_GROUP + "=" + isGroupDB, null);
+        }
+
+        public static ArrayList<Integer> getIdSchedules(Context context,boolean isGroup) {
+            int isGroupDB =1;
+            if(isGroup)isGroupDB=0;
+            ArrayList<Integer> idList = new ArrayList<>();
+
+            SQLiteDatabase db;
+            DBHelper dbHelper = new DBHelper(context);
+            db = dbHelper.getReadableDatabase();
+
+            Cursor cursor;
+            try {
+                cursor = db.rawQuery("SELECT "+COL_ID_SCHEDULE+" FROM " + TABLE_NAME+" WHERE "+COL_IS_GROUP +"="+isGroupDB, null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
 
 
+                    idList.add(cursor.getInt(cursor.getColumnIndex(COL_ID_SCHEDULE)));
+                    cursor.moveToNext();
+                }
+
+            } catch (SQLiteException e) {
+                Log.e("SQLITE DB EXCEPTION", e.toString(), e);
+            }
+
+            return idList;
         }
 
     }
 
+    public static class CampusesHelper {
 
-    public class ScheduleDatesHelper {
-
-        protected static final String TABLE_NAME = "ScheduleDates";
-        protected static final String COL_SCHEDULE_ID = "schedule_id";
-        protected static final String COL_DATE = "date";
-        protected static final String COL_IS_CANCELLED = "is_cancelled";
+        protected static final String TABLE_NAME = "Campuses";
+        protected static final String COL_ID_CAMPUS = "campus_id";
+        protected static final String COL_CAMPUS_NAME = "campus_name";
 
 
         public void create(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
-                    COL_SCHEDULE_ID + " INTEGER," +
-                    COL_DATE + " TEXT," +
-                    COL_IS_CANCELLED + " INTEGER" +
+                    COL_ID_CAMPUS + " INTEGER PRIMARY KEY," +
+                    COL_CAMPUS_NAME + " TEXT" +
                     ");");
-
         }
 
-
-        public void getScheduleDates(Context context, ArrayList<ScheduleDates> scheduleDates) {
-
-
-        }
-
-        public void setScheduleDates(Context context, ArrayList<ScheduleDates> scheduleDates){
-
+        public  void setCampuses(UniversityInfo init, Context context) {
             SQLiteDatabase sqliteDatabase;
-            DBHelper helper = DBHelper.getInstance(context);
+            DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
 
-            for (int i = 0; i < scheduleDates.size(); i++) {
+            for (int index = 0; index < init.CAMPUSES.size(); index++) {
+                if (!init.CAMPUSES.get(index).IS_DELETED) {
+                    ContentValues campusesRow = new ContentValues();
+                    campusesRow.put(COL_ID_CAMPUS, init.CAMPUSES.get(index).ID_CAMPUS);
+                    campusesRow.put(COL_CAMPUS_NAME, init.CAMPUSES.get(index).CAMPUS_NAME);
+                    sqliteDatabase.insert(TABLE_NAME, null, campusesRow);
+                } else {
+                    DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_CAMPUS, init.CAMPUSES.get(index).ID_CAMPUS);
+                }
+            }
+        }
+    }
 
-                            for(int j=0;j<scheduleDates.get(j).DATES.size();j++) {
-                                ContentValues scheduleDatesRow = new ContentValues();
-                                scheduleDatesRow.put(COL_SCHEDULE_ID, scheduleDates.get(i).ID_SCHEDULE);
-                                scheduleDatesRow.put(COL_DATE,scheduleDates.get(j).DATES.get(j).DATE);
-                                scheduleDatesRow.put(COL_IS_CANCELLED,scheduleDates.get(j).DATES.get(j).IS_CANCELED);
-                                sqliteDatabase.insert(TABLE_NAME, null, scheduleDatesRow);
-                            }
 
-                        }
+    public static class ClassroomsHelper {
 
+        protected static final String TABLE_NAME = "Classrooms";
+        protected static final String COL_ID_CLASSROOM = "classroom_id";
+        protected static final String COL_ID_BUILDING = "building_id";
+        protected static final String COL_CLASSROOM_FLOOR = "classroom_floor";
+        protected static final String COL_CLASSROOM_NAME = "classroom_name";
+        protected static final String COL_CLASSROOM_FULLNAME = "classroom_fullname";
+        protected static final String COL_CLASSROOM_TYPE = "classroom_type";
+        protected static final String COL_CLASSROOM_DESCRIPTION = "classroom_description";
+
+        public void create(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_ID_CLASSROOM + " INTEGER PRIMARY KEY," +
+                    COL_ID_BUILDING + " INTEGER," +
+                    COL_CLASSROOM_NAME + " TEXT," +
+                    COL_CLASSROOM_FULLNAME + " TEXT," +
+                    COL_CLASSROOM_FLOOR + " INTEGER," +
+                    COL_CLASSROOM_DESCRIPTION + " TEXT," +
+                    COL_CLASSROOM_TYPE + " INTEGER" +
+                    ");");
+        }
+
+        public  void setClassrooms(UniversityInfo init, Context context) {
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
+
+            for (int index = 0; index < init.CLASSROOMS.size(); index++) {
+                if (!init.CLASSROOMS.get(index).IS_DELETED) {
+                    ContentValues classroomsRow = new ContentValues();
+                    classroomsRow.put(COL_ID_CLASSROOM, init.CLASSROOMS.get(index).ID_CLASSROOM);
+                    classroomsRow.put(COL_ID_BUILDING, init.CLASSROOMS.get(index).ID_BUILDING);
+                    classroomsRow.put(COL_CLASSROOM_NAME, init.CLASSROOMS.get(index).CLASSROOM_NAME);
+                    classroomsRow.put(COL_CLASSROOM_FULLNAME, init.CLASSROOMS.get(index).CLASSROOM_FULLNAME);
+                    classroomsRow.put(COL_CLASSROOM_FLOOR, init.CLASSROOMS.get(index).CLASSROOM_FLOOR);
+                    classroomsRow.put(COL_CLASSROOM_DESCRIPTION, init.CLASSROOMS.get(index).CLASSROOM_DESCRIPTION);
+                    classroomsRow.put(COL_CLASSROOM_TYPE, init.CLASSROOMS.get(index).CLASSROOM_TYPE_NAME);
+                    sqliteDatabase.insert(TABLE_NAME, null, classroomsRow);
+                } else {
+                    DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_CLASSROOM, init.CLASSROOMS.get(index).ID_CLASSROOM);
+                }
+            }
+        }
+
+        public String getClassroom(Context context,int classroomId){
+            String classroomName="330";
+            int buildingName=0;
+            int buildingID=0;
+
+            DBHelper dbHelper = new DBHelper(context);
+           SQLiteDatabase  db = dbHelper.getReadableDatabase();
+
+            Cursor cursor;
+            try {
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE "+COL_ID_CLASSROOM+" = "+classroomId, null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+                    classroomName = cursor.getString(cursor.getColumnIndex(COL_CLASSROOM_NAME));
+                    buildingID = cursor.getInt(cursor.getColumnIndex(COL_ID_BUILDING));
+                    cursor.moveToNext();
+                }
+
+            } catch (SQLiteException e) {
+                Log.e("SQLITE DB EXCEPTION", e.toString(), e);
 
             }
 
+            try {
+                cursor = db.rawQuery("SELECT "+BuildingsHelper.COL_BUILDING_NUMBER+" FROM " + BuildingsHelper.TABLE_NAME + " WHERE "+BuildingsHelper.COL_ID_BUILDING+" = "+buildingID, null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+                    buildingName = cursor.getInt(cursor.getColumnIndex(BuildingsHelper.COL_BUILDING_NUMBER));
+
+                    cursor.moveToNext();
+                }
+
+            } catch (SQLiteException e) {
+                Log.e("SQLITE DB EXCEPTION", e.toString(), e);
+
+            }
+
+            if(classroomName == null || classroomName.equals("null")){
+                classroomName = "Корпус";
+            }
+
+            return Integer.toString(buildingName) + "-"+classroomName;
         }
+
+    }
+        public static class BuildingsHelper {
+
+            protected static final String TABLE_NAME = "Buildings";
+            protected static final String COL_ID_BUILDING = "building_id";
+            protected static final String COL_ID_CAMPUS = "campus_id";
+            protected static final String COL_BUILDING_NUMBER = "building_number";
+            protected static final String COL_BUILDING_NAME = "building_name";
+            protected static final String COL_BUILDING_TYPE_NAME = "building_type_name";
+            protected static final String COL_BUILDING_FLOOR_COUNT = "floor_count";
+            protected static final String COL_HAS_GROUND_FLOOR = "has_ground_floor";
+
+
+            public void create(SQLiteDatabase db) {
+                db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                        COL_ID_BUILDING + " INTEGER PRIMARY KEY," +
+                        COL_ID_CAMPUS + " INTEGER," +
+                        COL_BUILDING_NUMBER + " INTEGER," +
+                        COL_BUILDING_NAME + " TEXT," +
+                        COL_BUILDING_TYPE_NAME + " TEXT," +
+                        COL_BUILDING_FLOOR_COUNT + " INTEGER," +
+                        COL_HAS_GROUND_FLOOR + " INTEGER" +
+                        ");");
+            }
+
+            public  void setBuildings(UniversityInfo init, Context context) {
+                SQLiteDatabase sqliteDatabase;
+                DBHelper helper = new DBHelper(context);
+                sqliteDatabase = helper.getWritableDatabase();
+
+                for (int index = 0; index < init.BUILDINGS.size(); index++) {
+                    if (!init.BUILDINGS.get(index).IS_DELETED) {
+                        ContentValues buildingsRow = new ContentValues();
+                        buildingsRow.put(COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
+                        buildingsRow.put(COL_ID_CAMPUS, init.BUILDINGS.get(index).ID_CAMPUS);
+                        buildingsRow.put(COL_BUILDING_NUMBER, init.BUILDINGS.get(index).BUILDING_NUMBER);
+                        buildingsRow.put(COL_BUILDING_NAME, init.BUILDINGS.get(index).BUILDING_NAME);
+                        buildingsRow.put(COL_BUILDING_TYPE_NAME, init.BUILDINGS.get(index).BUILDING_TYPE_NAME);
+                        buildingsRow.put(COL_BUILDING_FLOOR_COUNT, init.BUILDINGS.get(index).BUILDING_FLOOR_COUNT);
+                        buildingsRow.put(COL_HAS_GROUND_FLOOR, init.BUILDINGS.get(index).HAS_GROUND_FLOOR);
+                        sqliteDatabase.insert(TABLE_NAME, null, buildingsRow);
+                    } else {
+                        DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
+                    }
+                }
+            }
+        }
+
+
 
 
 
