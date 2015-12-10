@@ -1211,8 +1211,9 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         public static ArrayList<Integer> getIdSchedules(Context context,boolean isGroup) {
-            int isGroupDB =1;
-            if(isGroup)isGroupDB=0;
+            int isGroupDB =0;
+            if(isGroup)isGroupDB=1;
+            //TODO Сделать добавление правильных айди,сейчас проверяется по всем в UsedSchedules,но это не критично
             ArrayList<Integer> idList = new ArrayList<>();
 
             SQLiteDatabase db;
@@ -1221,7 +1222,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT "+COL_ID_SCHEDULE+" FROM " + TABLE_NAME+" WHERE "+COL_IS_GROUP +"="+isGroupDB, null);
+                cursor = db.rawQuery("SELECT "+COL_ID_SCHEDULE+" FROM " + TABLE_NAME, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
