@@ -39,7 +39,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     @Override
     protected Integer doInBackground(GroupsModel... params) {
-
+        long start = System.nanoTime();
         this.params = params;
         String body = null; //Тело запроса
         JSONArray GROUPS = new JSONArray(); //Составление json для отправки в post
@@ -71,6 +71,9 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         HttpURLConnection urlConnection = null;
 
         try {
+            long end = System.nanoTime();
+            Log.d("11", "1: " + (end-start));
+            start = System.nanoTime();
             URL url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
@@ -80,7 +83,9 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             output.write(body != null ? body.getBytes("UTF-8") : new byte[0]);
             output.close();
             errorCode = urlConnection.getResponseCode();
-
+            end = System.nanoTime();
+            Log.d("11", "2: " + (end-start));
+            start = System.nanoTime();
             InputStream inputStream = urlConnection.getErrorStream(); //Получение результата
             if (inputStream == null) {
                 inputStream = urlConnection.getInputStream();
@@ -93,7 +98,8 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
             }
             reader.close();
             String reply = buffer.toString();
-
+            end = System.nanoTime();
+            Log.d("11", "3: " + (end-start));
             if (reply.isEmpty()) { //Если ответ пустой, вернуть ошибку
                 return -1;
             }
@@ -136,15 +142,24 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 ArrayList<Schedule> sched;
                 ArrayList<ScheduleDates> scheddates;
                 try {
+                    long start = System.nanoTime();
                     sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
-                    parsetoSqlite(sched);
+                   long end = System.nanoTime();
+                    Log.d("11", "4: " + (end-start));
+                    start = System.nanoTime();
+                    DBHelper dbHelper = DBHelper.getInstance(context);
+                    dbHelper.getSchedulesHelper().setSchedule(context, sched);
+                    end = System.nanoTime();
+                    Log.d("11", "5: " + (end-start));
                 } catch (JSONException e) {
                     //Поле оказалось нулевым?
                     e.printStackTrace();
                 }
                 try {
+                    long start = System.nanoTime();
                     scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
-                    parseScheduleDates(scheddates);
+                    long end = System.nanoTime();
+                    Log.d("11", "6: " + (end-start));
                 } catch (JSONException e) {
                     //Поле оказалось нулевым?
                     e.printStackTrace();
@@ -163,18 +178,6 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 errorCode = 1;
                 break;
         }
-    }
-
-    private void parsetoSqlite(ArrayList<Schedule> sched) {
-
-        DBHelper dbHelper = DBHelper.getInstance(context);
-        dbHelper.getSchedulesHelper().setSchedule(context, sched);
-    }
-
-    private void parseScheduleDates(ArrayList<ScheduleDates> scheduleDates) {
-
-        DBHelper dbHelper = DBHelper.getInstance(context);
-
     }
 
     private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний

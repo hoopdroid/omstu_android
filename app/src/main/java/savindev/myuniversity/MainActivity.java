@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -23,13 +24,9 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
-import java.util.ArrayList;
-
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
-import savindev.myuniversity.schedule.ScheduleModel;
-import savindev.myuniversity.serverTasks.Schedule;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 import savindev.myuniversity.welcomescreen.NotInternetFragment;

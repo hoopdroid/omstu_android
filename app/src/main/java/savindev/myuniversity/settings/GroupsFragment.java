@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
@@ -132,29 +131,29 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
             //Запрос к базе
             GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), null);
             if (MainActivity.isNetworkConnected(getActivity())) {
-                refreshItem.setActionView(R.layout.actionbar_progress); //Показать загрузку данных
-                refreshItem.setVisible(true);
+//                refreshItem.setActionView(R.layout.actionbar_progress); //Показать загрузку данных
+//                refreshItem.setVisible(true);
                 for (GroupsModel model : addList) {
                     model.setLastRefresh(getActivity().getResources().getString(R.string.unix)); //Установка даты последнего обновления - нет обновлений
                 }
                 gst.execute(addList.toArray(new GroupsModel[addList.size()])); //Выполняем запрос на получение нужных расписаний
-                try {  //TODO сделать красивое отображение загрузки
-                    if (gst.get() == -1) {
-                        refreshItem.setVisible(false);
-                    } else {
-                        refreshItem.setActionView(R.layout.actionbar_finish); //В случае успешной загрузки показать галочку на месте progressbar, через секунду скрыть
-                        new CountDownTimer(500, 500) {
-                            public void onTick(long millisUntilFinished) {
-                            }
-
-                            public void onFinish() {
-                                refreshItem.setVisible(false);
-                            }
-                        }.start();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                try {  //TODO сделать красивое отображение загрузки
+//                    if (gst.get() == -1) {
+//                        refreshItem.setVisible(false);
+//                    } else {
+//                        refreshItem.setActionView(R.layout.actionbar_finish); //В случае успешной загрузки показать галочку на месте progressbar, через секунду скрыть
+//                        new CountDownTimer(500, 500) {
+//                            public void onTick(long millisUntilFinished) {
+//                            }
+//
+//                            public void onFinish() {
+//                                refreshItem.setVisible(false);
+//                            }
+//                        }.start();
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             } else {
                 Toast.makeText(getActivity(), "Не удалось получить списки" + '\n'
                         + "Проверье соединение с интернетом", Toast.LENGTH_LONG).show();
