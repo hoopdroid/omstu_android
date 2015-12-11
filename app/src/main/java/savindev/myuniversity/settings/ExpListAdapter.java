@@ -32,10 +32,9 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
     private final Object mLock = new Object();
     private ArrayList<ArrayList<GroupsModel>> mOriginalValues;
     private ArrayList<String> mOriginalNames;
-    private ArrayList<GroupsModel> deleteList = new ArrayList<GroupsModel>();
-    private ArrayList<GroupsModel> addList = new ArrayList<GroupsModel>();
+    private ArrayList<GroupsModel> deleteList = new ArrayList<>();
+    private ArrayList<GroupsModel> addList = new ArrayList<>();
     private GroupsModel main;
-
 
     public ExpListAdapter(Context context, ArrayList<String> names,
                           ArrayList<ArrayList<GroupsModel>> groups) {
@@ -123,9 +122,8 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
     @Override
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
-        View view = null;
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = inflater.inflate(R.layout.child_view, null);
+        View view = inflater.inflate(R.layout.child_view, null);
         final ViewHolder holder = new ViewHolder();
         holder.textView = (TextView) view.findViewById(R.id.textChild);
         holder.eyeView = (ImageView) view.findViewById(R.id.eyeVisibility);
@@ -222,16 +220,16 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
 
             if (mOriginalValues == null) {
                 synchronized (mLock) {
-                    mOriginalValues = new ArrayList<ArrayList<GroupsModel>>(mGroup);
-                    mOriginalNames = new ArrayList<String>(mNames);
+                    mOriginalValues = new ArrayList<>(mGroup);
+                    mOriginalNames = new ArrayList<>(mNames);
                 }
             }
             if (prefix == null || prefix.length() == 0) {
                 ArrayList<ArrayList<GroupsModel>> list;
                 ArrayList<String> names;
                 synchronized (mLock) {
-                    list = new ArrayList<ArrayList<GroupsModel>>(mOriginalValues);
-                    names = new ArrayList<String>(mOriginalNames);
+                    list = new ArrayList<>(mOriginalValues);
+                    names = new ArrayList<>(mOriginalNames);
                 }
                 results.values = list;
                 results.count = list.size();
@@ -241,19 +239,19 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
                 String prefixString = prefix.toString().replaceAll(" ", "").toLowerCase();
                 ArrayList<ArrayList<GroupsModel>> values;
                 synchronized (mLock) {
-                    values = new ArrayList<ArrayList<GroupsModel>>(mOriginalValues);
+                    values = new ArrayList<>(mOriginalValues);
                 }
 
 
-                final ArrayList<ArrayList<GroupsModel>> newValues = new ArrayList<ArrayList<GroupsModel>>();
-                final ArrayList<String> newNames = new ArrayList<String>();
+                final ArrayList<ArrayList<GroupsModel>> newValues = new ArrayList<>();
+                final ArrayList<String> newNames = new ArrayList<>();
 
                 for (int i = 0; i < values.size(); i++) {
                     final int count = values.get(i).size();
-                    final ArrayList<GroupsModel> newValuesChild = new ArrayList<GroupsModel>();
+                    final ArrayList<GroupsModel> newValuesChild = new ArrayList<>();
                     for (int j = 0; j < count; j++) {
                         final GroupsModel value = values.get(i).get(j);
-                        final String valueText = value.getName().toString().replaceAll(" ", "").toLowerCase(Locale.getDefault());
+                        final String valueText = value.getName().replaceAll(" ", "").toLowerCase(Locale.getDefault());
 
                         // First match against the whole, non-splitted value
                         if (valueText.startsWith(prefixString)) {
@@ -263,8 +261,8 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
                             final int wordCount = words.length;
 
                             // Start at index 0, in case valueText starts with space(s)
-                            for (int k = 0; k < wordCount; k++) {
-                                if (words[k].startsWith(prefixString)) {
+                            for (String word : words) {
+                                if (word.startsWith(prefixString)) {
                                     newValuesChild.add(value);
                                     break;
                                 }

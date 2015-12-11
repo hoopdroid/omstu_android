@@ -200,7 +200,6 @@ public abstract class AbstractSchedule extends DialogFragment
             try {
                 positions.putAll(lmt.get());
                 lmt.onPostExecute(lmt.get());
-//                Thread.currentThread().sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
@@ -234,7 +233,7 @@ public abstract class AbstractSchedule extends DialogFragment
                 String selectedDate = (month + 1) + "-" + dayOfMonth + "-" + year + " ";
                 int p = getPostition(new GregorianCalendar(year, month, dayOfMonth));
                 if (p != 0)
-                   scheduleList.scrollToPosition(p+1);
+                    scheduleList.scrollToPosition(p + 1);
                 else
                     Toast.makeText(getActivity(), "Неверная дата", Toast.LENGTH_SHORT).show();
                 calendarDialog.dismiss();
@@ -274,7 +273,8 @@ public abstract class AbstractSchedule extends DialogFragment
         loading = false;
         lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
         lmt.execute(14);
-        positions.clear();
+        if (positions != null)
+            positions.clear();
         setPositions(lmt);
     }
 

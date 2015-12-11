@@ -81,7 +81,7 @@ public class PerfomanceFragment extends Fragment {
                         }
                         @Override
                         public void onDownloadFailed(int id, int errorCode, String errorMessage) {
-                            Toast.makeText(getActivity(), "Не удалось", Toast.LENGTH_SHORT);
+                            Toast.makeText(getActivity(), "Не удалось", Toast.LENGTH_SHORT).show();
                             Log.i("myuniversity", "Ошибка от сервера, запрос getPerfomance, текст:"
                                     + errorMessage);
                             pbar.setProgress(0);
@@ -92,7 +92,7 @@ public class PerfomanceFragment extends Fragment {
                         }
                     });
         } else {
-            Toast.makeText(getActivity(), "Нет интернета", Toast.LENGTH_SHORT);
+            Toast.makeText(getActivity(), "Нет интернета", Toast.LENGTH_SHORT).show();
         }
     }
 

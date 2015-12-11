@@ -11,7 +11,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -52,9 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
             }
-
         } else {
-
             setContentView(R.layout.activity_main);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -62,19 +59,11 @@ public class MainActivity extends AppCompatActivity {
             initDrawer();
             DBHelper dbHelper = DBHelper.getInstance(this);
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
-
-            Log.d("IDS",dbHelper.getUsedSchedulesHelper().getIdSchedules(this,true).toString());
         }
-
     }
-
-
     private void getUserSettings() {
-
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
-
         username = settings.getString("UserFirstName", "") + " " + settings.getString("UserLastName", "") + " " + DBRequest.getUserGroup(settings.getInt("UserGroup", 0), getApplicationContext());
-
         email = settings.getString("email", "no email");
     }
 
@@ -121,12 +110,9 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-
                         switch (position) {
                             case 1:
-
                                 addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
-
                                 break;
                             case 2:
                                 addfragment(R.string.drawer_navigator, new WelcomeFragment());
@@ -143,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
                             case 6:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
-
                         }
                         return false;
                     }
@@ -152,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void addfragment(int title, Fragment fragment) {
-
         toolbar.setTitle(title);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
@@ -160,19 +144,13 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction();
         fragmentTransaction.replace(R.id.content_main, fragment);
         fragmentTransaction.commit();
-
-
     }
 
     //Проверка на подключение к интернету
     public static boolean isNetworkConnected(Context c) {
         ConnectivityManager cm = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
-        if (ni == null) {
-            // There are no active networks.
-            return false;
-        } else
-            return true;
+        return ni != null;
     }
 
 

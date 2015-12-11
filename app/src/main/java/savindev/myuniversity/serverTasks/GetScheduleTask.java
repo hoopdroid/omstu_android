@@ -7,41 +7,46 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.GroupsModel;
 
+/**
+ * Запрос на сервер о сборе расписания для выбранных групп и преподавателей (возможно несколько)
+ * В качестве параметров в теле запроса передается список id групп и преподавателей с датой последнего обновления по каждому
+ * Возвращаемая информация: основное расписание и модификации для него, в общем виде для всех запрошенных групп
+ * После запроса на сервер информация разбирается с помощью класса Schedule
+ */
+
 public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
     private Context context;
-    private final static int TIMEOUT_MILLISEC = 5000;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     private GroupsModel[] params;
     private int errorCode;
 
     public GetScheduleTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
         super();
         this.context = context;
-        this.mSwipeRefreshLayout = mSwipeRefreshLayout;
     }
 
 
     @Override
     protected Integer doInBackground(GroupsModel... params) {
-        long start = System.nanoTime();
+        final int TIMEOUT_MILLISEC = 5000;
         this.params = params;
-        String body = null; //Тело запроса
         JSONArray GROUPS = new JSONArray(); //Составление json для отправки в post
         JSONArray TEACHERS = new JSONArray();
         for (GroupsModel param : params) {
@@ -63,54 +68,24 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         try {
             obj.put("GROUPS", (GROUPS.length() == 0) ? JSONObject.NULL : GROUPS);
             obj.put("TEACHERS", (TEACHERS.length() == 0) ? JSONObject.NULL : TEACHERS);
-            body = obj.toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        String uri = context.getResources().getString(R.string.uri) + "getSchedule";
-        HttpURLConnection urlConnection = null;
+        String url = context.getResources().getString(R.string.uri) + "getSchedule";
 
+        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
+        client.setReadTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
+        client.setWriteTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
+        RequestBody body = RequestBody.create(JSON, obj.toString());
+        Request request = new Request.Builder().url(url).post(body).build();
         try {
-            long end = System.nanoTime();
-            Log.d("11", "1: " + (end-start));
-            start = System.nanoTime();
-            URL url = new URL(uri);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
-            urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
-            urlConnection.setDoOutput(true); //Отправка json
-            OutputStream output = urlConnection.getOutputStream();
-            output.write(body != null ? body.getBytes("UTF-8") : new byte[0]);
-            output.close();
-            errorCode = urlConnection.getResponseCode();
-            end = System.nanoTime();
-            Log.d("11", "2: " + (end-start));
-            start = System.nanoTime();
-            InputStream inputStream = urlConnection.getErrorStream(); //Получение результата
-            if (inputStream == null) {
-                inputStream = urlConnection.getInputStream();
-            }
-            StringBuilder buffer = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-            }
-            reader.close();
-            String reply = buffer.toString();
-            end = System.nanoTime();
-            Log.d("11", "3: " + (end-start));
-            if (reply.isEmpty()) { //Если ответ пустой, вернуть ошибку
-                return -1;
-            }
-            replyParse(reply);
-        } catch (Exception e) {
+            Response response = client.newCall(request).execute();
+            replyParse(response.body().string());
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
             return -1;
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
         }
         return 1;
     }
@@ -130,10 +105,8 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     private void replyParse(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-        if (errorCode != 200) {
-            //TODO обрабатывать коды возврата
+        if (errorCode != 200)
             return;
-        }
         JSONObject obj = new JSONObject(reply);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
@@ -142,28 +115,18 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 ArrayList<Schedule> sched;
                 ArrayList<ScheduleDates> scheddates;
                 try {
-                    long start = System.nanoTime();
                     sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
-                   long end = System.nanoTime();
-                    Log.d("11", "4: " + (end-start));
-                    start = System.nanoTime();
                     DBHelper dbHelper = DBHelper.getInstance(context);
                     dbHelper.getSchedulesHelper().setSchedule(context, sched);
-                    end = System.nanoTime();
-                    Log.d("11", "5: " + (end-start));
-                } catch (JSONException e) {
-                    //Поле оказалось нулевым?
+                } catch (JSONException e) { //Поле оказалось нулевым?
                     e.printStackTrace();
                 }
-                try {
-                    long start = System.nanoTime();
-                    scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
-                    long end = System.nanoTime();
-                    Log.d("11", "6: " + (end-start));
-                } catch (JSONException e) {
-                    //Поле оказалось нулевым?
-                    e.printStackTrace();
-                }
+//                try {
+//                    scheddates = ScheduleDates.fromJson(content.getJSONArray("SCHEDULE_DATES"));
+//                } catch (JSONException e) {
+//                    //Поле оказалось нулевым?
+//                    e.printStackTrace();
+//                }
                 addToScheduleList(lastResresh);
                 break;
             case "ERROR":   //Неопознанная ошибка
@@ -180,16 +143,14 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         }
     }
 
-    private void addToScheduleList(String lastResresh) { //Внос в список используемых расписаний
+    private void addToScheduleList(String lastRefresh) { //Внос в список используемых расписаний
         for (GroupsModel model : params) {
             if (DBHelper.UsedSchedulesHelper.getGroupsModelList(context).contains(model) ||
                     DBHelper.UsedSchedulesHelper.getMainGroupModel(context) != null &&
-                            DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) {
-                DBHelper.UsedSchedulesHelper.updateRefreshDate(context, model.getId(), model.isGroup(), lastResresh);
-                //Если уже имеется - обновить дату
-            } else {
-                //Не имеется, добавить
-                DBHelper.UsedSchedulesHelper.setUsedSchedule(context, model.getId(), model.isGroup(), false, lastResresh);
+                            DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) { //Если уже имеется - обновить дату
+                DBHelper.UsedSchedulesHelper.updateRefreshDate(context, model.getId(), model.isGroup(), lastRefresh);
+            } else { //Не имеется, добавить
+                DBHelper.UsedSchedulesHelper.setUsedSchedule(context, model.getId(), model.isGroup(), false, lastRefresh);
             }
         }
     }

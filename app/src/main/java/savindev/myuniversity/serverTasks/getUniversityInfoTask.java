@@ -8,17 +8,18 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
@@ -34,9 +35,9 @@ import savindev.myuniversity.db.DBHelper;
  */
 public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
-    int errorCode = 0;
+    private int errorCode = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    SharedPreferences settings;
+    private SharedPreferences settings;
 
     public GetUniversityInfoTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
         super();
@@ -50,45 +51,20 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
         //Возвращать false, если изменений нет
         settings = context.getSharedPreferences("settings", 0);
         String refreshDate = settings.getString("init_last_refresh", context.getResources().getString(R.string.unix)); //дата последнего обновления
-        String uri;
-        if (settings.getBoolean("test", false)) {
-            uri = context.getResources().getString(R.string.uri_test) + "getUniversityInfo?universityAcronym=" +
-                    context.getResources().getString(R.string.university) + "&lastRefresh=" + refreshDate;
-        } else {
-            uri = context.getResources().getString(R.string.uri) + "getUniversityInfo?universityAcronym=" +
-                    context.getResources().getString(R.string.university) + "&lastRefresh=" + refreshDate;
-        }
-
-        URL url;
-        HttpURLConnection urlConnection = null;
+        String url;
+        url = context.getResources().getString(R.string.uri) + "getUniversityInfo?universityAcronym=" +
+                context.getResources().getString(R.string.university) + "&lastRefresh=" + refreshDate;
+        OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
+        client.setReadTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
+        Request request = new Request.Builder().url(url).build();
         try {
-            url = new URL(uri);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
-            urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuilder buffer = new StringBuilder();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-            }
-            String reply = buffer.toString();
-            if (reply.isEmpty()) { //Если после всех операций все равно пустой
-                return false;
-            }
-            parseReply(reply);
-        } catch (Exception e) {
+            Response response = client.newCall(request).execute();
+            parseReply(response.body().string());
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
             return false;
         }
-        finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-
         return true;
     }
 
@@ -117,8 +93,7 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
                 }
 
                 JSONObject content = obj.getJSONObject("CONTENT");
-                UniversityInfo init = UniversityInfo.fromJson(content);
-                parsetoSqlite(init);
+                parsetoSqlite(UniversityInfo.fromJson(content));
                 settings.edit().putString("init_last_refresh", modified).apply(); //Если не совпадают, занести новую дату
                 Log.d("DOWNLOADING DATA", "SUCCESS");
                 break;
@@ -134,26 +109,20 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
                 errorCode = 1;
                 break;
         }
-
-
     }
 
-
     void parsetoSqlite(UniversityInfo init) {
-
-
         DBHelper dbHelper = DBHelper.getInstance(context);
-
-        dbHelper.getUniversityInfoHelper().setUniversityInfo(context,init);
-        dbHelper.getTeachersHelper().setTeachers(context,init);
-        dbHelper.getSemestersHelper().setSemesters(context,init);
-        dbHelper.getPairsHelper().setPairs(context,init);
-        dbHelper.getGroupsHelper().setGroups(context,init);
-        dbHelper.getFacultiesHelper().setFaculties(context,init);
-        dbHelper.getDepartmentsHelper().setDepartments(context,init);
-        dbHelper.getCampusesHelper().setCampuses(init,context);
-        dbHelper.getClassroomsHelper().setClassrooms(init,context);
-        dbHelper.getBuildingsHelper().setBuildings(init,context);
+        dbHelper.getUniversityInfoHelper().setUniversityInfo(context, init);
+        dbHelper.getTeachersHelper().setTeachers(context, init);
+        dbHelper.getSemestersHelper().setSemesters(context, init);
+        dbHelper.getPairsHelper().setPairs(context, init);
+        dbHelper.getGroupsHelper().setGroups(context, init);
+        dbHelper.getFacultiesHelper().setFaculties(context, init);
+        dbHelper.getDepartmentsHelper().setDepartments(context, init);
+        dbHelper.getCampusesHelper().setCampuses(init, context);
+        dbHelper.getClassroomsHelper().setClassrooms(init, context);
+        dbHelper.getBuildingsHelper().setBuildings(init, context);
 
     }
 
@@ -166,11 +135,9 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
                 context.sendBroadcast(new Intent("FINISH_UPDATE")); //Отправить запрос на обновление
             }
         }
-
         if (!data) {
             Toast.makeText(context, "Сервер недоступен", Toast.LENGTH_LONG).show();
         }
-
     }
 
 }
