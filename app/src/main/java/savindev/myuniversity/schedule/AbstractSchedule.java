@@ -118,7 +118,7 @@ public abstract class AbstractSchedule extends DialogFragment
     public void postInitializeData() {
         scheduleList.setAdapter(adapter);
         lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
-        lmt.execute(14); //Вывод данных на ближайшие 14 дней
+        lmt.execute(8); //Вывод данных на ближайшие 8 дней
         setPositions(lmt);
         //Реализация подгрузки данных при достижении конца списка
         scheduleList.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -135,7 +135,7 @@ public abstract class AbstractSchedule extends DialogFragment
                 }
 
                 if (loading) {
-                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount-3) {
                         loading = false;
                         lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
                         lmt.execute(totalItemCount);
@@ -250,7 +250,7 @@ public abstract class AbstractSchedule extends DialogFragment
         if (MainActivity.isNetworkConnected(getActivity())) { //Если есть интернет - попробовать обновить БД
             GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
             GroupsModel model = null; //Достать активную группу для обновления. Нельзя создавать новую модель, т.к. нужна дата
-            if (currentID == main.getId() && isGroup == main.isGroup())
+            if (main != null && currentID == main.getId() && isGroup == main.isGroup())
                 model = main;
             else
                 for (GroupsModel m : usedList) {

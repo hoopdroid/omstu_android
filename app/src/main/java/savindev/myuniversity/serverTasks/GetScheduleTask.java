@@ -105,8 +105,6 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     private void replyParse(String reply) throws JSONException {
         //здесь разбор json и раскладка в sqlite
-        if (errorCode != 200)
-            return;
         JSONObject obj = new JSONObject(reply);
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
@@ -130,15 +128,22 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 addToScheduleList(lastResresh);
                 break;
             case "ERROR":   //Неопознанная ошибка
+                errorCode = -1;
                 Log.i("myuniversity", "Ошибка ERROR от сервера, запрос GetScheduleTask, текст:"
                         + obj.get("CONTENT"));
                 break;
             case "WARNING": //Определенная сервером ошибка
+                errorCode = -1;
                 Log.i("myuniversity", "Ошибка WARNING от сервера, запрос GetScheduleTask, текст:"
                         + obj.get("CONTENT"));
                 break;
             case "NOT_FOUND": //Нет новых данных
                 errorCode = 1;
+                break;
+            default:
+                Log.i("myuniversity", "Неопознанная ошибка от сервера, запрос GetScheduleTask, текст:"
+                        + obj.get("CONTENT"));
+                errorCode = -1;
                 break;
         }
     }
