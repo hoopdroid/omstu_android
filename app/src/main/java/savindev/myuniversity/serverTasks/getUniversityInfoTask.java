@@ -60,8 +60,8 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
         Request request = new Request.Builder().url(url).build();
         try {
             Response response = client.newCall(request).execute();
-            parseReply(response.body().string());
-        } catch (IOException | JSONException e) {
+//            parseReply(response.body().string());
+        } catch (IOException  e) {
             e.printStackTrace();
             return false;
         }

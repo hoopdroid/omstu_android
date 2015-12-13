@@ -130,7 +130,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         if (!addList.isEmpty()) {
             //Запрос к базе
-            GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), null);
+            GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext());
             if (MainActivity.isNetworkConnected(getActivity())) {
                 refreshItem.setActionView(R.layout.actionbar_progress); //Показать загрузку данных
                 refreshItem.setVisible(true);

@@ -37,7 +37,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
     private GroupsModel[] params;
     private int errorCode;
 
-    public GetScheduleTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
+    public GetScheduleTask(Context context) {
         super();
         this.context = context;
     }
@@ -82,8 +82,9 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         Request request = new Request.Builder().url(url).post(body).build();
         try {
             Response response = client.newCall(request).execute();
-            replyParse(response.body().string());
-        } catch (IOException | JSONException e) {
+//            replyParse(response.body().string());
+//        } catch (IOException | JSONException e) {
+        } catch (IOException  e) {
             e.printStackTrace();
             return -1;
         }

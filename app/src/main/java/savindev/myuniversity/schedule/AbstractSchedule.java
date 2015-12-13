@@ -248,7 +248,7 @@ public abstract class AbstractSchedule extends DialogFragment
         // начинаем показывать прогресс
         mSwipeRefreshLayout.setRefreshing(true);
         if (MainActivity.isNetworkConnected(getActivity())) { //Если есть интернет - попробовать обновить БД
-            GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
+            GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext());
             GroupsModel model = null; //Достать активную группу для обновления. Нельзя создавать новую модель, т.к. нужна дата
             if (main != null && currentID == main.getId() && isGroup == main.isGroup())
                 model = main;

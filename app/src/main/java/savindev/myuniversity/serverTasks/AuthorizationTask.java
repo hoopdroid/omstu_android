@@ -87,11 +87,11 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             }
         }
 
-        try {
-            return parseContent(result);
-        } catch (JSONException e) {
+//        try {
+//            return parseContent(result);
+//        } catch (JSONException e) {
             return false;
-        }
+//        }
     }
 
     private String query(String uri) { //Запрос к серверу. по uri возвращает ответ
@@ -204,7 +204,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                     }
                     //Получить расписание для этой группы, если ранее оно не было получено
 
-                    GetScheduleTask gst = new GetScheduleTask(context, null);
+                    GetScheduleTask gst = new GetScheduleTask(context);
                     gst.execute(DBHelper.UsedSchedulesHelper.getMainGroupModel(context));
                 }
 

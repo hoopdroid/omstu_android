@@ -34,9 +34,7 @@ public class SettingsFragment extends Fragment {
 
 
     FragmentTransaction ft;
-    //	FrameLayout cont;
     int lastPosition;
-    //	Boolean reload = false;
     MenuItem refreshItem;
     GroupsFragment groups;
     GetUniversityInfoTask guit;
@@ -112,24 +110,6 @@ public class SettingsFragment extends Fragment {
                         }
                         break;
                     case 2:
-                        settints.setBackgroundColor(Color.WHITE);
-                        settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
-                        lastPosition = position;
-                        if (getResources().getConfiguration().orientation ==
-                                Configuration.ORIENTATION_LANDSCAPE) {
-                            settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
-                        }
-                        break;
-                    case 3:
-                        settints.setBackgroundColor(Color.WHITE);
-                        settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
-                        lastPosition = position;
-                        if (getResources().getConfiguration().orientation ==
-                                Configuration.ORIENTATION_LANDSCAPE) {
-                            settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
-                        }
-                        break;
-                    case 4: //Тестовая функция, перевод порта
                         settints.setBackgroundColor(Color.WHITE);
                         settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;
