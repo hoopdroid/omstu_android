@@ -1,13 +1,17 @@
 package savindev.myuniversity.schedule;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +23,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,6 +31,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -62,10 +68,16 @@ public abstract class AbstractSchedule extends DialogFragment
     private boolean loading = true;
     protected boolean isLinear;
     private int lastFirstVisiblePosition;
+    private TreeMap<GregorianCalendar, Integer> positions;
+    private AlertDialog calendarDialog;
 
     protected View preInitializeData(LayoutInflater inflater, ViewGroup container) { //Объявление общей информации при загрузке фрагмента
         View view = null;
         calendar = new GregorianCalendar();  //Получение текущей даты для начала заполнения расписания
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         calendar.add(Calendar.DAY_OF_MONTH, -1); //Чтобы не пропускать день при работе в цикле
         SharedPreferences setting = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
         usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
@@ -99,13 +111,15 @@ public abstract class AbstractSchedule extends DialogFragment
 
         getActivity().registerReceiver(broadcastReceiverUpdate, new IntentFilter("FINISH_UPDATE"));
         getActivity().registerReceiver(broadcastReceiverLMT, new IntentFilter("FINISH_LMT"));
+        onCreateDialog(null); //Создание диалога с календариком
         return view;
     }
 
     public void postInitializeData() {
         scheduleList.setAdapter(adapter);
         lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
-        lmt.execute(14); //Вывод данных на ближайшие 14 дней
+        lmt.execute(8); //Вывод данных на ближайшие 8 дней
+        setPositions(lmt);
         //Реализация подгрузки данных при достижении конца списка
         scheduleList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             int pastVisiblesItems, visibleItemCount, totalItemCount;
@@ -121,10 +135,11 @@ public abstract class AbstractSchedule extends DialogFragment
                 }
 
                 if (loading) {
-                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount-3) {
                         loading = false;
                         lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
                         lmt.execute(totalItemCount);
+                        setPositions(lmt);
                     }
                 }
             }
@@ -141,6 +156,93 @@ public abstract class AbstractSchedule extends DialogFragment
         setRetainInstance(true);
     }
 
+    private void setPositions(final LoadMoreTask lmt) { //Специально для обновления данных в отдельном потоке
+        new Thread(new Runnable() {
+            public void run() {//Этот метод будет выполняться в побочном потоке
+                try {
+                    if (positions == null)
+                        positions = lmt.get();
+                    else
+                        positions.putAll(lmt.get());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private int getPostition(GregorianCalendar date) {
+        //TODO время семестра нормально получать.
+//        if (DBHelper.getInstance(getActivity()).getSemestersHelper().getSemesterStartDate(getActivity(), new GregorianCalendar().getTime()).compareTo(date) < 0)
+//            return 0; //Вызываемая дата раньше начала семестра, не надо это показывать
+        if (new GregorianCalendar().after(date)) { //Если запрошенная дата меньше текущей
+            calendar = date; //Перезагрузить адаптер, начиная с указанной даты
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+            adapter.deleteData();
+            loading = false;
+            lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
+            lmt.execute(14);
+            try {
+                positions = lmt.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        if (positions.lastKey().before(date)) { //Если в адаптере последняя дата меньше, догрузить до нужной
+            int days = (int) ((date.getTimeInMillis() - positions.lastKey().getTimeInMillis()) / 86400000); //Получение числа дней между последней загруженной датой и заданной
+            loading = false;
+            lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
+            lmt.execute(days + 7); //С маленьким запасом
+            try {
+                positions.putAll(lmt.get());
+                lmt.onPostExecute(lmt.get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        //Вернуть позицию для ключа или ближайшего ключа, если точного нет
+        if (positions.floorEntry(date) == null)
+            return 0;
+        return positions.floorEntry(date).getValue();
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(true);
+        builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); // Отпускает диалоговое окно
+            }
+        });
+        final View dialog = getActivity().getLayoutInflater()
+                .inflate(R.layout.calendar_dialog, null);
+        CalendarView calendar = (CalendarView) dialog.findViewById(R.id.calendar);
+        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year,
+                                            int month, int dayOfMonth) {
+                String selectedDate = (month + 1) + "-" + dayOfMonth + "-" + year + " ";
+                int p = getPostition(new GregorianCalendar(year, month, dayOfMonth));
+                if (p != 0)
+                    scheduleList.scrollToPosition(p + 1);
+                else
+                    Toast.makeText(getActivity(), "Неверная дата", Toast.LENGTH_SHORT).show();
+                calendarDialog.dismiss();
+            }
+        });
+        calendarDialog = builder.setView(dialog).create();
+        return calendarDialog;
+    }
+
     @Override
     public void onRefresh() {
         // начинаем показывать прогресс
@@ -148,7 +250,7 @@ public abstract class AbstractSchedule extends DialogFragment
         if (MainActivity.isNetworkConnected(getActivity())) { //Если есть интернет - попробовать обновить БД
             GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), mSwipeRefreshLayout);
             GroupsModel model = null; //Достать активную группу для обновления. Нельзя создавать новую модель, т.к. нужна дата
-            if (currentID == main.getId() && isGroup == main.isGroup())
+            if (main != null && currentID == main.getId() && isGroup == main.isGroup())
                 model = main;
             else
                 for (GroupsModel m : usedList) {
@@ -168,8 +270,12 @@ public abstract class AbstractSchedule extends DialogFragment
         calendar = new GregorianCalendar(); //Чистка адаптера, начало со старой даты
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         adapter.deleteData();
+        loading = false;
         lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
         lmt.execute(14);
+        if (positions != null)
+            positions.clear();
+        setPositions(lmt);
     }
 
     //Перехватчик широковещательных сообщений. Продолжение onRefresh: когда обновление завершилось, обновить ScheduleView
@@ -227,7 +333,11 @@ public abstract class AbstractSchedule extends DialogFragment
         }
     }
 
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        MenuItem item = menu.findItem(R.id.calendar); //Установка текущей даты для навигационного календаря
+        GregorianCalendar c = new GregorianCalendar();
+        item.setTitle(c.get(Calendar.DAY_OF_MONTH) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
 
         //Если имеются используемые расписания
         if (!(usedList == null || usedList.isEmpty())) {
@@ -258,6 +368,9 @@ public abstract class AbstractSchedule extends DialogFragment
                 break; //Для вывода подменю
             case 16908332:
                 break; //Для вывода бокового меню
+            case R.id.calendar:
+                calendarDialog.show();
+                break;
             default:
                 //Отобразить новую выбранную группу
                 settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);

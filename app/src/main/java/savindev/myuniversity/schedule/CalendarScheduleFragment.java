@@ -7,8 +7,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -48,6 +46,9 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private ListView pairNames, pairTypes;
     private TextView number, time, name, teacher, auditory, type;
     private View drawerView;
+    private Drawer drawer;
+    Toolbar toolbar;
+    DrawerBuilder b;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
@@ -138,10 +139,13 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             }
         });
 
-        Toolbar toolbar = (Toolbar) ((AppCompatActivity) getActivity()).getSupportActionBar().getCustomView();
-        ActionBarDrawerToggle toggle = null;
-        Drawer drawer = new DrawerBuilder().withActivity(getActivity()).withToolbar(toolbar)
-                .withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).build();
+
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        b = new DrawerBuilder(getActivity());
+        drawer = b.withToolbar(toolbar)
+                .withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).buildForFragment();
+//        drawer.getDrawerLayout().setVisibility(View.GONE);
+
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -330,5 +334,11 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
             }
         });
+    }
+
+    @Override
+    public void onDetach() {
+        int a = 3;
+        super.onDetach();
     }
 }

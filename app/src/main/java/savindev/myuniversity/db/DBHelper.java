@@ -878,6 +878,25 @@ public class DBHelper extends SQLiteOpenHelper {
             Cursor cursor;
             int selectionGroup, selectionTeacher;
             String nameTeacher, nameGroup;
+            SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+            Date beginDate = null;
+            Date endDate = null;
+
+
+
+
+
+
+            try {
+                beginDate = format.parse(date);
+                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
+                if(beginDate.compareTo(endDate) >= 0)
+                    return null;
+
+                }
+             catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             try {
                 if (isGroup)
@@ -946,10 +965,23 @@ public class DBHelper extends SQLiteOpenHelper {
 
             ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,true);
 
+
+            String tempselect=idList.get(0).toString() +",";
+            String select="";
+
+            for(int i =0 ; i<idList.size();i++) {
+                select += tempselect + idList.get(i).toString()+",";
+                tempselect =  idList.get(i).toString()+",";
+            }
+
+            select = select.substring(0, select.length()-1);
+
+            Log.d("SELECT",select);
+
                 db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
                         " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 1, null);
 
-                db.delete(TABLE_NAME, COL_GROUP_ID + "=" + idSchedule, null);
+            db.delete(TABLE_NAME, COL_GROUP_ID + " IN ("+idSchedule+") " +" AND " + COL_TEACHER_ID +" NOT IN ("+select+")", null);
         }
 
         public static void deleteTeacherchedule(Context context, int idSchedule) {
@@ -961,13 +993,29 @@ public class DBHelper extends SQLiteOpenHelper {
 
             ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,false);
 
+
+            String tempselect=idList.get(0).toString() +",";
+            String select="";
+
+            for(int i =0 ; i<idList.size();i++) {
+                select += tempselect + idList.get(i).toString()+",";
+                tempselect =  idList.get(i).toString()+",";
+            }
+
+            select = select.substring(0, select.length()-1);
+
+            Log.d("SELECT",select);
+
+
+
+
             for(int i=0;i<idList.size();i++){
 
 
                 db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
                         " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 0, null);
 
-                db.delete(TABLE_NAME, COL_TEACHER_ID + "=" + idSchedule +" AND " + COL_GROUP_ID +"!="+idList.get(i), null);
+                db.delete(TABLE_NAME, COL_TEACHER_ID + " IN ("+idSchedule+") " +" AND " + COL_GROUP_ID +" NOT IN ("+select+")", null);
             }
 
 
@@ -1033,7 +1081,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
         public static void setUsedSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh) {
-
+            int isGroupDB = 0;
+            if(isGroup)
+                isGroupDB=1;
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
@@ -1046,6 +1096,7 @@ public class DBHelper extends SQLiteOpenHelper {
             scheduleRow.put(COL_IS_GROUP, isGroup);
             scheduleRow.put(COL_IS_MAIN, isMain);
             scheduleRow.put(COL_LAST_REFRESH_DATE, lastRefresh);
+            if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_ID_SCHEDULE, groupid))
             db.insert(TABLE_NAME, null, scheduleRow);
 
         }
@@ -1160,8 +1211,9 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         public static ArrayList<Integer> getIdSchedules(Context context,boolean isGroup) {
-            int isGroupDB =1;
-            if(isGroup)isGroupDB=0;
+            int isGroupDB =0;
+            if(isGroup)isGroupDB=1;
+            //TODO Сделать добавление правильных айди,сейчас проверяется по всем в UsedSchedules,но это не критично
             ArrayList<Integer> idList = new ArrayList<>();
 
             SQLiteDatabase db;
@@ -1170,7 +1222,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT "+COL_ID_SCHEDULE+" FROM " + TABLE_NAME+" WHERE "+COL_IS_GROUP +"="+isGroupDB, null);
+                cursor = db.rawQuery("SELECT "+COL_ID_SCHEDULE+" FROM " + TABLE_NAME, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {

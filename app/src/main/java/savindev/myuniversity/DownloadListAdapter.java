@@ -1,26 +1,30 @@
-package savindev.myuniversity.settings;
+package savindev.myuniversity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
+import android.net.Uri;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.thin.downloadmanager.DownloadRequest;
+import com.thin.downloadmanager.DownloadStatusListener;
+import com.thin.downloadmanager.ThinDownloadManager;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.schedule.GroupsModel;
 
-public class ExpListAdapter extends BaseExpandableListAdapter implements Filterable {
+public class DownloadListAdapter extends BaseExpandableListAdapter implements Filterable {
     /**
      * Кастомный адаптер, используется для отображения списка групп и преподавателей
      * Совмещает в себе возможность выбора списка групп и основной группы
@@ -32,35 +36,16 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
     private final Object mLock = new Object();
     private ArrayList<ArrayList<GroupsModel>> mOriginalValues;
     private ArrayList<String> mOriginalNames;
-    private ArrayList<GroupsModel> deleteList = new ArrayList<>();
-    private ArrayList<GroupsModel> addList = new ArrayList<>();
-    private GroupsModel main;
+    private ThinDownloadManager mDownloadManager;
+    private boolean isPerfomance;
 
-    public ExpListAdapter(Context context, ArrayList<String> names,
-                          ArrayList<ArrayList<GroupsModel>> groups) {
+    public DownloadListAdapter(Context context, ArrayList<String> names, ArrayList<ArrayList<GroupsModel>> groups,
+                               ThinDownloadManager downloadManager, boolean isPerfomance) {
         mContext = context;
         mNames = names;
         mGroup = groups;
-
-        //Для выделения элементов, сохранных в расписании ранее
-        ArrayList<GroupsModel> oldListModel = DBHelper.UsedSchedulesHelper.getGroupsModelList(context); //Список старых групп
-        main = DBHelper.UsedSchedulesHelper.getMainGroupModel(context); //Основная группа, чтобы ее не добавлять и не удалять
-        ArrayList<Integer> oldlistId = new ArrayList<>(); //Два листа для уникальности: требуется сравнить все поля по и id idGroup
-        ArrayList<Boolean> oldlist = new ArrayList<>();
-        for (GroupsModel model : oldListModel) {
-            oldlistId.add(model.getId());
-            oldlist.add(model.isGroup());
-        }
-        for (int i = 0; i < mNames.size(); i++)
-            for (int j = 0; j < mGroup.get(i).size(); j++) {
-                for (int k = 0; k < oldListModel.size(); k++) {
-                    if (oldlistId.get(k) == mGroup.get(i).get(j).getId() && //Если есть совпадение - проверить по признаку isGroup
-                            oldlist.get(k) == mGroup.get(i).get(j).isGroup()) {
-                        mGroup.get(i).get(j).setSelected(true);
-                    }
-                }
-            }
-
+        mDownloadManager = downloadManager;
+        this.isPerfomance = isPerfomance;
     }
 
     @Override
@@ -101,64 +86,67 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
-
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.group_view, null);
         }
-
         TextView textGroup = (TextView) convertView.findViewById(R.id.textGroup);
         textGroup.setText(mNames.get(groupPosition));
-
         return convertView;
-
     }
 
     static class ViewHolder {
         public TextView textView;
-        public ImageView eyeView;
+        public ProgressBar pbar;
     }
 
     @Override
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.child_view, null);
+        View view = inflater.inflate(R.layout.download_child_view, null);
         final ViewHolder holder = new ViewHolder();
         holder.textView = (TextView) view.findViewById(R.id.textChild);
-        holder.eyeView = (ImageView) view.findViewById(R.id.eyeVisibility);
-        if (mGroup.get(groupPosition).get(childPosition).isSelected()) {
-            view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
-            holder.eyeView.setVisibility(View.VISIBLE);
-            holder.textView.setTextColor(Color.WHITE);
-            //Выделение ранее сохраненных групп
-        }
-        if (main != null && mGroup.get(groupPosition).get(childPosition).getId() == main.getId() &&
-                mGroup.get(groupPosition).get(childPosition).isGroup() == main.isGroup()) {
-            view.setBackgroundColor(mContext.getResources().getColor(R.color.accent));
-            holder.eyeView.setVisibility(View.VISIBLE);
-            holder.textView.setTextColor(Color.WHITE); //Выделение главной группы
-        }
-
-
-        view.setOnClickListener(new OnClickListener() {
+        holder.pbar = (ProgressBar) view.findViewById(R.id.progress);
+        view.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if (main == null || !(mGroup.get(groupPosition).get(childPosition).getId() == main.getId() &&
-                        mGroup.get(groupPosition).get(childPosition).isGroup() == main.isGroup())) { //Выполнять только для не главной группы
-                    if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {
-                        view.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
-                        holder.eyeView.setVisibility(View.VISIBLE);
-                        holder.textView.setTextColor(Color.WHITE);
-                        mGroup.get(groupPosition).get(childPosition).setSelected(true);
-                        addGroup(mGroup.get(groupPosition).get(childPosition));
-                    } else {
-                        view.setBackgroundColor(Color.WHITE);
-                        holder.eyeView.setVisibility(View.GONE);
-                        holder.textView.setTextColor(mContext.getResources().getColor(R.color.primary_text));
-                        mGroup.get(groupPosition).get(childPosition).setSelected(false);
-                        deleteGroup(mGroup.get(groupPosition).get(childPosition));
-                    }
+            public void onClick(View view) { //Скачивание с сервера рейтинга
+                if (MainActivity.isNetworkConnected(mContext)) {
+                    String url;
+                    if (isPerfomance)
+                        url = R.string.uri + "getPerfomance?group_id=" + mGroup.get(groupPosition).get(childPosition).getId();
+                    else
+                        url = R.string.uri + "getDistanceSchedule?group_id=" + mGroup.get(groupPosition).get(childPosition).getId();
+                    Uri downloadUri = Uri.parse(url);
+                    String destFolder;
+                    if (isPerfomance)
+                        destFolder = "/" + mGroup.get(groupPosition).get(childPosition).getName() + "-рейтинг.xlsx";
+                    else
+                        destFolder = "/" + mGroup.get(groupPosition).get(childPosition).getName() + "-расписание.pdf";
+                    Uri destinationUri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                            + destFolder);
+                    DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
+                            .setDestinationURI(destinationUri)
+                            .setPriority(DownloadRequest.Priority.LOW)
+                            .setDownloadListener(new DownloadStatusListener() {
+                                @Override
+                                public void onDownloadComplete(int id) {
+                                    holder.pbar.setProgress(100);
+                                }
+                                @Override
+                                public void onDownloadFailed(int id, int errorCode, String errorMessage) {
+                                    Toast.makeText(mContext, "Не удалось", Toast.LENGTH_SHORT).show();
+                                    Log.i("myuniversity", "Ошибка от сервера, запрос downloadListAdapter, текст:"
+                                            + errorMessage);
+                                    holder.pbar.setProgress(0);
+                                }
+                                @Override
+                                public void onProgress(int id, long totalBytes, long arg3, int progress) {
+                                    holder.pbar.setProgress(progress);
+                                }
+                            });
+                } else {
+                    Toast.makeText(mContext, "Нет интернета", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -167,40 +155,12 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         return view;
     }
 
-    private void deleteGroup(GroupsModel group) {
-        if (addList.contains(group)) {
-            addList.remove(group);
-        } else {
-            deleteList.add(group);
-        }
-    }
 
-    private void addGroup(GroupsModel group) {
-        if (deleteList.contains(group)) {
-            deleteList.remove(group);
-        } else {
-            addList.add(group);
-        }
-    }
-
-    public ArrayList<GroupsModel> getAddList() {
-        return addList;
-    }
-
-    public ArrayList<GroupsModel> getDeleteList() {
-        return deleteList;
-    }
-
-    public void deleteLists() {
-        addList = new ArrayList<>();
-        deleteList = new ArrayList<>();
-    }
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
-
 
     @Override
     public Filter getFilter() {

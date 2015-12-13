@@ -28,7 +28,7 @@ public class ScheduleDates { //Класс для парсинга дополни
     }
 
     public static ArrayList<ScheduleDates> fromJson(final JSONArray array) {
-        final ArrayList<ScheduleDates> ScheduleDates = new ArrayList<ScheduleDates>();
+        final ArrayList<ScheduleDates> ScheduleDates = new ArrayList<>();
         for (int index = 0; index < array.length(); ++index) {
             try {
                 final ScheduleDates sched = fromJson(array.getJSONObject(index));
