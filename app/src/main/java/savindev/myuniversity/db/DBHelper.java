@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -883,10 +884,6 @@ public class DBHelper extends SQLiteOpenHelper {
             Date endDate = null;
 
 
-
-
-
-
             try {
                 beginDate = format.parse(date);
                 endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
@@ -925,26 +922,37 @@ public class DBHelper extends SQLiteOpenHelper {
                         isCancelled = false;
 
                     int idPair = cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID));
-                    ScheduleModel scheduleModel = new ScheduleModel(
 
+                    List<ScheduleModel.Pair> list = new ArrayList<>();
+
+                    ScheduleModel.Pair pair = new ScheduleModel.Pair(
                             cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),
                             idPair,
                             selectionGroup,
                             selectionTeacher,
-                            cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID)),
+                            cursor.getColumnIndex(COL_CLASSROOM_ID),
                             cursor.getInt(cursor.getColumnIndex(COL_SUBGROUP_NUMBER)),
-                            dbHelper.getPairsHelper().getPairNumber(context, idPair),
-                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME, idPair),
-                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, idPair),
-                            cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)),
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
                             nameTeacher,
                             nameGroup,
                             dbHelper.getClassroomsHelper().getClassroom(context,cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID))),
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
                             isCancelled
-
                     );
+                    list.add(pair);
+
+
+                    ScheduleModel scheduleModel = new ScheduleModel(
+
+                            dbHelper.getPairsHelper().getPairNumber(context, idPair),
+                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME, idPair),
+                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, idPair),
+                            cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)),
+                            isCancelled,
+                            list
+                    );
+
+
                     scheduleModelArrayList.add(scheduleModel);
                     cursor.moveToNext();
                 }
@@ -952,6 +960,7 @@ public class DBHelper extends SQLiteOpenHelper {
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
+
             return scheduleModelArrayList;
 
         }
