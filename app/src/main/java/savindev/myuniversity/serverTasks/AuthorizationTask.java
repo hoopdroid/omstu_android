@@ -6,17 +6,20 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
@@ -24,7 +27,6 @@ import savindev.myuniversity.schedule.GroupsModel;
 
 /**
  * Запрос на сервер об авторизации пользователя. Происходит только по запросу пользователя
- * <p/>
  * Первым этапом - отправка на сервер логина и получение соли
  * Соль пароля алгоритмом В_ВЕРХНИЙ_РЕГИСТР(MD5(Чистый пароль + соль))
  * Отправка на сервер пары логин - соленый пароль, по результату авторизация
@@ -51,18 +53,16 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
     protected Boolean doInBackground(String... params) {
         //Возвращать false при провале авторизации
         login = params[0];
-
-
         //Первый запрос
-        String uri;
-        if (context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("test", false)) {
-            uri = context.getResources().getString(R.string.uri_test) + "getSalt?universityAcronym=" +
-                    context.getResources().getString(R.string.university) + "&login=" + login; //Строка запроса на получение соли по логину
-        } else {
-            uri = context.getResources().getString(R.string.uri) + "getSalt?universityAcronym=" +
-                    context.getResources().getString(R.string.university) + "&login=" + login; //Строка запроса на получение соли по логину
+        JSONObject json = new JSONObject(); //Составление json для отправки в post
+        try {
+            json.put("UNIVERSITY_ACRONYM", context.getResources().getString(R.string.university));
+            json.put("LOGIN", login);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        String result = query(uri);
+        String url = context.getResources().getString(R.string.uri_test2) + "getSalt"; //Строка запроса на получение соли по логину
+        String result = query(url, json);
         if (result == null) {
             return false;
         }
@@ -73,20 +73,24 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             e.printStackTrace();
             return false;
         }
-        if (salt == null || salt.isEmpty()) { //Если соль пуста, дальше работать нет смысла. Выдать ошибку
+        if (salt == null || salt.isEmpty()) //Если соль пуста, дальше работать нет смысла. Выдать ошибку
             return false;
 
-        } else { //Иначе - второй запрос на сервер
-            passwordHash = md5(params[1] + salt).toUpperCase();
-            uri = context.getResources().getString(R.string.uri) + "authorization?universityAcronym=" +
-                    context.getResources().getString(R.string.university) + "&login=" +
-                    params[0] + "&passwordHash=" + passwordHash;
-            result = query(uri);
-            if (result == null) {
-                return false;
-            }
+        //Второй запрос
+        json = new JSONObject(); //Составление json для отправки в post
+        passwordHash = md5(params[1] + salt).toUpperCase();
+        try {
+            json.put("UNIVERSITY_ACRONYM", context.getResources().getString(R.string.university));
+            json.put("LOGIN", login);
+            json.put("PASSWORD_HASH", passwordHash);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-
+        url = context.getResources().getString(R.string.uri_test2) + "authorization";
+        result = query(url, json);
+        if (result == null) {
+            return false;
+        }
         try {
             return parseContent(result);
         } catch (JSONException e) {
@@ -94,35 +98,21 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         }
     }
 
-    private String query(String uri) { //Запрос к серверу. по uri возвращает ответ
-        URL url;
-        String reply;
-        HttpURLConnection urlConnection = null;
+    private String query(String url, JSONObject json) { //Запрос к серверу. по uri возвращает ответ
+        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
+        client.setReadTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
+        client.setWriteTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
+        RequestBody body = RequestBody.create(JSON, json.toString());
+        Request request = new Request.Builder().url(url).post(body).build();
         try {
-            url = new URL(uri);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(TIMEOUT_MILLISEC);
-            urlConnection.setReadTimeout(TIMEOUT_MILLISEC);
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuilder buffer = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-            }
-            reply = buffer.toString();
-            if (reply.isEmpty()) { //Если после всех операций все равно пустой
-                return null;
-            }
-        } catch (Exception e) {
+            Response response = client.newCall(request).execute();
+            return response.body().string();
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
         }
-        return reply;
     }
 
     private static String md5(final String s) {
@@ -157,7 +147,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
             case "MESSAGE": //Получен адекватный результат
                 return obj.getJSONObject("CONTENT").getString("SALT");
             case "ERROR":   //Неопознанная ошибка
-                if (obj.getJSONObject("CONTENT").get("ERROR_CODE").toString().equals("E0001")) {
+                if (obj.getJSONObject("CONTENT").get("ERROR_CODE").toString().equals("GET_SALT-002")) {
                     errorCode = 1;
                 } else {
                     Log.i("myuniversity", "Ошибка ERROR от сервера, запрос AuthorizationTask.getSalt, текст:"
@@ -207,11 +197,9 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                     GetScheduleTask gst = new GetScheduleTask(context, null);
                     gst.execute(DBHelper.UsedSchedulesHelper.getMainGroupModel(context));
                 }
-
-
                 return true;
             case "ERROR":   //Неопознанная ошибка
-                if (obj.getJSONObject("CONTENT").get("ERROR_CODE").toString().equals("E0001")) {
+                if (obj.getJSONObject("CONTENT").getString("ERROR_CODE").equals("AUTHORIZATION-002")) {
                     errorCode = 2;
                 } else {
                     Log.i("myuniversity", "Ошибка ERROR от сервера, запрос AuthorizationTask.getSalt, текст:"

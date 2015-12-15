@@ -164,9 +164,7 @@ public abstract class AbstractSchedule extends DialogFragment
                         positions = lmt.get();
                     else
                         positions.putAll(lmt.get());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
