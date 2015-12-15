@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                                 addfragment(R.string.drawer_navigator, new WelcomeFragment());
                                 break;
                             case 3:
-                                addfragment(R.string.drawer_notes, new WelcomeFragment());
+                                addfragment(R.string.drawer_notes, new NotesFragment());
                                 break;
                             case 4:
                                 addfragment(R.string.drawer_news, new NewsFragment());
@@ -156,10 +156,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        SharedPreferences settings = getSharedPreferences("settings", Context.MODE_PRIVATE); //Удалить активную группу
-        settings.edit().remove("openGroup").apply();
-        settings.edit().remove("openIsGroup").apply();
-        settings.edit().remove("openGroupName").apply();
+        SharedPreferences.Editor settings = getSharedPreferences("settings", Context.MODE_PRIVATE).edit(); //Удалить активную группу
+        settings.remove("openGroup").remove("openIsGroup").remove("openGroupName").remove("positionDate").remove("positionN").apply();
         super.onDestroy();
     }
 }

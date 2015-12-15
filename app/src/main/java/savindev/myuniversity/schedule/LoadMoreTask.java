@@ -59,10 +59,12 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
                 continue;
             ArrayList<ScheduleModel> daySchedule;
             String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+            String month = String.valueOf(calendar.get(Calendar.MONTH));
             if (day.length() < 2)
                 day = "0" + day;
-            daySchedule = DBHelper.SchedulesHelper.getSchedules(context,
-                    "" + calendar.get(Calendar.YEAR) + (calendar.get(Calendar.MONTH) + 1) + day,
+            if (month.length() < 2)
+                month = "0" + month;
+            daySchedule = DBHelper.SchedulesHelper.getSchedules(context, "" + calendar.get(Calendar.YEAR) + month + day,
                     currentID, isGroup);  //Получение расписания на день
 
             if (daySchedule == null)
@@ -73,7 +75,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
                 public int compare(ScheduleModel lhs, ScheduleModel rhs) {
                     if (lhs.getStartTime().equals(rhs.getStartTime()))
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            return Boolean.compare(lhs.isCancelled(), rhs.isCancelled());
+                            return Boolean.compare(lhs.getPairs().get(0).isCancelled(), rhs.getPairs().get(0).isCancelled());
                         }
                     return lhs.getStartTime().compareTo(rhs.getStartTime());
                 }
@@ -81,7 +83,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
             if (!isGroup) //Сортировать только для преподавателей
                 daySchedule = groupPacking(daySchedule);
             if (!isLinear) {//Переформировывать только для сетки
-                daySchedule = toGridView(daySchedule, i == 0);
+                toGridView(daySchedule, i == 0);
             }
             positions.put((GregorianCalendar) calendar.clone(), data.size() + 1 + oldDataSize);
             data.addAll(daySchedule);
@@ -96,8 +98,9 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
         for (int i = 0; i < pairs.size(); ) {
             pair = pairs.get(i);
             while (i + skip < pairs.size() && pairs.get(i).getN().equals(pairs.get(i + skip).getN()) &&
-                    pairs.get(i).getName().equals(pairs.get(i + skip).getName()) && pairs.get(i).isCancelled() == (pairs.get(i + skip).isCancelled())) {
-                pair.setTeacher(pair.getTeacher() + ", " + pairs.get(i + skip).getTeacher());
+                    pairs.get(i).getPairs().get(0).getName().equals(pairs.get(i + skip).getPairs().get(0).getName()) &&
+                    pairs.get(i).getPairs().get(0).isCancelled() == (pairs.get(i + skip).getPairs().get(0).isCancelled())) {
+                pair.getPairs().get(i).setTeacher(pair.getPairs().get(0).getTeacher() + ", " + pairs.get(i + skip).getPairs().get(0).getTeacher());
                 skip++;
             }
             schedule.add(pair);
@@ -108,17 +111,18 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
         return schedule;
     }
 
-    private ArrayList<ScheduleModel> toGridView(ArrayList<ScheduleModel> pairs, boolean isFirst) { //переформирование для сетки
+    private void toGridView(ArrayList<ScheduleModel> pairs, boolean isFirst) { //переформирование для сетки
         ArrayList<ScheduleModel> schedule = new ArrayList<>();
         //Добавить окна
         int i = 0;
         int pairCount = DBHelper.getInstance(context).getPairsHelper().getPairsInDay(context);
         String pairNum = "";
         for (; i < pairs.size(); i++) { //окна до последней пары
-            if (pairs.get(i).getN().equals(pairNum)) {//Номер пары совпадает с предыдущим, пару не записывать
+            if (pairs.get(i).getN().equals(pairNum)) {//Номер пары совпадает с предыдущим, пару продублировать в предыдущую
+                pairs.get(i-1).addListItem(pairs.get(i).getPairs());
                 pairs.remove(i);
                 i--;
-                continue; //TODO нормальное действие с парой-дублем
+                continue;
             }
             if (Integer.parseInt(pairs.get(i).getN()) != (i + 1)) {//Если номер пары не совпадает с позицией - заткнуть дырку пустотой
                 pairs.add(i, null);
@@ -136,7 +140,6 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
         //Добавить месяц
         if (oldMonth != calendar.get(Calendar.MONTH)) //смена месяца
             pairs.add(0, new ScheduleModel(CellType.MONTH, calendar.get(Calendar.MONTH) + ""));
-        return pairs;
     }
 
     private String day() { //По календарю отдает день недели

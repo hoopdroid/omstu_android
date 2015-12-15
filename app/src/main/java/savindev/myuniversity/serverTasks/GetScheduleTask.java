@@ -109,7 +109,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
         switch (obj.get("STATE").toString()) {//определение типа полученного результата
             case "MESSAGE": //Получен адекватный результат
                 JSONObject content = obj.getJSONObject("CONTENT");
-                String lastResresh = obj.getString("LAST_REFRESH"); //дата обновления, в таблицу дат
+                String lastRefresh = obj.getString("LAST_REFRESH"); //дата обновления, в таблицу дат
                 ArrayList<Schedule> sched;
                 ArrayList<ScheduleDates> scheddates;
                 try {
@@ -125,7 +125,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 //                    //Поле оказалось нулевым?
 //                    e.printStackTrace();
 //                }
-                addToScheduleList(lastResresh);
+                addToScheduleList(lastRefresh);
                 break;
             case "ERROR":   //Неопознанная ошибка
                 errorCode = -1;

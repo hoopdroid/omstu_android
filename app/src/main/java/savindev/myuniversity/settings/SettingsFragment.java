@@ -34,9 +34,7 @@ public class SettingsFragment extends Fragment {
 
 
     FragmentTransaction ft;
-    //	FrameLayout cont;
     int lastPosition;
-    //	Boolean reload = false;
     MenuItem refreshItem;
     GroupsFragment groups;
     GetUniversityInfoTask guit;
@@ -48,7 +46,7 @@ public class SettingsFragment extends Fragment {
         setRetainInstance(true); //Запрет на пересоздание объекта
         View view = inflater.inflate(R.layout.fragment_settings, null);
         final ListView settints = (ListView) view.findViewById(R.id.settingsView);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 R.layout.settings_item, getResources().getStringArray(R.array.settings_array));
         settints.setAdapter(adapter);
 
@@ -97,8 +95,7 @@ public class SettingsFragment extends Fragment {
                                 Intent intent = new Intent(getActivity(), GroupsActivity.class);
                                 startActivity(intent);
                             } else {
-                                ft = getFragmentManager().beginTransaction();
-                                ft.replace(R.id.frgmCont, groups).commit();
+                                getFragmentManager().beginTransaction().replace(R.id.frgmCont, groups).commit();
                             }
                         }
                         break;
@@ -162,8 +159,7 @@ public class SettingsFragment extends Fragment {
     public void onDestroy() {
         if (guit != null) //завершение запроса, если он активен
             guit.cancel(false);
-        ft = getFragmentManager().beginTransaction(); //отсоединение фрагмента с настройками, чтобы в actionBar не было лишних элементов
-        ft.remove(groups).commit();
+        getFragmentManager().beginTransaction().remove(groups).commit(); //отсоединение фрагмента с настройками, чтобы в actionBar не было лишних элементов
         super.onDestroy();
     }
 
