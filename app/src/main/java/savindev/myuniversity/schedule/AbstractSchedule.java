@@ -56,7 +56,7 @@ public abstract class AbstractSchedule extends DialogFragment
     ScheduleAdapter adapter;
     private ArrayList<GroupsModel> usedList;
     private GregorianCalendar calendar;
-    private LoadMoreTask lmt;
+    protected LoadMoreTask lmt;
     protected SwipeRefreshLayout mSwipeRefreshLayout;
     protected RecyclerView scheduleList;
     protected boolean isGroup;
@@ -173,10 +173,11 @@ public abstract class AbstractSchedule extends DialogFragment
         }).start();
     }
 
-    private int getPostition(GregorianCalendar date) {
+    protected int getPostition(final GregorianCalendar date) {
         //TODO время семестра нормально получать.
 //        if (DBHelper.getInstance(getActivity()).getSemestersHelper().getSemesterStartDate(getActivity(), new GregorianCalendar().getTime()).compareTo(date) < 0)
 //            return 0; //Вызываемая дата раньше начала семестра, не надо это показывать
+        GregorianCalendar date2 = (GregorianCalendar) date.clone(); //Непонятный по своей природе костыль: без этого дата после before() вырастает на месяц
         if (new GregorianCalendar().after(date)) { //Если запрошенная дата меньше текущей
             calendar = date; //Перезагрузить адаптер, начиная с указанной даты
             calendar.add(Calendar.DAY_OF_YEAR, -1);
@@ -186,13 +187,16 @@ public abstract class AbstractSchedule extends DialogFragment
             lmt.execute(14);
             try {
                 positions = lmt.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
-        if (positions.lastKey().before(date)) { //Если в адаптере последняя дата меньше, догрузить до нужной
+//        long a = date.getTimeInMillis();
+//        long b = positions.lastKey().getTimeInMillis();
+//        GregorianCalendar c = new GregorianCalendar();
+//        c.set(2015, 12, 18);
+//        long d = c.getTimeInMillis();
+        if (positions.lastKey().before(date2)) { //Если в адаптере последняя дата меньше, догрузить до нужной
             int days = (int) ((date.getTimeInMillis() - positions.lastKey().getTimeInMillis()) / 86400000); //Получение числа дней между последней загруженной датой и заданной
             loading = false;
             lmt = new LoadMoreTask(getActivity(), calendar, currentID, isGroup, adapter, scheduleList, isLinear);
@@ -200,9 +204,7 @@ public abstract class AbstractSchedule extends DialogFragment
             try {
                 positions.putAll(lmt.get());
                 lmt.onPostExecute(lmt.get());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }

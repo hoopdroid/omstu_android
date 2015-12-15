@@ -29,6 +29,10 @@ public class ScheduleModel {
         this.date = value;
     }
 
+    public void addListItem(List<Pair> pair) {
+        pairs.addAll(pair);
+    }
+
     public String getEndTime() {
         return endTime;
     }
