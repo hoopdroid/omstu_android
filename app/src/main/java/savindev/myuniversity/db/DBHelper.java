@@ -171,18 +171,18 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase = getReadableDatabase();
             Cursor cursor;
 
-                cursor = sqliteDatabase.rawQuery("SELECT " + COL_DAYS_IN_WEEK + " FROM " + TABLE_NAME, null);
-                cursor.moveToFirst();
+            cursor = sqliteDatabase.rawQuery("SELECT " + COL_DAYS_IN_WEEK + " FROM " + TABLE_NAME, null);
+            cursor.moveToFirst();
 
-                while (!cursor.isAfterLast()) {
+            while (!cursor.isAfterLast()) {
 
-                    daysinweek = cursor.getInt(cursor.getColumnIndex(COL_DAYS_IN_WEEK));
+                daysinweek = cursor.getInt(cursor.getColumnIndex(COL_DAYS_IN_WEEK));
 
-                    cursor.moveToNext();
+                cursor.moveToNext();
 
-                }
+            }
 
-                return daysinweek;
+            return daysinweek;
 
         }
 
@@ -893,8 +893,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 if(beginDate.compareTo(endDate) >= 0)
                     return null;
 
-                }
-             catch (ParseException e) {
+            }
+            catch (ParseException e) {
                 e.printStackTrace();
             }
 
@@ -978,8 +978,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
             Log.d("SELECT",select);
 
-                db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
-                        " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 1, null);
+            db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
+                    " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 1, null);
 
             db.delete(TABLE_NAME, COL_GROUP_ID + " IN ("+idSchedule+") " +" AND " + COL_TEACHER_ID +" NOT IN ("+select+")", null);
         }
@@ -1027,7 +1027,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
         public static boolean equalsTeachAndGroups(Context context,DBHelper dbHelper,SQLiteDatabase database,String TableName,
-                                                          String dbfieldGroup, int fieldIdGroup,String dbfieldTeacher,int fieldIdTeacher) {
+                                                   String dbfieldGroup, int fieldIdGroup,String dbfieldTeacher,int fieldIdTeacher) {
 
             String Query = "SELECT * FROM " + TableName + " WHERE " + dbfieldGroup + " = " + fieldIdGroup+" AND "+ dbfieldTeacher + "="+fieldIdTeacher;
             Cursor cursor = database.rawQuery(Query, null);
@@ -1046,7 +1046,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db = dbHelper.getWritableDatabase();
             ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,isGroup);
             for (int i = 0 ;i<idList.size();i++)
-            db.delete(TABLE_NAME, selection +"!="+idList.get(i), null);
+                db.delete(TABLE_NAME, selection +"!="+idList.get(i), null);
 
         }
 
@@ -1097,7 +1097,7 @@ public class DBHelper extends SQLiteOpenHelper {
             scheduleRow.put(COL_IS_MAIN, isMain);
             scheduleRow.put(COL_LAST_REFRESH_DATE, lastRefresh);
             if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_ID_SCHEDULE, groupid))
-            db.insert(TABLE_NAME, null, scheduleRow);
+                db.insert(TABLE_NAME, null, scheduleRow);
 
         }
 
@@ -1325,7 +1325,7 @@ public class DBHelper extends SQLiteOpenHelper {
             int buildingID=0;
 
             DBHelper dbHelper = new DBHelper(context);
-           SQLiteDatabase  db = dbHelper.getReadableDatabase();
+            SQLiteDatabase  db = dbHelper.getReadableDatabase();
 
             Cursor cursor;
             try {
@@ -1368,52 +1368,52 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
     }
-        public static class BuildingsHelper {
+    public static class BuildingsHelper {
 
-            protected static final String TABLE_NAME = "Buildings";
-            protected static final String COL_ID_BUILDING = "building_id";
-            protected static final String COL_ID_CAMPUS = "campus_id";
-            protected static final String COL_BUILDING_NUMBER = "building_number";
-            protected static final String COL_BUILDING_NAME = "building_name";
-            protected static final String COL_BUILDING_TYPE_NAME = "building_type_name";
-            protected static final String COL_BUILDING_FLOOR_COUNT = "floor_count";
-            protected static final String COL_HAS_GROUND_FLOOR = "has_ground_floor";
+        protected static final String TABLE_NAME = "Buildings";
+        protected static final String COL_ID_BUILDING = "building_id";
+        protected static final String COL_ID_CAMPUS = "campus_id";
+        protected static final String COL_BUILDING_NUMBER = "building_number";
+        protected static final String COL_BUILDING_NAME = "building_name";
+        protected static final String COL_BUILDING_TYPE_NAME = "building_type_name";
+        protected static final String COL_BUILDING_FLOOR_COUNT = "floor_count";
+        protected static final String COL_HAS_GROUND_FLOOR = "has_ground_floor";
 
 
-            public void create(SQLiteDatabase db) {
-                db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
-                        COL_ID_BUILDING + " INTEGER PRIMARY KEY," +
-                        COL_ID_CAMPUS + " INTEGER," +
-                        COL_BUILDING_NUMBER + " INTEGER," +
-                        COL_BUILDING_NAME + " TEXT," +
-                        COL_BUILDING_TYPE_NAME + " TEXT," +
-                        COL_BUILDING_FLOOR_COUNT + " INTEGER," +
-                        COL_HAS_GROUND_FLOOR + " INTEGER" +
-                        ");");
-            }
+        public void create(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_ID_BUILDING + " INTEGER PRIMARY KEY," +
+                    COL_ID_CAMPUS + " INTEGER," +
+                    COL_BUILDING_NUMBER + " INTEGER," +
+                    COL_BUILDING_NAME + " TEXT," +
+                    COL_BUILDING_TYPE_NAME + " TEXT," +
+                    COL_BUILDING_FLOOR_COUNT + " INTEGER," +
+                    COL_HAS_GROUND_FLOOR + " INTEGER" +
+                    ");");
+        }
 
-            public  void setBuildings(UniversityInfo init, Context context) {
-                SQLiteDatabase sqliteDatabase;
-                DBHelper helper = new DBHelper(context);
-                sqliteDatabase = helper.getWritableDatabase();
+        public  void setBuildings(UniversityInfo init, Context context) {
+            SQLiteDatabase sqliteDatabase;
+            DBHelper helper = new DBHelper(context);
+            sqliteDatabase = helper.getWritableDatabase();
 
-                for (int index = 0; index < init.BUILDINGS.size(); index++) {
-                    if (!init.BUILDINGS.get(index).IS_DELETED) {
-                        ContentValues buildingsRow = new ContentValues();
-                        buildingsRow.put(COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
-                        buildingsRow.put(COL_ID_CAMPUS, init.BUILDINGS.get(index).ID_CAMPUS);
-                        buildingsRow.put(COL_BUILDING_NUMBER, init.BUILDINGS.get(index).BUILDING_NUMBER);
-                        buildingsRow.put(COL_BUILDING_NAME, init.BUILDINGS.get(index).BUILDING_NAME);
-                        buildingsRow.put(COL_BUILDING_TYPE_NAME, init.BUILDINGS.get(index).BUILDING_TYPE_NAME);
-                        buildingsRow.put(COL_BUILDING_FLOOR_COUNT, init.BUILDINGS.get(index).BUILDING_FLOOR_COUNT);
-                        buildingsRow.put(COL_HAS_GROUND_FLOOR, init.BUILDINGS.get(index).HAS_GROUND_FLOOR);
-                        sqliteDatabase.insert(TABLE_NAME, null, buildingsRow);
-                    } else {
-                        DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
-                    }
+            for (int index = 0; index < init.BUILDINGS.size(); index++) {
+                if (!init.BUILDINGS.get(index).IS_DELETED) {
+                    ContentValues buildingsRow = new ContentValues();
+                    buildingsRow.put(COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
+                    buildingsRow.put(COL_ID_CAMPUS, init.BUILDINGS.get(index).ID_CAMPUS);
+                    buildingsRow.put(COL_BUILDING_NUMBER, init.BUILDINGS.get(index).BUILDING_NUMBER);
+                    buildingsRow.put(COL_BUILDING_NAME, init.BUILDINGS.get(index).BUILDING_NAME);
+                    buildingsRow.put(COL_BUILDING_TYPE_NAME, init.BUILDINGS.get(index).BUILDING_TYPE_NAME);
+                    buildingsRow.put(COL_BUILDING_FLOOR_COUNT, init.BUILDINGS.get(index).BUILDING_FLOOR_COUNT);
+                    buildingsRow.put(COL_HAS_GROUND_FLOOR, init.BUILDINGS.get(index).HAS_GROUND_FLOOR);
+                    sqliteDatabase.insert(TABLE_NAME, null, buildingsRow);
+                } else {
+                    DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
                 }
             }
         }
+    }
 
 
 
