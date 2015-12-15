@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                                 addfragment(R.string.drawer_navigator, new WelcomeFragment());
                                 break;
                             case 3:
-                                addfragment(R.string.drawer_notes, new WelcomeFragment());
+                                addfragment(R.string.drawer_notes, new NotesFragment());
                                 break;
                             case 4:
                                 addfragment(R.string.drawer_news, new NewsFragment());

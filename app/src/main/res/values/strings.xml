@@ -40,9 +40,7 @@
     <string name="unix">19700101000000</string>
 
     <string name="university">OMGUPS</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="building">Корпус</string>
 
     <string-array name="settings_array">
         <item>Отображаемые расписания</item>
@@ -50,7 +48,6 @@
         <item>Настройки сервера(dev)</item>
     </string-array>
     <string name="title_activity_profile">ProfileActivity</string>
-
 
 
 </resources>
