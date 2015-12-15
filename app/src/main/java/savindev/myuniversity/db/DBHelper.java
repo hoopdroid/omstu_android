@@ -144,7 +144,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
 
-    public class UniversityInfoHelper { // [CR] Р»РёР±Рѕ РєР»Р°СЃСЃ СЃРґРµР»Р°С‚СЊ РїСЂРёРІР°С‚РЅС‹Рј, Р»РёР±Рѕ СѓР±СЂР°С‚СЊ РіРµС‚С‚РµСЂС‹ РґР»СЏ РєР»Р°СЃСЃРѕРІ. РїСЂР°РІРёР»СЊРЅРµРµ - РїРµСЂРІРѕРµ
+    public class UniversityInfoHelper { // [CR] либо класс сделать приватным, либо убрать геттеры для классов. правильнее - первое
 
 
         protected static final String TABLE_NAME = "UniversityInfo";
@@ -215,7 +215,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public static class TeachersHelper { // [CR] Рё РІРѕ РІСЃРµС… СЌС‚Рѕ РїРѕРїСЂР°РІРёС‚СЊ
+    public static class TeachersHelper { // [CR] и во всех это поправить
 
         protected static final String TABLE_NAME = "Teachers";
         protected static final String COL_ID_TEACHER = "id_teacher";
@@ -703,7 +703,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        //Р—Р°РїСЂРѕСЃ Рє Р‘Р” РЅР° РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
+        //Запрос к БД на получение данных
         public ArrayList<String> getDepartments(Context context) {
 
             String table = DepartmentsHelper.TABLE_NAME;
@@ -838,10 +838,10 @@ public class DBHelper extends SQLiteOpenHelper {
                     //TODO test all variants of work dataalreadyornot function)) {
                     try {
                         firstPair = true;
-                        beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//РґР°С‚Р° РЅР°С‡Р°Р»Р° РїР°СЂС‹
-                        endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //РєРѕРЅРµС† СЃРµРјРµСЃС‚СЂР°
+                        beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
+                        endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
                         previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
-                        while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // РµСЃР»Рё РґР°С‚Р° РЅР°С‡Р°Р»Р° РїР°СЂС‹ СЂР°РЅСЊС€Рµ РєРѕРЅС†Р° СЃРµРјРµСЃС‚СЂР°
+                        while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // если дата начала пары раньше конца семестра
                             firstPair = false;
                             ContentValues scheduleRow = new ContentValues();
                             scheduleRow.put(SchedulesHelper.COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
@@ -854,7 +854,7 @@ public class DBHelper extends SQLiteOpenHelper {
                             scheduleRow.put(SchedulesHelper.COL_SCHEDULE_DATE, previousValue);
                             scheduleRow.put(SchedulesHelper.COL_CLASSROOM_ID, schedule.get(index).ID_CLASSROOM);
                             scheduleRow.put(SchedulesHelper.COL_SUBGROUP_NUMBER, schedule.get(index).SUBGROUP_NUMBER);
-                            scheduleRow.put(SchedulesHelper.COL_IS_CANCELLED, false);//TODO РЎРґРµР»Р°С‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ РІ ScheduleDates
+                            scheduleRow.put(SchedulesHelper.COL_IS_CANCELLED, false);//TODO Сделать обработку в ScheduleDates
 
                             if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE, COL_SCHEDULE_DATE, previousValue))
                                 sqliteDatabase.insert(TABLE_NAME, null, scheduleRow);
@@ -885,9 +885,13 @@ public class DBHelper extends SQLiteOpenHelper {
             Date endDate = null;
 
 
+
+
+
+
             try {
                 beginDate = format.parse(date);
-                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, 1))); //РєРѕРЅРµС† СЃРµРјРµСЃС‚СЂР°
+                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
                 if(beginDate.compareTo(endDate) >= 0)
                     return null;
 
@@ -961,7 +965,6 @@ public class DBHelper extends SQLiteOpenHelper {
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
-
             return scheduleModelArrayList;
 
         }
@@ -1223,7 +1226,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public static ArrayList<Integer> getIdSchedules(Context context,boolean isGroup) {
             int isGroupDB =0;
             if(isGroup)isGroupDB=1;
-            //TODO РЎРґРµР»Р°С‚СЊ РґРѕР±Р°РІР»РµРЅРёРµ РїСЂР°РІРёР»СЊРЅС‹С… Р°Р№РґРё,СЃРµР№С‡Р°СЃ РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ РїРѕ РІСЃРµРј РІ UsedSchedules,РЅРѕ СЌС‚Рѕ РЅРµ РєСЂРёС‚РёС‡РЅРѕ
+            //TODO Сделать добавление правильных айди,сейчас проверяется по всем в UsedSchedules,но это не критично
             ArrayList<Integer> idList = new ArrayList<>();
 
             SQLiteDatabase db;
