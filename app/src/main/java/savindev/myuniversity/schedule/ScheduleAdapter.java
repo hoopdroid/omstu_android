@@ -34,6 +34,8 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
         protected RelativeLayout teacherLayout;
         protected CardView cv;
 
+        protected TextView dublPairName;
+
         ScheduleViewHolder(View itemView) {
             super(itemView);
             pairNumber = (TextView) itemView.findViewById(R.id.pairNumber);
@@ -48,6 +50,8 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
             teacherLayout = (RelativeLayout) itemView.findViewById(R.id.teacherLayout);
             pairDayWeek = (TextView) itemView.findViewById(R.id.pairDayWeek);
             cv = (CardView) itemView.findViewById(R.id.cv);
+
+            dublPairName = (TextView) itemView.findViewById(R.id.dublPairName);
         }
     }
 

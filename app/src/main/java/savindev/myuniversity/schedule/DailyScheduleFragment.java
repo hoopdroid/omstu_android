@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import savindev.myuniversity.R;
 
@@ -44,7 +46,17 @@ public class DailyScheduleFragment extends AbstractSchedule {
             if (settings.contains("positionDate")) {
                 String date = settings.getString("positionDate", "");
                 String n = settings.getString("positionN", "");
-                //TODO обработать переход на нужную позицию
+                try { //Костыль, чтобы сначала получились и обработались данные, а потом пустило к позиции
+                    lmt.onPostExecute(lmt.get());
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+                GregorianCalendar c = new GregorianCalendar();
+                        c.set(Integer.parseInt(date.substring(0,4)), Integer.parseInt(date.substring(4,6)),
+                        Integer.parseInt(date.substring(6)));
+                int p = getPostition(c);
+                if (p != 0)
+                    scheduleList.scrollToPosition(p-1);
                 SharedPreferences.Editor e = settings.edit();
                 e.remove("positionDate");
                 e.remove("positionN").apply();
@@ -100,17 +112,17 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 scheduleViewHolder.pairHandler.setImageDrawable(getResources().getDrawable(R.drawable.ic_account));
             scheduleViewHolder.pairTime.setText(models.get(i).getStartTime() + "-\n" + models.get(i).getEndTime());
             scheduleViewHolder.pairDayWeek.setText(DateUtil.getDayWeek(DateUtil.formatDate(models.get(i).getDate())));
-            scheduleViewHolder.pairName.setText(models.get(i).getName());
-            if (models.get(i).getSubgroup() != 0)
-                scheduleViewHolder.pairName.setText(scheduleViewHolder.pairName.getText() + ", подгруппа " + models.get(i).getSubgroup());
-            if (models.get(i).isCancelled())
+            scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName());
+            if (models.get(i).getPairs().get(0).getSubgroup() != 0)
+                scheduleViewHolder.pairName.setText(scheduleViewHolder.pairName.getText() + ", подгруппа " + models.get(i).getPairs().get(0).getSubgroup());
+            if (models.get(i).getPairs().get(0).isCancelled())
                 scheduleViewHolder.pairName.setText(scheduleViewHolder.pairName.getText() + " (отм.)");
-            scheduleViewHolder.pairTeacher.setText(models.get(i).getTeacher());
-            scheduleViewHolder.pairAuditory.setText(models.get(i).getClassroom());
-            scheduleViewHolder.pairType.setText(models.get(i).getType());
+            scheduleViewHolder.pairTeacher.setText(models.get(i).getPairs().get(0).getTeacher());
+            scheduleViewHolder.pairAuditory.setText(models.get(i).getPairs().get(0).getClassroom());
+            scheduleViewHolder.pairType.setText(models.get(i).getPairs().get(0).getType());
             scheduleViewHolder.pairDate.setText(DateUtil.formatDate(models.get(i).getDate()));
 
-            if (models.get(i).getTeacher().equals("")) {
+            if (models.get(i).getPairs().get(0).getTeacher().equals("")) {
                 scheduleViewHolder.teacherLayout.setVisibility(View.GONE);
             } else
                 scheduleViewHolder.teacherLayout.setVisibility(View.VISIBLE);

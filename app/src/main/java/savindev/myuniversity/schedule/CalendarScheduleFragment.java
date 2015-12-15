@@ -195,6 +195,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
         @Override
         public int getItemViewType(int position) {
+            if (models.isEmpty())
+                return 0;
             if (models.get(position) == null)
                 return VIEW_PAIR;
             switch (models.get(position).getCellType()) {
@@ -235,20 +237,51 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         break;
                     case PAIR:
                         if (!checkedPairFilters(models.get(i))) {
-                            scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
+                            scheduleViewHolder.pairName.setVisibility(View.GONE);
                             break;
                         }
                         //Если проверка на фильтрацию пройдена, показать пару
-                        scheduleViewHolder.pairName.setText(models.get(i).getName());
+                        if (models.get(i).getPairs().get(0).getSubgroup() != 0)
+                            scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName() + ", п/г " + models.get(i).getPairs().get(0).getSubgroup());
+                        else
+                            scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
                         scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
                         scheduleViewHolder.cv.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
-                                    fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()));
+                                    fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()), 0);
                             }
                         });
+                        scheduleViewHolder.cv.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View v) {
+                                SharedPreferences.Editor e = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE).edit();
+                                e.putString("positionDate", models.get(scheduleViewHolder.getAdapterPosition()).getDate());
+                                e.putString("positionN", models.get(scheduleViewHolder.getAdapterPosition()).getN()).apply();
+                                FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                                ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
+                                return false;
+                            }
+                        });
+                        if (models.get(i).getPairs().size() > 1) { //Есть пара-дубль TODO сделать универсальную систему на любое число пар
+                            if (models.get(i).getPairs().get(0).getSubgroup() != 0)
+                                scheduleViewHolder.dublPairName.setText(models.get(i).getPairs().get(1).getName() + ", п/г " + models.get(i).getPairs().get(1).getSubgroup());
+                            else
+                                scheduleViewHolder.dublPairName.setText(models.get(i).getPairs().get(1).getName());
+                            scheduleViewHolder.dublPairName.setVisibility(View.VISIBLE);
+                            scheduleViewHolder.dublPairName.setBackgroundColor(Color.WHITE);
+                            scheduleViewHolder.cv.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
+                                        fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()), 1);
+                                }
+                            });
+                        } else {
+                            scheduleViewHolder.dublPairName.setVisibility(View.GONE);
+                        }
                         break;
                     case MONTH:
                         scheduleViewHolder.pairName.setText(month(models.get(i).getDate()));
@@ -263,7 +296,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             {
                 if (chosenType != null) //Первый вызов до формирования chosenType
                     for (int j = 0; j < chosenType.size(); j++) { //Выделен ли такой тип
-                        if (chosenType.valueAt(j) && model.getType().equals(filterType.get(chosenType.keyAt(j)))) {//Если имеется такая запись в выделенных
+                        if (chosenType.valueAt(j) && model.getPairs().get(0).getType().equals(filterType.get(chosenType.keyAt(j)))) {//Если имеется такая запись в выделенных
                             int a = 3;
                             break type;
                         }
@@ -274,7 +307,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             {
                 if (chosenName != null)
                     for (int j = 0; j < chosenName.size(); j++) { //Выделено ли такое имя
-                        if (chosenName.valueAt(j) && model.getName().equals(filterName.get(chosenName.keyAt(j)))) {//Если имеется такая запись в выделенных
+                        if (chosenName.valueAt(j) && model.getPairs().get(0).getName().equals(filterName.get(chosenName.keyAt(j)))) {//Если имеется такая запись в выделенных
                             int a = 3;
                             break name;
                         }
@@ -316,13 +349,16 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         }
     }
 
-    private void fillDetailsLayout(final ScheduleModel model) {
+    private void fillDetailsLayout(final ScheduleModel model, int num) {
         number.setText(model.getN());
         time.setText(model.getDate() + ", " + model.getStartTime() + "-" + model.getEndTime());
-        name.setText(model.getName());
-        teacher.setText(model.getTeacher());
-        auditory.setText(model.getClassroom());
-        type.setText(model.getType());
+        if (model.getPairs().get(num).getSubgroup() != 0)
+            name.setText(model.getPairs().get(num).getName() + ", п/г " + model.getPairs().get(num).getSubgroup());
+        else
+            name.setText(model.getPairs().get(num).getName());
+        teacher.setText(model.getPairs().get(num).getTeacher());
+        auditory.setText(model.getPairs().get(num).getClassroom());
+        type.setText(model.getPairs().get(num).getType());
         //По нажатию переход на списочный вид
         detailsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -338,7 +374,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
     @Override
     public void onDetach() {
-        int a = 3;
         super.onDetach();
     }
 }

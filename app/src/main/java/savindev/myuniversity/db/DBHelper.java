@@ -14,10 +14,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import savindev.myuniversity.R;
 import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.schedule.ScheduleModel;
@@ -142,7 +144,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
 
-    public class UniversityInfoHelper { // [CR] либо класс сделать приватным, либо убрать геттеры для классов. правильнее - первое
+    public class UniversityInfoHelper { // [CR] Р»РёР±Рѕ РєР»Р°СЃСЃ СЃРґРµР»Р°С‚СЊ РїСЂРёРІР°С‚РЅС‹Рј, Р»РёР±Рѕ СѓР±СЂР°С‚СЊ РіРµС‚С‚РµСЂС‹ РґР»СЏ РєР»Р°СЃСЃРѕРІ. РїСЂР°РІРёР»СЊРЅРµРµ - РїРµСЂРІРѕРµ
 
 
         protected static final String TABLE_NAME = "UniversityInfo";
@@ -213,7 +215,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public static class TeachersHelper { // [CR] и во всех это поправить
+    public static class TeachersHelper { // [CR] Рё РІРѕ РІСЃРµС… СЌС‚Рѕ РїРѕРїСЂР°РІРёС‚СЊ
 
         protected static final String TABLE_NAME = "Teachers";
         protected static final String COL_ID_TEACHER = "id_teacher";
@@ -701,7 +703,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        //Запрос к БД на получение данных
+        //Р—Р°РїСЂРѕСЃ Рє Р‘Р” РЅР° РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
         public ArrayList<String> getDepartments(Context context) {
 
             String table = DepartmentsHelper.TABLE_NAME;
@@ -836,10 +838,10 @@ public class DBHelper extends SQLiteOpenHelper {
                     //TODO test all variants of work dataalreadyornot function)) {
                     try {
                         firstPair = true;
-                        beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
-                        endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
+                        beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//РґР°С‚Р° РЅР°С‡Р°Р»Р° РїР°СЂС‹
+                        endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //РєРѕРЅРµС† СЃРµРјРµСЃС‚СЂР°
                         previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
-                        while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // если дата начала пары раньше конца семестра
+                        while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // РµСЃР»Рё РґР°С‚Р° РЅР°С‡Р°Р»Р° РїР°СЂС‹ СЂР°РЅСЊС€Рµ РєРѕРЅС†Р° СЃРµРјРµСЃС‚СЂР°
                             firstPair = false;
                             ContentValues scheduleRow = new ContentValues();
                             scheduleRow.put(SchedulesHelper.COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
@@ -852,7 +854,7 @@ public class DBHelper extends SQLiteOpenHelper {
                             scheduleRow.put(SchedulesHelper.COL_SCHEDULE_DATE, previousValue);
                             scheduleRow.put(SchedulesHelper.COL_CLASSROOM_ID, schedule.get(index).ID_CLASSROOM);
                             scheduleRow.put(SchedulesHelper.COL_SUBGROUP_NUMBER, schedule.get(index).SUBGROUP_NUMBER);
-                            scheduleRow.put(SchedulesHelper.COL_IS_CANCELLED, false);//TODO Сделать обработку в ScheduleDates
+                            scheduleRow.put(SchedulesHelper.COL_IS_CANCELLED, false);//TODO РЎРґРµР»Р°С‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ РІ ScheduleDates
 
                             if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE, COL_SCHEDULE_DATE, previousValue))
                                 sqliteDatabase.insert(TABLE_NAME, null, scheduleRow);
@@ -883,13 +885,9 @@ public class DBHelper extends SQLiteOpenHelper {
             Date endDate = null;
 
 
-
-
-
-
             try {
                 beginDate = format.parse(date);
-                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
+                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, 1))); //РєРѕРЅРµС† СЃРµРјРµСЃС‚СЂР°
                 if(beginDate.compareTo(endDate) >= 0)
                     return null;
 
@@ -925,26 +923,37 @@ public class DBHelper extends SQLiteOpenHelper {
                         isCancelled = false;
 
                     int idPair = cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID));
-                    ScheduleModel scheduleModel = new ScheduleModel(
 
+                    List<ScheduleModel.Pair> list = new ArrayList<>();
+
+                    ScheduleModel.Pair pair = new ScheduleModel.Pair(
                             cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),
                             idPair,
                             selectionGroup,
                             selectionTeacher,
-                            cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID)),
+                            cursor.getColumnIndex(COL_CLASSROOM_ID),
                             cursor.getInt(cursor.getColumnIndex(COL_SUBGROUP_NUMBER)),
-                            dbHelper.getPairsHelper().getPairNumber(context, idPair),
-                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME, idPair),
-                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, idPair),
-                            cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)),
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
                             nameTeacher,
                             nameGroup,
                             dbHelper.getClassroomsHelper().getClassroom(context,cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID))),
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
                             isCancelled
-
                     );
+                    list.add(pair);
+
+
+                    ScheduleModel scheduleModel = new ScheduleModel(
+
+                            dbHelper.getPairsHelper().getPairNumber(context, idPair),
+                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_BEGIN_TIME, idPair),
+                            dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, idPair),
+                            cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)),
+                            isCancelled,
+                            list
+                    );
+
+
                     scheduleModelArrayList.add(scheduleModel);
                     cursor.moveToNext();
                 }
@@ -952,6 +961,7 @@ public class DBHelper extends SQLiteOpenHelper {
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
+
             return scheduleModelArrayList;
 
         }
@@ -1213,7 +1223,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public static ArrayList<Integer> getIdSchedules(Context context,boolean isGroup) {
             int isGroupDB =0;
             if(isGroup)isGroupDB=1;
-            //TODO Сделать добавление правильных айди,сейчас проверяется по всем в UsedSchedules,но это не критично
+            //TODO РЎРґРµР»Р°С‚СЊ РґРѕР±Р°РІР»РµРЅРёРµ РїСЂР°РІРёР»СЊРЅС‹С… Р°Р№РґРё,СЃРµР№С‡Р°СЃ РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ РїРѕ РІСЃРµРј РІ UsedSchedules,РЅРѕ СЌС‚Рѕ РЅРµ РєСЂРёС‚РёС‡РЅРѕ
             ArrayList<Integer> idList = new ArrayList<>();
 
             SQLiteDatabase db;
@@ -1361,7 +1371,7 @@ public class DBHelper extends SQLiteOpenHelper {
             }
 
             if(classroomName == null || classroomName.equals("null")){
-                classroomName = "Корпус";
+                classroomName =  context.getResources().getString(R.string.building);
             }
 
             return Integer.toString(buildingName) + "-"+classroomName;
