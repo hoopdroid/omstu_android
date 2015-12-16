@@ -1,7 +1,6 @@
 package savindev.myuniversity.schedule;
 
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +19,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 
 public class DailyScheduleFragment extends AbstractSchedule {
@@ -42,10 +42,9 @@ public class DailyScheduleFragment extends AbstractSchedule {
             scheduleList.setLayoutManager(llm);
             postInitializeData();
 
-            SharedPreferences settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE); //Если с календарного фрагмента, перевести на позицию
-            if (settings.contains("positionDate")) {
-                String date = settings.getString("positionDate", "");
-                String n = settings.getString("positionN", "");
+            if (MainActivity.getPositionDate() != null) {
+                String date = MainActivity.getPositionDate();
+                String n = MainActivity.getPositionN();
                 try { //Костыль, чтобы сначала получились и обработались данные, а потом пустило к позиции
                     lmt.onPostExecute(lmt.get());
                 } catch (InterruptedException | ExecutionException e) {
@@ -57,9 +56,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 int p = getPostition(c);
                 if (p != 0)
                     scheduleList.scrollToPosition(p-1);
-                SharedPreferences.Editor e = settings.edit();
-                e.remove("positionDate");
-                e.remove("positionN").apply();
+                MainActivity.clearPositions();
             }
         }
         return view;
@@ -78,10 +75,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
         switch (item.getItemId()) {
             case R.id.transition:
                 //Переход на календарный вид
-                settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
-                settings.edit().putInt("openGroup", currentID).apply(); //Запись по id. потом по нему открывать расписание
-                settings.edit().putString("openGroupName", currentGroup).apply();
-                settings.edit().putBoolean("openIsGroup", isGroup).apply();
+                MainActivity.setOpen(currentID, isGroup, currentGroup); //Запись по id. потом по нему открывать расписание
                 ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new CalendarScheduleFragment()).commit();
                 break;

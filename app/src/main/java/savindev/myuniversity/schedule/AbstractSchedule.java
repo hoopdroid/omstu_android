@@ -83,10 +83,10 @@ public abstract class AbstractSchedule extends DialogFragment
         usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
         main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
 
-        if (setting.contains("openGroup")) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
-            currentID = setting.getInt("openGroup", 0);
-            isGroup = setting.getBoolean("openIsGroup", true);
-            currentGroup = setting.getString("openGroupName", "");
+        if (MainActivity.getOpenGroup() != 0) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
+            currentID = MainActivity.getOpenGroup();
+            isGroup = MainActivity.isOpenIsGroup();
+            currentGroup = MainActivity.getOpenGroupName();
         } else if (main != null) { //Проверка на наличие главной группы авторизованного
             currentID = main.getId();
             isGroup = main.isGroup();
@@ -158,7 +158,7 @@ public abstract class AbstractSchedule extends DialogFragment
 
     private void setPositions(final LoadMoreTask lmt) { //Специально для обновления данных в отдельном потоке
         new Thread(new Runnable() {
-            public void run() {//Этот метод будет выполняться в побочном потоке
+            public void run() {
                 try {
                     if (positions == null)
                         positions = lmt.get();
@@ -189,11 +189,6 @@ public abstract class AbstractSchedule extends DialogFragment
                 e.printStackTrace();
             }
         }
-//        long a = date.getTimeInMillis();
-//        long b = positions.lastKey().getTimeInMillis();
-//        GregorianCalendar c = new GregorianCalendar();
-//        c.set(2015, 12, 18);
-//        long d = c.getTimeInMillis();
         if (positions.lastKey().before(date2)) { //Если в адаптере последняя дата меньше, догрузить до нужной
             int days = (int) ((date.getTimeInMillis() - positions.lastKey().getTimeInMillis()) / 86400000); //Получение числа дней между последней загруженной датой и заданной
             loading = false;
@@ -373,10 +368,7 @@ public abstract class AbstractSchedule extends DialogFragment
                 break;
             default:
                 //Отобразить новую выбранную группу
-                settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
-                settings.edit().putInt("openGroup", usedList.get(item.getItemId() - 101).getId()).apply(); //Запись по id. потом по нему открывать расписание
-                settings.edit().putString("openGroupName", usedList.get(item.getItemId() - 101).getName()).apply();
-                settings.edit().putBoolean("openIsGroup", usedList.get(item.getItemId() - 101).isGroup()).apply();
+                MainActivity.setOpen(usedList.get(item.getItemId() - 101).getId(), usedList.get(item.getItemId() - 101).isGroup(), usedList.get(item.getItemId() - 101).getName());
                 ft = getFragmentManager().beginTransaction();
                 if (isLinear)
                     ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();

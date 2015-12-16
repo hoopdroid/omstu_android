@@ -59,7 +59,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
                 continue;
             ArrayList<ScheduleModel> daySchedule;
             String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-            String month = String.valueOf(calendar.get(Calendar.MONTH));
+            String month = String.valueOf((calendar.get(Calendar.MONTH)) + 1);
             if (day.length() < 2)
                 day = "0" + day;
             if (month.length() < 2)

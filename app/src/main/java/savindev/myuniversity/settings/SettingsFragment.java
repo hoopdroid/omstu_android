@@ -33,26 +33,26 @@ import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 public class SettingsFragment extends Fragment {
 
 
-    FragmentTransaction ft;
-    int lastPosition;
-    MenuItem refreshItem;
-    GroupsFragment groups;
-    GetUniversityInfoTask guit;
+    private FragmentTransaction ft;
+    private int lastPosition;
+    private MenuItem refreshItem;
+    private GroupsFragment groups;
+    private GetUniversityInfoTask guit;
+    private Fragment mFragment;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         setRetainInstance(true); //Запрет на пересоздание объекта
-        View view = inflater.inflate(R.layout.fragment_settings, null);
-        final ListView settints = (ListView) view.findViewById(R.id.settingsView);
+        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        final ListView settings = (ListView) view.findViewById(R.id.settingsView);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 R.layout.settings_item, getResources().getStringArray(R.array.settings_array));
-        settints.setAdapter(adapter);
-
+        settings.setAdapter(adapter);
         groups = new GroupsFragment();
         //При тыке на пункт меню
-        settints.setOnItemClickListener(new OnItemClickListener() {
+        settings.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 switch (position) {
@@ -65,29 +65,41 @@ public class SettingsFragment extends Fragment {
                                 guit = new GetUniversityInfoTask(getActivity().getBaseContext(), null);
                                 guit.execute();
                                 try {
-                                    if (guit.get(7, TimeUnit.SECONDS)) {
-                                        //Подождать загрузку данных
-                                        //TODO проанимировать это дело
-                                    }
+                                    guit.get(7, TimeUnit.SECONDS);
+//                                    if (guit.get(7, TimeUnit.SECONDS)) {
+//                                        //Подождать загрузку данных
+//                                        //TODO проанимировать это дело
+//                                    }
                                 } catch (InterruptedException | ExecutionException | TimeoutException e1) {
                                     e1.printStackTrace();
-                                    refreshItem.setVisible(false);
                                 }
+                                refreshItem.setVisible(false);
                             } else {
                                 Toast.makeText(getActivity(), "Не удалось получить списки" + '\n'
                                         + "Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
                             }
                         }
                         if (DBRequest.isUniversityInfoThere(getActivity())) { //если выполнено успешно или ключ существует
-                            settints.setBackgroundColor(Color.WHITE); //перекрасить выделенный элемент
-                            settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                            settings.setBackgroundColor(Color.WHITE); //перекрасить выделенный элемент
+                            settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                             lastPosition = position;
                             if (getResources().getConfiguration().orientation ==
                                     Configuration.ORIENTATION_LANDSCAPE) {
-                                settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
-                                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.frgmCont, new GroupsFragment());
-                                fragmentTransaction.commit();
+//                                ft = getFragmentManager().beginTransaction();
+//                                if (mFragment == null) {
+//                                    mFragment = Fragment.instantiate(getActivity(), GroupsFragment.class.getName());
+//                                    ft.replace(R.id.frgmCont, mFragment, "groups").commit();
+//                                } else {
+//                                    if (mFragment.isDetached()) {
+//                                        ft.attach(mFragment);
+//                                    }
+//                                }
+
+
+                                settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                                ft = getFragmentManager().beginTransaction();
+                                ft.replace(R.id.frgmCont, new GroupsFragment());
+                                ft.commit();
                             }
                             //Запустить активность/фрагмент для выбора группы
                             if (getResources().getConfiguration().orientation ==
@@ -100,39 +112,39 @@ public class SettingsFragment extends Fragment {
                         }
                         break;
                     case 1:
-                        settints.setBackgroundColor(Color.WHITE);
-                        settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                        settings.setBackgroundColor(Color.WHITE);
+                        settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
                                 Configuration.ORIENTATION_LANDSCAPE) {
-                            settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                         }
                         break;
                     case 2:
-                        settints.setBackgroundColor(Color.WHITE);
-                        settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                        settings.setBackgroundColor(Color.WHITE);
+                        settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
                                 Configuration.ORIENTATION_LANDSCAPE) {
-                            settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                         }
                         break;
                     case 3:
-                        settints.setBackgroundColor(Color.WHITE);
-                        settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                        settings.setBackgroundColor(Color.WHITE);
+                        settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
                                 Configuration.ORIENTATION_LANDSCAPE) {
-                            settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                         }
                         break;
                     case 4: //Тестовая функция, перевод порта
-                        settints.setBackgroundColor(Color.WHITE);
-                        settints.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                        settings.setBackgroundColor(Color.WHITE);
+                        settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
                                 Configuration.ORIENTATION_LANDSCAPE) {
-                            settints.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                         }
                         Intent intent = new Intent(getActivity(), Test.class);
                         startActivity(intent);
