@@ -153,11 +153,54 @@ public class MainActivity extends AppCompatActivity {
         return ni != null;
     }
 
-
-    @Override
-    protected void onDestroy() {
-        SharedPreferences.Editor settings = getSharedPreferences("settings", Context.MODE_PRIVATE).edit(); //Удалить активную группу
-        settings.remove("openGroup").remove("openIsGroup").remove("openGroupName").remove("positionDate").remove("positionN").apply();
-        super.onDestroy();
+    private static String mFragment;
+    public static String getFragment() {
+        return mFragment;
     }
+    public static void setFragment(String fragment) {
+        mFragment = fragment;
+    }
+    private static View view;
+    public static View getView() {
+        return view;
+    }
+    public static void setView(View v) {
+        view = v;
+    }
+    private static int openGroup;
+    private static boolean openIsGroup;
+    private static String openGroupName;
+    private static String positionDate;
+    private static String positionN;
+    public static int getOpenGroup() {
+        return openGroup;
+    }
+    public static boolean isOpenIsGroup() {
+        return openIsGroup;
+    }
+    public static String getOpenGroupName() {
+        return openGroupName;
+    }
+    public static String getPositionDate() {
+        return positionDate;
+    }
+    public static String getPositionN() {
+        return positionN;
+    }
+    public static void clearPositions() {
+        positionDate = null;
+        positionN = null;
+    }
+
+    public static void setOpen(int openGroup, boolean openIsGroup, String openGroupName) {
+        MainActivity.openGroup = openGroup;
+        MainActivity.openIsGroup = openIsGroup;
+        MainActivity.openGroupName = openGroupName;
+    }
+
+    public static void setPosition(String positionDate, String positionN) {
+        MainActivity.positionDate = positionDate;
+        MainActivity.positionN = positionN;
+    }
+
 }

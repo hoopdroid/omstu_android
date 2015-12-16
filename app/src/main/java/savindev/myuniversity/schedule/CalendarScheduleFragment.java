@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,6 +31,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 
@@ -47,8 +49,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private TextView number, time, name, teacher, auditory, type;
     private View drawerView;
     private Drawer drawer;
-    Toolbar toolbar;
-    DrawerBuilder b;
+    private Button next;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
@@ -62,6 +63,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             isLinear = false;
 
             detailsLayout = (LinearLayout) view.findViewById(R.id.detailll);
+            next = (Button)view.findViewById(R.id.next);
             if (userInfo.getBoolean("openDetails", true)) {
                 detailsLayout.setVisibility(View.VISIBLE); //Скрыть подробности
             } else {
@@ -140,8 +142,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         });
 
 
-        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        b = new DrawerBuilder(getActivity());
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        DrawerBuilder b = new DrawerBuilder(getActivity());
         drawer = b.withToolbar(toolbar)
                 .withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).buildForFragment();
 //        drawer.getDrawerLayout().setVisibility(View.GONE);
@@ -170,10 +172,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 break;
             case R.id.transition:
                 //Переход на листовой вид
-                userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
-                userInfo.edit().putInt("openGroup", currentID).apply(); //Запись по id. потом по нему открывать расписание
-                userInfo.edit().putString("openGroupName", currentGroup).apply();
-                userInfo.edit().putBoolean("openIsGroup", isGroup).apply();
+                MainActivity.setOpen(currentID, isGroup, currentGroup); //Запись по id. потом по нему открывать расписание
                 ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
                 break;
@@ -238,8 +237,12 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     case PAIR:
                         if (!checkedPairFilters(models.get(i))) {
                             scheduleViewHolder.pairName.setVisibility(View.GONE);
+                            scheduleViewHolder.cv.setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                            scheduleViewHolder.cv.setAlpha(0.5f);
                             break;
                         }
+                        scheduleViewHolder.cv.setBackgroundColor(Color.WHITE);
+                        scheduleViewHolder.cv.setAlpha(1f);
                         //Если проверка на фильтрацию пройдена, показать пару
                         if (models.get(i).getPairs().get(0).getSubgroup() != 0)
                             scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName() + ", п/г " + models.get(i).getPairs().get(0).getSubgroup());
@@ -247,7 +250,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                             scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
                         scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
-                        scheduleViewHolder.cv.setOnClickListener(new View.OnClickListener() {
+                        scheduleViewHolder.pairName.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
@@ -257,9 +260,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         scheduleViewHolder.cv.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                SharedPreferences.Editor e = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE).edit();
-                                e.putString("positionDate", models.get(scheduleViewHolder.getAdapterPosition()).getDate());
-                                e.putString("positionN", models.get(scheduleViewHolder.getAdapterPosition()).getN()).apply();
+                                MainActivity.setPosition(models.get(scheduleViewHolder.getAdapterPosition()).getDate(),
+                                        models.get(scheduleViewHolder.getAdapterPosition()).getN());
                                 FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
                                 ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
                                 return false;
@@ -272,7 +274,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                                 scheduleViewHolder.dublPairName.setText(models.get(i).getPairs().get(1).getName());
                             scheduleViewHolder.dublPairName.setVisibility(View.VISIBLE);
                             scheduleViewHolder.dublPairName.setBackgroundColor(Color.WHITE);
-                            scheduleViewHolder.cv.setOnClickListener(new View.OnClickListener() {
+                            scheduleViewHolder.dublPairName.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
@@ -349,7 +351,17 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         }
     }
 
-    private void fillDetailsLayout(final ScheduleModel model, int num) {
+    private void fillDetailsLayout(final ScheduleModel model, final int num) {
+        if (model.getPairs().size() > 1) {
+            next.setVisibility(View.VISIBLE);
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fillDetailsLayout(model, (num+1)%model.getPairs().size());
+                }
+            });
+        } else
+            next.setVisibility(View.GONE);
         number.setText(model.getN());
         time.setText(model.getDate() + ", " + model.getStartTime() + "-" + model.getEndTime());
         if (model.getPairs().get(num).getSubgroup() != 0)
@@ -363,9 +375,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         detailsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor e = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE).edit();
-                e.putString("positionDate", model.getDate());
-                e.putString("positionN", model.getN()).apply();
+                MainActivity.setPosition(model.getDate(), model.getN());
                 FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
             }

@@ -1,10 +1,12 @@
 package savindev.myuniversity.settings;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.view.MenuItemCompat;
@@ -31,15 +33,28 @@ import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 
 
 public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
-    ExpandableListView list;
-    ExpListAdapter adapter;
-    MenuItem refreshItem;
+    private ExpandableListView list;
+    private ExpListAdapter adapter;
+    private MenuItem refreshItem;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    MenuItem searchItem;
-    SearchView searchView;
+    private MenuItem searchItem;
+    private SearchView searchView;
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+//        try {
+//           if (getActivity().getClass().getMethod("getFragment", new Class[] {}).invoke(getActivity().getClass()).equals("groups")) {
+//               return null;
+//           }
+//            getActivity().getClass().getMethod("setFragment", new Class[] {String.class}).invoke("groups");
+//        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+//            e.printStackTrace();
+//        }
+        if (MainActivity.getFragment() != null && MainActivity.getFragment().equals("groups")) {
+            return MainActivity.getView();
+        }
+        MainActivity.setFragment("groups");
         setRetainInstance(true);
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_groups_settings, container, false);
@@ -50,6 +65,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         parse();
 
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("FINISH_UPDATE"));
+        MainActivity.setView(view);
         return view;
     }
 
@@ -168,7 +184,6 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     DBHelper.SchedulesHelper.deleteGroupSchedule(getActivity().getBaseContext(), model.getId());
                 else
                     DBHelper.SchedulesHelper.deleteTeacherchedule(getActivity().getBaseContext(), model.getId());
-//                DBHelper.UsedSchedulesHelper.deleteUsedSchedule(getActivity().getBaseContext(), model.getId(),model.isGroup());
             }
         }
         adapter.deleteLists(); //Подчистить на случай повторного сохранения
