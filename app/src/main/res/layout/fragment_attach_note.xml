@@ -27,15 +27,15 @@
                 android:id="@+id/image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/edittext"
-                android:layout_alignTop="@+id/edittext"
+                android:layout_alignBottom="@+id/textNote"
+                android:layout_alignTop="@+id/textNote"
                 android:scaleType="centerInside"
                 android:paddingLeft="16dp"
                 android:src="@drawable/ic_clipboard_text"
                 android:visibility="visible" />
 
             <EditText
-                android:id="@+id/edittext"
+                android:id="@+id/textNote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/image"
@@ -55,20 +55,20 @@
                 android:id="@+id/image1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/edittext1"
-                android:layout_alignTop="@+id/edittext1"
+                android:layout_alignBottom="@+id/lessonName"
+                android:layout_alignTop="@+id/lessonName"
                 android:scaleType="centerInside"
                 android:paddingLeft="16dp"
                 android:src="@drawable/ic_tag"
                 android:visibility="visible" />
 
-            <EditText
-                android:id="@+id/edittext1"
-                android:layout_width="wrap_content"
+            <Spinner
+                android:id="@+id/lessonName"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/image1"
-                android:hint="Предмет"
-                android:singleLine="true" />
+                android:singleLine="true"
+                 />
 
         </RelativeLayout>
 
@@ -83,19 +83,18 @@
                 android:id="@+id/image2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/edittext2"
-                android:layout_alignTop="@+id/edittext2"
+                android:layout_alignBottom="@+id/priority"
+                android:layout_alignTop="@+id/priority"
                 android:scaleType="centerInside"
                 android:paddingLeft="16dp"
                 android:src="@drawable/ic_flag"
                 android:visibility="visible" />
 
-            <EditText
-                android:id="@+id/edittext2"
-                android:layout_width="wrap_content"
+            <Spinner
+                android:id="@+id/priority"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/image2"
-                android:hint="Приоритет"
                 android:singleLine="true" />
 
         </RelativeLayout>
@@ -121,7 +120,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/dateSelect"
-                android:text="Назначить дату занятия"
+                android:text="Назначить дату"
                 android:layout_alignParentBottom="true"
                 android:layout_toRightOf="@+id/image3"
                 android:layout_toEndOf="@+id/image3" />

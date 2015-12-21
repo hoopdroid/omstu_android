@@ -19,22 +19,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
 
-public class CustomListAdapter extends ArrayAdapter<String> {
+import savindev.myuniversity.notes.NoteModel;
+
+public class CustomNoteAdapter extends ArrayAdapter<NoteModel> {
 
     private final Activity context;
-    private final ArrayList<String> itemname;
-    private final ArrayList<String> note_date;
-    private final ArrayList<String> tag;
+    private final ArrayList<NoteModel> noteModelArrayList;
 
-
-    public CustomListAdapter(Activity context, ArrayList itemname,ArrayList eventdate,ArrayList tagslist) {
-        super(context, R.layout.notelist,itemname);
+    public CustomNoteAdapter(Activity context, ArrayList<NoteModel> noteModelArrayList) {
+        super(context, R.layout.notelist,noteModelArrayList);
         // TODO Auto-generated constructor stub
 
         this.context=context;
-        this.itemname=itemname;
-        this.note_date=eventdate;
-        this.tag = tagslist;
+        this.noteModelArrayList=noteModelArrayList;
+
 
 
 
@@ -50,11 +48,11 @@ public class CustomListAdapter extends ArrayAdapter<String> {
         TextView tagsText = (TextView) rowView.findViewById(R.id.texttags);
 
 
-        txtTitle.setText(itemname.get(position));
+        txtTitle.setText(noteModelArrayList.get(position).getNoteText());
 
-        dateTitle.setText(note_date.get(position));
+        dateTitle.setText(noteModelArrayList.get(position).getNoteDate());
 
-        tagsText.setText(tag.get(position));
+        tagsText.setText(noteModelArrayList.get(position).getLessonName());
 
         return rowView;
 

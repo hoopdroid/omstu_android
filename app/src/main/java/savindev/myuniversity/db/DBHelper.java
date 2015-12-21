@@ -1,6 +1,5 @@
 package savindev.myuniversity.db;
 
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -20,6 +19,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import savindev.myuniversity.R;
+import savindev.myuniversity.notes.NoteModel;
 import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.schedule.ScheduleModel;
@@ -46,7 +46,6 @@ public class DBHelper extends SQLiteOpenHelper {
     private BuildingsHelper buildingsHelper;
     private NotesHelper notesHelper;
 
-
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
 
@@ -63,7 +62,6 @@ public class DBHelper extends SQLiteOpenHelper {
         classroomsHelper = new ClassroomsHelper();
         buildingsHelper = new BuildingsHelper();
         notesHelper = new NotesHelper();
-
 
     }
 
@@ -1434,7 +1432,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public static class NotesHelper {
+    public class NotesHelper {
 
         protected static final String TABLE_NAME = "Notes";
         protected static final String COL_ID_NOTE = "note_id";
@@ -1447,7 +1445,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void create(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
-                    COL_ID_NOTE + " INTEGER PRIMARY KEY," +
+                    COL_ID_NOTE + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     COL_ID_SCHEDULE + " INTEGER," +
                     COL_LESSON_NAME + " TEXT," +
                     COL_NOTE_DATE + " TEXT," +
@@ -1457,17 +1455,64 @@ public class DBHelper extends SQLiteOpenHelper {
                     ");");
         }
 
-        public void setNote(Context context,String noteType) {
+        public void setNote( NoteModel noteModel) {
 
+
+           SQLiteDatabase sqliteDatabase = getWritableDatabase();
+
+            ContentValues noteRow = new ContentValues();
+            noteRow.put(COL_ID_SCHEDULE, noteModel.getNoteId());
+            noteRow.put(COL_LESSON_NAME, noteModel.getLessonName());
+            noteRow.put(COL_NOTE_DATE, noteModel.getNoteDate());
+            noteRow.put(COL_NOTE_TEXT, noteModel.getNoteText());
+            noteRow.put(COL_PHOTO_LINK, noteModel.getPhotoLink());
+            noteRow.put(COL_PRIORITY, noteModel.getPriority());
+
+            sqliteDatabase.insert(TABLE_NAME, null, noteRow);
         }
 
-        public void getNote(Context context,String noteType,int noteId) {
+        public ArrayList<NoteModel> getNotes() {
+            ArrayList<NoteModel> noteModelArrayList = new ArrayList<>();
 
+            SQLiteDatabase db;
+
+            db = getReadableDatabase();
+
+            Cursor cursor;
+            try {
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+                    NoteModel noteModel = new NoteModel(
+                            cursor.getInt(cursor.getColumnIndex(COL_ID_NOTE)),
+                            cursor.getInt(cursor.getColumnIndex(COL_ID_SCHEDULE)),
+                            cursor.getString(cursor.getColumnIndex(COL_LESSON_NAME)),
+                            cursor.getString(cursor.getColumnIndex(COL_NOTE_DATE)),
+                            cursor.getString(cursor.getColumnIndex(COL_NOTE_TEXT)),
+                            cursor.getString(cursor.getColumnIndex(COL_PHOTO_LINK)),
+                            cursor.getInt(cursor.getColumnIndex(COL_PRIORITY))
+                    );
+                    noteModelArrayList.add(noteModel);
+                    cursor.moveToNext();
+                }
+
+            } catch (SQLiteException e) {
+                Log.e("SQLITE DB EXCEPTION", e.toString(), e);
+            }
+
+            return  noteModelArrayList;
         }
+
+        public  void deleteNote(int note){
+            SQLiteDatabase db;
+            db = getWritableDatabase();
+            db.delete(TABLE_NAME, COL_ID_NOTE + "=" + note, null);
+        }
+
+
     }
-
-
-
 
 
     @Override

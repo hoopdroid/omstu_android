@@ -1,37 +1,32 @@
 package savindev.myuniversity;
 
 
-import android.graphics.Color;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
-import com.gordonwong.materialsheetfab.MaterialSheetFab;
 
-import java.util.AbstractCollection;
 import java.util.ArrayList;
 
-import savindev.myuniversity.schedule.AbstractSchedule;
+import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.notes.NoteModel;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class NotesFragment extends Fragment {
-
+RelativeLayout emptyNotesLayout;
 
     public NotesFragment() {
         // Required empty public constructor
@@ -43,24 +38,9 @@ public class NotesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_notes, container, false);
-        ArrayList taskslist;
-        ArrayList datelist;
-        ArrayList tagslist;
-        taskslist = new ArrayList();
-        datelist = new ArrayList();
-        tagslist = new ArrayList();
-
-
-
-
-        for(int i = 0 ;i<10;i++){
-            taskslist.add("note 1 with big awesome incredible text without any excuses");
-            datelist.add(Integer.toString(i)+"декабря");
-            tagslist.add("Альтман");
-        }
-
         final SwipeMenuListView listView = (SwipeMenuListView)view.findViewById(R.id.listView);
-
+        MainActivity.fab.show();
+        emptyNotesLayout = (RelativeLayout)view.findViewById(R.id.no_notes);
         SwipeMenuCreator creator = new SwipeMenuCreator() {
 
             @Override
@@ -92,19 +72,53 @@ public class NotesFragment extends Fragment {
                 menu.addMenuItem(deleteItem);
             }
         };
-        CustomListAdapter adapter=new CustomListAdapter(getActivity(), taskslist,datelist,tagslist);
+
+        final DBHelper dbHelper = new DBHelper(getActivity());
+
+        ArrayList<NoteModel> noteModelArrayList =  dbHelper.getNotesHelper().getNotes();
+        CustomNoteAdapter adapter=new CustomNoteAdapter(getActivity(),
+               noteModelArrayList);
 
 
 
         listView.setMenuCreator(creator);
         listView.setAdapter(adapter);
 
-
+        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                        //TODO add DONE move
+                        break;
+                    case 1:
+                        dbHelper.getNotesHelper().deleteNote(dbHelper.getNotesHelper().getNotes().get(position).getNoteId());
+                        refresh();
+                        break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
+            }
+        });
+        if(noteModelArrayList.size() == 0)
+            emptyNotesLayout.setVisibility(View.VISIBLE);
+        else
+            emptyNotesLayout.setVisibility(View.GONE);
 
         return view;
     }
 
-
+    public void refresh(){
+        FragmentManager manager  = getFragmentManager();
+        FragmentTransaction ft = manager.beginTransaction();
+        Fragment newFragment = this;
+        this.onDestroy();
+        ft.remove(this);
+        ft.replace(R.id.content_main,newFragment);
+        //container is the ViewGroup of current fragment
+        ft.addToBackStack(null);
+        ft.commit();
+    }
 }
 
 
