@@ -23,6 +23,7 @@
     <string name="drawer_navigator">Навигатор</string>
     <string name="drawer_notes">Заметки</string>
     <string name="drawer_education">Учебные материалы</string>
+    <string name="drawer_performance">Успеваемость</string>
     <string name="drawer_news">Новости</string>
     <string name="drawer_settings">Настройки</string>
 
@@ -34,7 +35,8 @@
         <item>Настройки</item>
         <item>Авторизация</item>
     </string-array>
-    <string name="uri">http://83.220.169.40:1342/MyUniversity/api/v1.0/</string>
+    <!--<string name="uri">http://83.220.169.40:1342/MyUniversity/api/v1.0/</string>-->
+    <string name="uri">http://178.74.102.58:1342/MyUniversity/api/v1.0/</string>
     <string name="uri_test">http://178.74.102.58:4586/MyUniversity/api/v1.0/</string>
     <string name="uri_test2">http://178.74.102.58:1342/MyUniversity/api/v1.0/</string>
     <string name="unix">19700101000000</string>

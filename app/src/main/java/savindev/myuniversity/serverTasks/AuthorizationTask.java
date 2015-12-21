@@ -61,7 +61,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        String url = context.getResources().getString(R.string.uri_test2) + "getSalt"; //Строка запроса на получение соли по логину
+        String url = context.getResources().getString(R.string.uri) + "getSalt"; //Строка запроса на получение соли по логину
         String result = query(url, json);
         if (result == null) {
             return false;
@@ -86,7 +86,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        url = context.getResources().getString(R.string.uri_test2) + "authorization";
+        url = context.getResources().getString(R.string.uri) + "authorization";
         result = query(url, json);
         if (result == null) {
             return false;

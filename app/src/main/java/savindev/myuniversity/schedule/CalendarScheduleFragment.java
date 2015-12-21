@@ -144,8 +144,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         DrawerBuilder b = new DrawerBuilder(getActivity());
-        drawer = b.withToolbar(toolbar)
-                .withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).buildForFragment();
+        drawer = b.withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).buildForFragment();
 //        drawer.getDrawerLayout().setVisibility(View.GONE);
 
     }
@@ -214,7 +213,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         @Override
         public ScheduleViewHolder onCreateViewHolder(final ViewGroup parent, final int position) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.one_calendar_pair, parent, false);
-//            parent.setOnLongClickListener();
             return new ScheduleViewHolder(v);
         }
 

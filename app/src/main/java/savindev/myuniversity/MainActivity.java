@@ -25,6 +25,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
+import savindev.myuniversity.performance.PerformanceFragment;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_notes).withSelectedIcon(R.drawable.ic_notes_select);
         PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withBadge("12").withSelectedIcon(R.drawable.ic_news_select);
         PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
+        PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings).withSelectedIcon(R.drawable.ic_settings_select);
 
         // Create the AccountHeader
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                         itemNotes,
                         itemNews,
                         itemEducation,
+                        itemPerformance,
                         itemSettings
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -127,6 +130,9 @@ public class MainActivity extends AppCompatActivity {
                                 addfragment(R.string.drawer_education, new WelcomeFragment());
                                 break;
                             case 6:
+                                addfragment(R.string.drawer_performance, new PerformanceFragment());
+                                break;
+                            case 7:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
                         }
