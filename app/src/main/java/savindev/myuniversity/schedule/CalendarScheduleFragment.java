@@ -60,6 +60,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             view = inflater.inflate(R.layout.fragment_calendar_schedule, container, false);
             drawerView = inflater.inflate(R.layout.filters_drawer, container, false);
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
+
             isLinear = false;
 
             detailsLayout = (LinearLayout) view.findViewById(R.id.detailll);
@@ -105,6 +106,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             teacher = (TextView) view.findViewById(R.id.detailTeacher);
             auditory = (TextView) view.findViewById(R.id.detailAuditory);
             type = (TextView) view.findViewById(R.id.detailType);
+            MainActivity.fab.hide();
         }
         return view;
     }
@@ -382,8 +384,13 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         });
     }
 
+
+
     @Override
     public void onDetach() {
         super.onDetach();
     }
+
+
+
 }

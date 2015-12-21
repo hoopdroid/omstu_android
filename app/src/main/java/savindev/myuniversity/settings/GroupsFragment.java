@@ -66,6 +66,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("FINISH_UPDATE"));
         MainActivity.setView(view);
+        MainActivity.fab.hide();
         return view;
     }
 

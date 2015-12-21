@@ -12,7 +12,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 
+import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -20,6 +22,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
@@ -30,12 +33,14 @@ import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 import savindev.myuniversity.welcomescreen.NotInternetFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static Toolbar toolbar;
+    public static Fab fab;
+    TextView noteadd;
     String username;
     String email;
-
+    MaterialSheetFab materialSheetFab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,11 +64,34 @@ public class MainActivity extends AppCompatActivity {
             initDrawer();
             DBHelper dbHelper = DBHelper.getInstance(this);
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
+            fab = (Fab)findViewById(R.id.fab);
+            fab.hide();
+            View sheetView = findViewById(R.id.fab_sheet);
+            View overlay = findViewById(R.id.overlay);
+            int sheetColor = getResources().getColor(R.color.md_white_1000);
+            int fabColor = getResources().getColor(R.color.accent);
+
+            // Initialize material sheet FAB
+                    noteadd = (TextView)findViewById(R.id.fab_sheet_item_note);
+                    noteadd.setOnClickListener(this);
+                    materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
+                    sheetColor, fabColor);
+
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        if (materialSheetFab.isSheetVisible()) {
+            materialSheetFab.hideSheet();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void getUserSettings() {
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
-        username = settings.getString("UserFirstName", "") + " " + settings.getString("UserLastName", "") + " " + DBRequest.getUserGroup(settings.getInt("UserGroup", 0), getApplicationContext());
+        username = settings.getString("UserFirstName", "") + " " + settings.getString("UserLastName", "");
         email = settings.getString("email", "no email");
     }
 
@@ -72,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_schedule).withSelectedIcon(R.drawable.ic_schedule_select);
         PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_navigation).withSelectedIcon(R.drawable.ic_navigation_select);
         PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_notes).withSelectedIcon(R.drawable.ic_notes_select);
-        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withBadge("12").withSelectedIcon(R.drawable.ic_news_select);
+        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withSelectedIcon(R.drawable.ic_news_select);
         PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings).withSelectedIcon(R.drawable.ic_settings_select);
 
@@ -93,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 })
+                .withSelectionListEnabledForSingleProfile(false)
                 .build();
 
         Drawer result = new DrawerBuilder()
@@ -203,4 +232,14 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.positionN = positionN;
     }
 
+
+    @Override
+    public void onClick(View v) {
+        if (v==noteadd){
+            Intent i = new Intent(getApplicationContext(),AttachActivity.class);
+            i.putExtra("TypeAttach","Note");
+            startActivity(i);
+            materialSheetFab.hideSheet();
+        }
+    }
 }

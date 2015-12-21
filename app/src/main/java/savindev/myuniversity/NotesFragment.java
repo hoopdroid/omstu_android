@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,12 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
-import com.melnykov.fab.FloatingActionButton;
+import com.gordonwong.materialsheetfab.MaterialSheetFab;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
+
+import savindev.myuniversity.schedule.AbstractSchedule;
 
 
 /**
@@ -39,16 +43,14 @@ public class NotesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_notes, container, false);
-
         ArrayList taskslist;
         ArrayList datelist;
         ArrayList tagslist;
         taskslist = new ArrayList();
         datelist = new ArrayList();
         tagslist = new ArrayList();
-        final FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
-        final CoordinatorLayout Clayout = (CoordinatorLayout)view.findViewById(R.id.snackbarlocation);
+
 
 
         for(int i = 0 ;i<10;i++){
@@ -91,41 +93,18 @@ public class NotesFragment extends Fragment {
             }
         };
         CustomListAdapter adapter=new CustomListAdapter(getActivity(), taskslist,datelist,tagslist);
-        // присваиваем адаптер списку
-        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                switch (index) {
-                    case 0:
-                        // open
-                        break;
-                    case 1:
-                        listView.setActivated(false);
-                        // delete
-                        fab.hide();
-                        Snackbar.make(Clayout, "Заметка удалена!", Snackbar.LENGTH_LONG)
-                                .setAction("Undo", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Toast.makeText(getActivity(), "Удаление!", Toast.LENGTH_SHORT).show();
-                                        fab.show();
-                                    }
-                                })
-                                .show();
-                        break;
-                }
-                // false : close the menu; true : not close the menu
-                return false;
-            }
-        });
+
 
 
         listView.setMenuCreator(creator);
         listView.setAdapter(adapter);
 
-        fab.attachToListView(listView);
+
 
         return view;
     }
 
+
 }
+
+

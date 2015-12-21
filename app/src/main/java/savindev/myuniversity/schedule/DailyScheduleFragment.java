@@ -34,6 +34,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
 
         if (view == null) {//Если данные существуют:
             view = inflater.inflate(R.layout.fragment_daily_schedule, container, false);
+            MainActivity.fab.show();
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
             scheduleList = (RecyclerView) view.findViewById(R.id.schedule);
             llm = new LinearLayoutManager(getActivity());

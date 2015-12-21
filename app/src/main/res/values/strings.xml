@@ -29,6 +29,13 @@
     <string name="profile_text">Мой Профиль</string>
 
 
+    <string name="fab_add_note">Заметка</string>
+    <string name="fab_add_reminder">Напоминание</string>
+    <string name="fab_add_homework">Домашнее задание</string>
+
+    <string name="title_attach_note">Добавление заметки</string>
+
+
     <string-array name="views_array">
         <item>Расписание</item>
         <item>Настройки</item>
@@ -48,6 +55,11 @@
         <item>Настройки сервера(dev)</item>
     </string-array>
     <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_attach">AttachActivity</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

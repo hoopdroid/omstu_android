@@ -59,7 +59,7 @@ public class WelcomeFragment extends Fragment {
 
 
         mListView.add(welcome_card);
-
+        MainActivity.fab.hide();
         return view;
     }
 

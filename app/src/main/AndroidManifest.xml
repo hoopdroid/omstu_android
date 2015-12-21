@@ -30,13 +30,19 @@
             android:name=".settings.GroupsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.Common" />
+
+
         <activity
             android:name=".settings.Test"
             android:theme="@style/AppTheme.Common" />
         <activity
             android:name=".ProfileActivity"
             android:label="@string/title_activity_profile"
-            android:theme="@style/AppTheme.Common"/>
+            android:theme="@style/AppTheme.Common" />
+        <activity
+            android:name=".AttachActivity"
+            android:label="@string/title_activity_attach"
+            android:theme="@style/AppTheme.Common"></activity>
     </application>
 
 </manifest>
