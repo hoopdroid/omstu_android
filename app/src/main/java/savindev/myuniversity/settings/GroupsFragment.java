@@ -43,18 +43,11 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        try {
-//           if (getActivity().getClass().getMethod("getFragment", new Class[] {}).invoke(getActivity().getClass()).equals("groups")) {
-//               return null;
-//           }
-//            getActivity().getClass().getMethod("setFragment", new Class[] {String.class}).invoke("groups");
-//        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-//            e.printStackTrace();
+
+//        if (MainActivity.getFragment() != null && MainActivity.getFragment().equals("groups")) {
+//            return MainActivity.getView();
 //        }
-        if (MainActivity.getFragment() != null && MainActivity.getFragment().equals("groups")) {
-            return MainActivity.getView();
-        }
-        MainActivity.setFragment("groups");
+//        MainActivity.setFragment("groups");
         setRetainInstance(true);
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_groups_settings, container, false);
@@ -65,7 +58,7 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         parse();
 
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("FINISH_UPDATE"));
-        MainActivity.setView(view);
+//        MainActivity.setView(view);
         MainActivity.fab.hide();
         return view;
     }
