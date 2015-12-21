@@ -18,7 +18,7 @@ import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 public class ProfileActivity extends AppCompatActivity {
-    TextView userNameTxt;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,14 +35,14 @@ public class ProfileActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
         getSupportActionBar().setTitle("Мой профиль");
-        userNameTxt = (TextView)findViewById(R.id.usernameTxt);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
 
         String username = settings.getString("UserFirstName","")+ " "+settings.getString("UserMiddleName","") +" " +settings.getString("UserLastName","");
-        userNameTxt.setText(username);
 
+        toolbar.setTitle(username);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

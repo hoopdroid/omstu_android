@@ -29,4 +29,84 @@
         android:layout_below="@+id/view">
     </FrameLayout>
 
+
+    <!-- Your FAB implementation -->
+    <savindev.myuniversity.Fab
+        android:id="@+id/fab"
+        style="@style/Widget.MaterialSheetFab.Fab"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:paddingRight="16dp"
+        android:paddingEnd="8dp"
+        app:elevation="6dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Overlay that dims the screen -->
+    <com.gordonwong.materialsheetfab.DimOverlayFrameLayout
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent" />
+
+    <!-- Circular reveal container for the sheet -->
+    <io.codetail.widget.RevealLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:gravity="end|bottom"
+        android:orientation="vertical">
+
+        <!-- Sheet that contains your items -->
+        <android.support.v7.widget.CardView
+            android:id="@+id/fab_sheet"
+            style="@style/Widget.MaterialSheetFab.Sheet">
+
+            <!-- Sheet items -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+
+                <!-- Reminder -->
+                <TextView
+                    android:id="@+id/fab_sheet_item_reminder"
+                    style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
+                    android:drawableLeft="@drawable/ic_bell"
+                    android:drawableStart="@drawable/ic_bell"
+                    android:text="@string/fab_add_reminder" />
+
+                <!-- Photo -->
+                <TextView
+                    android:id="@+id/fab_sheet_item_homework"
+                    style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
+                    android:drawableLeft="@drawable/ic_book"
+                    android:drawableStart="@drawable/ic_book"
+
+                    android:text="@string/fab_add_homework"></TextView>
+
+                <!-- Note -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <TextView
+                        android:id="@+id/fab_sheet_item_note"
+                        style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
+                        android:drawableLeft="@drawable/ic_notes"
+                        android:drawableStart="@drawable/ic_notes_select"
+                        android:text="@string/fab_add_note"
+                        android:textColor="@color/accent"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </io.codetail.widget.RevealLinearLayout>
+
+
 </RelativeLayout>

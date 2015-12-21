@@ -44,6 +44,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private CampusesHelper campusesHelper;
     private ClassroomsHelper classroomsHelper;
     private BuildingsHelper buildingsHelper;
+    private NotesHelper notesHelper;
 
 
     public DBHelper(Context context) {
@@ -61,6 +62,7 @@ public class DBHelper extends SQLiteOpenHelper {
         campusesHelper = new CampusesHelper();
         classroomsHelper = new ClassroomsHelper();
         buildingsHelper = new BuildingsHelper();
+        notesHelper = new NotesHelper();
 
 
     }
@@ -85,6 +87,7 @@ public class DBHelper extends SQLiteOpenHelper {
         campusesHelper.create(db);
         classroomsHelper.create(db);
         buildingsHelper.create(db);
+        notesHelper.create(db);
     }
 
     @Override
@@ -141,6 +144,9 @@ public class DBHelper extends SQLiteOpenHelper {
         return buildingsHelper;
     }
 
+    public NotesHelper getNotesHelper() {
+        return notesHelper;
+    }
 
 
 
@@ -1425,6 +1431,38 @@ public class DBHelper extends SQLiteOpenHelper {
                     DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
                 }
             }
+        }
+    }
+
+    public static class NotesHelper {
+
+        protected static final String TABLE_NAME = "Notes";
+        protected static final String COL_ID_NOTE = "note_id";
+        protected static final String COL_ID_SCHEDULE = "schedule_id";
+        protected static final String COL_LESSON_NAME = "lesson_name";
+        protected static final String COL_NOTE_DATE = "note_date";
+        protected static final String COL_NOTE_TEXT = "note_text";
+        protected static final String COL_PHOTO_LINK = "photo_link";
+        protected static final String COL_PRIORITY = "priority";
+
+        public void create(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_ID_NOTE + " INTEGER PRIMARY KEY," +
+                    COL_ID_SCHEDULE + " INTEGER," +
+                    COL_LESSON_NAME + " TEXT," +
+                    COL_NOTE_DATE + " TEXT," +
+                    COL_NOTE_TEXT + " TEXT," +
+                    COL_PHOTO_LINK + " TEXT," +
+                    COL_PRIORITY + " INTEGER" +
+                    ");");
+        }
+
+        public void setNote(Context context,String noteType) {
+
+        }
+
+        public void getNote(Context context,String noteType,int noteId) {
+
         }
     }
 

@@ -23,7 +23,7 @@ import savindev.myuniversity.welcomescreen.FirstStartActivity;
  */
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
-    TextView userNameTxt;
+
     Button logoutButton;
 
     public ProfileFragment() {
@@ -39,12 +39,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         logoutButton = (Button)view.findViewById(R.id.buttonLogOut);
         logoutButton.setOnClickListener(this);
-        userNameTxt = (TextView)view.findViewById(R.id.usernameTxt);
+
 
         SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", 0);
 
         String username = settings.getString("UserFirstName","")+ " "+settings.getString("UserMiddleName","") +" " +settings.getString("UserLastName","");
-        userNameTxt.setText(username);
+
         return view;
     }
 

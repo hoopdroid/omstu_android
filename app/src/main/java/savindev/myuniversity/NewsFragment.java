@@ -65,7 +65,7 @@ public class NewsFragment extends Fragment {
                 startActivity(intent);
             }});
 
-
+        MainActivity.fab.hide();
         return view;
 
     }
