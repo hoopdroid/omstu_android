@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -37,8 +36,6 @@ import java.util.concurrent.TimeUnit;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
-import savindev.myuniversity.schedule.GroupsModel;
 
 /**
  * Отвечает за внешний вид экрана с успеваемостью студентов
@@ -114,7 +111,6 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
 
     private void download() {
         if (MainActivity.isNetworkConnected(getActivity())) {
-            GroupsModel main = DBHelper.getInstance(getActivity()).getUsedSchedulesHelper().getMainGroupModel(getActivity());
             String url = getActivity().getResources().getString(R.string.uri) + "getRaitingFile?idProgressRaitingFile=" + mainId;
             Uri downloadUri = Uri.parse(url);
             final String destFolder = "/" + mainName + ".xlsx";
@@ -135,7 +131,6 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
                                     MimeTypeMap mime = MimeTypeMap.getSingleton();
                                     File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                                             + destFolder);
-                                    PackageManager packageManager = getActivity().getPackageManager();
                                     Intent intent = new Intent();
                                     intent.setAction(Intent.ACTION_VIEW);
                                     Uri uri = Uri.fromFile(file);

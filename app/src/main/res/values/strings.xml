@@ -34,7 +34,7 @@
     <string name="fab_add_reminder">Напоминание</string>
     <string name="fab_add_homework">Домашнее задание</string>
 
-    <string name="title_attach_note">Добавление заметки</string>
+    <string name="title_attach_note">Заметка</string>
 
 
     <string-array name="views_array">
@@ -62,6 +62,13 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string-array name="notePriority">
+        <item>Высокий</item>
+        <item>Средний</item>
+        <item>Низкий</item>
+    </string-array>
 
 
 </resources>
