@@ -1,30 +1,21 @@
-package savindev.myuniversity;
+package savindev.myuniversity.notes;
 
 
-import android.graphics.Color;
+import android.app.Fragment;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
-import com.gordonwong.materialsheetfab.MaterialSheetFab;
 
-import java.util.AbstractCollection;
 import java.util.ArrayList;
 
-import savindev.myuniversity.schedule.AbstractSchedule;
+import savindev.myuniversity.R;
 
 
 /**
@@ -38,6 +29,7 @@ public class NotesFragment extends Fragment {
     }
 
 
+    //выкинь листы, используй модель
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

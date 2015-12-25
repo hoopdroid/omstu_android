@@ -22,12 +22,11 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import savindev.myuniversity.db.DBHelper;
-import savindev.myuniversity.db.DBRequest;
+import savindev.myuniversity.notes.NotesFragment;
 import savindev.myuniversity.performance.PerformanceFragment;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
 import savindev.myuniversity.settings.SettingsFragment;

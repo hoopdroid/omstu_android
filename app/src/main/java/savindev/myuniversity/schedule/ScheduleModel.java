@@ -2,6 +2,8 @@ package savindev.myuniversity.schedule;
 
 import java.util.List;
 
+import savindev.myuniversity.notes.NoteModel;
+
 /**
  * Класс-объект для пары
  */
@@ -13,15 +15,19 @@ public class ScheduleModel {
     private String startTime; //Начало пары, из той же таблички
     private String endTime; //Конец пары, из той же таблички
     private CellType cellType;
+    private boolean isCancelled;
     private List<Pair> pairs;
+    private NoteModel note;
 
-    public ScheduleModel(String n, String startTime, String endTime, String date, boolean isCancelled, List<Pair> pairs) {
+    public ScheduleModel(String n, String startTime, String endTime, String date, boolean isCancelled, List<Pair> pairs, NoteModel note) {
         this.n = n;
         this.startTime = startTime;
         this.endTime = endTime;
         this.date = date;
         this.cellType = CellType.PAIR;
         this.pairs = pairs;
+        this.isCancelled = isCancelled;
+        this.note = note;
     }
 
     public ScheduleModel(CellType cellType, String value) { //конструктор с использованием типа ячейки, для расписания-сетки
@@ -60,6 +66,14 @@ public class ScheduleModel {
 
     public List<Pair> getPairs() {
         return pairs;
+    }
+
+    public NoteModel getNote() {
+        return note;
+    }
+
+    public void setNote(NoteModel note) {
+        this.note = note;
     }
 
     public static class Pair {
