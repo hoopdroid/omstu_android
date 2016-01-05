@@ -2,6 +2,7 @@ package savindev.myuniversity.schedule;
 
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import savindev.myuniversity.MainActivity;
+import savindev.myuniversity.PairInfoActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 
@@ -107,6 +109,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             auditory = (TextView) view.findViewById(R.id.detailAuditory);
             type = (TextView) view.findViewById(R.id.detailType);
             MainActivity.fab.hide();
+
+
         }
         return view;
     }
@@ -215,6 +219,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         @Override
         public ScheduleViewHolder onCreateViewHolder(final ViewGroup parent, final int position) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.one_calendar_pair, parent, false);
+
             return new ScheduleViewHolder(v);
         }
 
@@ -290,6 +295,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
                         scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
                         break;
+
                 }
         }
 

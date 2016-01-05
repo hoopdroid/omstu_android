@@ -5,6 +5,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,6 +33,8 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
         protected ImageView pairHandler;
         protected RelativeLayout pairDateLayout;
         protected RelativeLayout teacherLayout;
+        protected LinearLayout noteLayout;
+        protected TextView pairNote;
         protected CardView cv;
 
         protected TextView dublPairName;
@@ -50,6 +53,8 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
             teacherLayout = (RelativeLayout) itemView.findViewById(R.id.teacherLayout);
             pairDayWeek = (TextView) itemView.findViewById(R.id.pairDayWeek);
             cv = (CardView) itemView.findViewById(R.id.cv);
+            pairNote = (TextView) itemView.findViewById(R.id.pairNote);
+            noteLayout = (LinearLayout)itemView.findViewById(R.id.noteLayout);
 
             dublPairName = (TextView) itemView.findViewById(R.id.dublPairName);
         }

@@ -13,6 +13,7 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 
+import savindev.myuniversity.AttachActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 
@@ -32,6 +33,7 @@ public class AttachNoteFragment extends Fragment {
     DBHelper dbHelper;
     static String lesson;
     static String noteText;
+    static String noteName;
     static int priorityItem;
 
     public AttachNoteFragment() {
@@ -58,14 +60,13 @@ public class AttachNoteFragment extends Fragment {
                 ArrayAdapter.createFromResource(getActivity(), R.array.notePriority, android.R.layout.simple_spinner_item);
         adapterPriority.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        //Параметризуй генерики!!!
-        ArrayList listLessons = new ArrayList(dbHelper.getSchedulesHelper().
+        ArrayList<String> listLessons = new ArrayList(dbHelper.getSchedulesHelper().
                 getGroupLessons(getActivity(), userGroup, true));
 
         ArrayAdapter<?> adapterLessonName = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_item, listLessons);
         adapterLessonName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Вызываем адаптер
+
         priority.setAdapter(adapterPriority);
         lessonName.setAdapter(adapterLessonName);
 
@@ -73,16 +74,15 @@ public class AttachNoteFragment extends Fragment {
         return view;
     }
 
-    //не совсем понимаю, почему сохранение должно возвращать модель.
+
     public static NoteModel saveNote() {
 
         lesson = lessonName.getSelectedItem().toString();
         noteText = textNote.getText().toString();
-        priorityItem = priority.getSelectedItemPosition();
-//        закомментировала. модель изменилась
-//        return new NoteModel(userGroup, lesson,
-//                null, noteText, "dummy", priorityItem);
-        return null;
+        String pairId = Integer.toString(AttachActivity.scheduleId)+AttachActivity.date;
+        return new NoteModel(AttachActivity.noteName.getText().toString(), "username",0,null,null,
+        null,noteText,AttachActivity.time,pairId,null);
+
 
     }
 

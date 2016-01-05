@@ -11,16 +11,13 @@ import java.util.ArrayList;
 
 import savindev.myuniversity.R;
 
-public class CustomNoteAdapter extends ArrayAdapter<NoteModel> {
+public class NoteListAdapter extends ArrayAdapter<NoteModel> {
 
     private final Activity context;
     private final ArrayList<NoteModel> noteModelArrayList;
 
-    public CustomNoteAdapter(Activity context, ArrayList<NoteModel> noteModelArrayList) {
+    public NoteListAdapter(Activity context, ArrayList<NoteModel> noteModelArrayList) {
         super(context, R.layout.notelist,noteModelArrayList);
-        //выкидывай автосгенерированные туду
-        // TODO Auto-generated constructor stub
-
         this.context=context;
         this.noteModelArrayList=noteModelArrayList;
 
@@ -31,21 +28,15 @@ public class CustomNoteAdapter extends ArrayAdapter<NoteModel> {
 
     public View getView(int position,View view,ViewGroup parent) {
         LayoutInflater inflater=context.getLayoutInflater();
+
         View rowView=inflater.inflate(R.layout.notelist, null, true);
 
         TextView txtTitle = (TextView) rowView.findViewById(R.id.item);
-        TextView dateTitle = (TextView) rowView.findViewById(R.id.dateTime);
-
-        TextView tagsText = (TextView) rowView.findViewById(R.id.texttags);
-
-// и опять закомментировала из-за изменений
-//        txtTitle.setText(noteModelArrayList.get(position).getNoteText());
-//
-//        dateTitle.setText(noteModelArrayList.get(position).getNoteDate());
-//
-//        tagsText.setText(noteModelArrayList.get(position).getLessonName());
+        TextView dateNote = (TextView)rowView.findViewById(R.id.dateTime);
+        txtTitle.setText(noteModelArrayList.get(position).getName());
+        dateNote.setText(noteModelArrayList.get(position).getDate());
 
         return rowView;
 
-    };
+    }
 }

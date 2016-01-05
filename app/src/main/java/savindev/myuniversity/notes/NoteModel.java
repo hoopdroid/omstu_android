@@ -5,20 +5,27 @@ import android.graphics.Bitmap;
 import java.util.Date;
 import java.util.HashSet;
 
+/**
+ * Класс-объект для заметок
+ */
+
+
 public class NoteModel {
+
+    private int noteId; // идентификатор заметки
     private String name; //имя заметки
     private String text;    //текст заметки
     private NoteType type;  //тип: для дня, для даты, повторяющаяся, мб еще чего придумаем
     private HashSet<Bitmap> pictures;   //здесь будут лежать фотки
     private Priority priority;  //приоритет
-    private Boolean isDone; //выполнено ли
+    private int isDone; //выполнено ли
     private String sender;  //кто отправитель (если можно будет шарить)
-    private Date date;  //дата для заметки, здесь же время, если тип привязки такой
+    private String date;  //дата для заметки, здесь же время, если тип привязки такой
     private String pairId; //не помню, в каком формате лежит этот id. он + дата = уникальный идентификатор пары, для которой заметка. только если тип - для пары
     private Access access; //режим доступа для расшаривания
 
 
-    public NoteModel(String name, String sender, Boolean isDone, Priority priority, HashSet<Bitmap> pictures, NoteType type, String text, Date date, String pairId, Access access) {
+    public NoteModel(String name, String sender, int isDone, Priority priority, HashSet<Bitmap> pictures, NoteType type, String text, String date, String pairId, Access access) {
         this.name = name;
         this.sender = sender;
         this.isDone = isDone;
@@ -79,11 +86,11 @@ public class NoteModel {
         this.priority = priority;
     }
 
-    public Boolean getDone() {
+    public int getDone() {
         return isDone;
     }
 
-    public void setDone(Boolean done) {
+    public void setDone(int done) {
         isDone = done;
     }
 
@@ -95,11 +102,11 @@ public class NoteModel {
         this.sender = sender;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

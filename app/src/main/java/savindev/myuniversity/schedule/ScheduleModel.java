@@ -1,5 +1,6 @@
 package savindev.myuniversity.schedule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import savindev.myuniversity.notes.NoteModel;
@@ -17,9 +18,9 @@ public class ScheduleModel {
     private CellType cellType;
     private boolean isCancelled;
     private List<Pair> pairs;
-    private NoteModel note;
+    private ArrayList<NoteModel> notes;
 
-    public ScheduleModel(String n, String startTime, String endTime, String date, boolean isCancelled, List<Pair> pairs, NoteModel note) {
+    public ScheduleModel(String n, String startTime, String endTime, String date, boolean isCancelled, List<Pair> pairs, ArrayList<NoteModel> notes) {
         this.n = n;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -27,7 +28,7 @@ public class ScheduleModel {
         this.cellType = CellType.PAIR;
         this.pairs = pairs;
         this.isCancelled = isCancelled;
-        this.note = note;
+        this.notes = notes;
     }
 
     public ScheduleModel(CellType cellType, String value) { //конструктор с использованием типа ячейки, для расписания-сетки
@@ -68,12 +69,12 @@ public class ScheduleModel {
         return pairs;
     }
 
-    public NoteModel getNote() {
-        return note;
+    public ArrayList<NoteModel> getNotes() {
+        return notes;
     }
 
-    public void setNote(NoteModel note) {
-        this.note = note;
+    public void setNotes(ArrayList<NoteModel> notes) {
+        this.notes = notes;
     }
 
     public static class Pair {

@@ -1,6 +1,9 @@
 package savindev.myuniversity.schedule;
 
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +23,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import savindev.myuniversity.MainActivity;
+import savindev.myuniversity.NewsFragment;
+import savindev.myuniversity.PairInfoActivity;
 import savindev.myuniversity.R;
 
 public class DailyScheduleFragment extends AbstractSchedule {
@@ -34,7 +39,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
 
         if (view == null) {//Если данные существуют:
             view = inflater.inflate(R.layout.fragment_daily_schedule, container, false);
-            MainActivity.fab.show();
+            MainActivity.fab.hide();
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
             scheduleList = (RecyclerView) view.findViewById(R.id.schedule);
             llm = new LinearLayoutManager(getActivity());
@@ -99,7 +104,9 @@ public class DailyScheduleFragment extends AbstractSchedule {
         }
 
         @Override
-        public void onBindViewHolder(ScheduleViewHolder scheduleViewHolder, int i) {
+        public void onBindViewHolder(final ScheduleViewHolder scheduleViewHolder,final int i) {
+
+
             scheduleViewHolder.pairNumber.setText(models.get(i).getN());
             if (!isGroup)
                 scheduleViewHolder.pairHandler.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_multiple));
@@ -127,6 +134,33 @@ public class DailyScheduleFragment extends AbstractSchedule {
             } else {
                 scheduleViewHolder.pairDateLayout.setVisibility(View.GONE);
             }
+
+
+            scheduleViewHolder.cv.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+
+                    Intent intent = new Intent(context, PairInfoActivity.class);
+                    intent.putExtra("pairname",scheduleViewHolder.pairName.getText());
+                    intent.putExtra("pairtime",scheduleViewHolder.pairDate.getText().toString().substring(0,5)+" "
+                            +scheduleViewHolder.pairDayWeek.getText().toString()+" "+scheduleViewHolder.pairTime.getText().toString().substring(0,5));
+                     intent.putExtra("scheduleId",models.get(i).getPairs().get(0).getIdSchedule());
+                    intent.putExtra("date", models.get(i).getDate());
+                    startActivity(intent);
+
+                }
+            });
+
+            //Work with Notes
+
+          if(!models.get(i).getNotes().isEmpty()){
+              scheduleViewHolder.noteLayout.setVisibility(View.VISIBLE);
+              scheduleViewHolder.pairNote.setText(models.get(i).getNotes().get(0).getName());
+
+          }
+              else
+              scheduleViewHolder.noteLayout.setVisibility(View.GONE);
+
+
         }
     }
 

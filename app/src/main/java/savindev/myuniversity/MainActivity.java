@@ -19,6 +19,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
                     sheetColor, fabColor);
 
+
+
+
         }
     }
 
@@ -91,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void getUserSettings() {
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
-        username = settings.getString("UserFirstName", "") + " " + settings.getString("UserLastName", "");
-        email = settings.getString("email", "no email");
+        username = settings.getString("UserFirstName", "Вы не") + " " + settings.getString("UserLastName", "авторизовались");
+        email = settings.getString("email", "войдите в систему");
     }
 
     void initDrawer() {
@@ -102,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_notes).withSelectedIcon(R.drawable.ic_notes_select);
         PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withSelectedIcon(R.drawable.ic_news_select);
         PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
-        PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
+        PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings).withSelectedIcon(R.drawable.ic_settings_select);
 
         // Create the AccountHeader
@@ -136,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         itemNews,
                         itemEducation,
                         itemPerformance,
+                        new DividerDrawerItem(),
                         itemSettings
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -160,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             case 6:
                                 addfragment(R.string.drawer_performance, new PerformanceFragment());
                                 break;
-                            case 7:
+                            case 8:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
                         }
@@ -170,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
     }
 
-    void addfragment(int title, Fragment fragment) {
+   void addfragment(int title, Fragment fragment) {
         toolbar.setTitle(title);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;

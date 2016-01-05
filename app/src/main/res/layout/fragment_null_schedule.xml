@@ -15,18 +15,21 @@
         android:id="@+id/log_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Залогиниться"/>
+        android:text="Залогиниться"
+        android:layout_gravity="center_horizontal" />
 
     <Button
         android:id="@+id/set_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="В настройки"/>
+        android:text="В настройки"
+        android:layout_gravity="center_horizontal" />
 
     <Button
         android:id="@+id/upd_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Все равно ничего не происходит!"/>
+        android:text="Обновить"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.notes.NoteModel;
 import savindev.myuniversity.schedule.DateUtil;
@@ -958,14 +959,15 @@ public class DBHelper extends SQLiteOpenHelper {
                             dbHelper.getPairsHelper().getPairTime(context, PairsHelper.COL_END_TIME, idPair),
                             cursor.getString(cursor.getColumnIndex(COL_SCHEDULE_DATE)),
                             isCancelled,
-                            list
+                            list,
+                            dbHelper.getNotesHelper().getPairNotes(
+                                    cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),date)
                     );
-
 
                     scheduleModelArrayList.add(scheduleModel);
                     cursor.moveToNext();
                 }
-
+                int a =5;
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
@@ -1433,45 +1435,70 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public class NotesHelper {
-
+        //TODO Поясни мне работу с enum приоритетом и типом
         protected static final String TABLE_NAME = "Notes";
         protected static final String COL_ID_NOTE = "note_id";
-        protected static final String COL_ID_SCHEDULE = "schedule_id";
-        protected static final String COL_LESSON_NAME = "lesson_name";
-        protected static final String COL_NOTE_DATE = "note_date";
-        protected static final String COL_NOTE_TEXT = "note_text";
-        protected static final String COL_PHOTO_LINK = "photo_link";
+        protected static final String COL_NOTE_NAME = "note_name";
+        protected static final String COL_SENDER_NAME = "sender_name";
+        protected static final String COL_IS_DONE= "is_done";
         protected static final String COL_PRIORITY = "priority";
+        protected static final String COL_PHOTO_LINK = "photo_link";
+        protected static final String COL_TYPE_PAIR = "pair_type";
+        protected static final String COL_TYPE_TIME = "pair_time";
+        protected static final String COL_TYPE_REPEAT = "pair_repeat";
+        protected static final String COL_TYPE_DATE = "pair_date";
+        protected static final String COL_NOTE_TEXT = "note_text";
+        protected static final String COL_NOTE_DATE = "note_date";
+        protected static final String COL_PAIR_ID = "pair_id";
+        protected static final String COL_NOTE_TIME = "time";
+        protected static final String COL_REPEAT_TIME = "repeat_time";
+        protected static final String COL_ACCESS = "pair_access";
 
         public void create(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
                     COL_ID_NOTE + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    COL_ID_SCHEDULE + " INTEGER," +
-                    COL_LESSON_NAME + " TEXT," +
-                    COL_NOTE_DATE + " TEXT," +
-                    COL_NOTE_TEXT + " TEXT," +
+                    COL_NOTE_NAME + " TEXT," +
+                    COL_SENDER_NAME + " TEXT," +
+                    COL_IS_DONE + " INTEGER," +
+                    COL_PRIORITY + " TEXT," +
                     COL_PHOTO_LINK + " TEXT," +
-                    COL_PRIORITY + " INTEGER" +
+                    COL_TYPE_PAIR + " INTEGER," +
+                    COL_TYPE_TIME + " INTEGER," +
+                    COL_TYPE_REPEAT + " INTEGER," +
+                    COL_TYPE_DATE + " INTEGER," +
+                    COL_NOTE_TEXT + " TEXT," +
+                    COL_NOTE_DATE + " TEXT," +
+                    COL_PAIR_ID + " TEXT," +//Уникальный идентификатор pairID + Date из Schedules
+                    COL_NOTE_TIME + " TEXT," +
+                    COL_REPEAT_TIME + " TEXT," +
+                    COL_ACCESS + " TEXT" +
                     ");");
         }
 
-        public void setNote( NoteModel noteModel) {
+        public void setPairNote( NoteModel noteModel ) {
 
 
            SQLiteDatabase sqliteDatabase = getWritableDatabase();
 
             ContentValues noteRow = new ContentValues();
-            noteRow.put(COL_ID_SCHEDULE, noteModel.getNoteId());
-            noteRow.put(COL_LESSON_NAME, noteModel.getLessonName());
-            noteRow.put(COL_NOTE_DATE, noteModel.getNoteDate());
-            noteRow.put(COL_NOTE_TEXT, noteModel.getNoteText());
-            noteRow.put(COL_PHOTO_LINK, noteModel.getPhotoLink());
-            noteRow.put(COL_PRIORITY, noteModel.getPriority());
+            noteRow.put(COL_NOTE_NAME, noteModel.getName());
+            noteRow.put(COL_SENDER_NAME, "UserName");
+            noteRow.put(COL_IS_DONE, 0);
+          //TODO   noteRow.put(COL_PRIORITY, noteModel.getPriority().toString());//как тут поступать?
+            noteRow.put(COL_TYPE_PAIR, 1);
+            noteRow.put(COL_NOTE_TEXT, noteModel.getText());
+            noteRow.put(COL_PAIR_ID, noteModel.getPairId());
+            noteRow.put(COL_NOTE_DATE, noteModel.getDate());
 
             sqliteDatabase.insert(TABLE_NAME, null, noteRow);
+
         }
 
-        public ArrayList<NoteModel> getNotes() {
+
+
+
+
+        public ArrayList<NoteModel> getAllNotes() {
             ArrayList<NoteModel> noteModelArrayList = new ArrayList<>();
 
             SQLiteDatabase db;
@@ -1480,19 +1507,22 @@ public class DBHelper extends SQLiteOpenHelper {
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME+" ORDER BY "+ COL_NOTE_DATE + " IS NOT NULL", null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
 
                     NoteModel noteModel = new NoteModel(
-                            cursor.getInt(cursor.getColumnIndex(COL_ID_NOTE)),
-                            cursor.getInt(cursor.getColumnIndex(COL_ID_SCHEDULE)),
-                            cursor.getString(cursor.getColumnIndex(COL_LESSON_NAME)),
-                            cursor.getString(cursor.getColumnIndex(COL_NOTE_DATE)),
+                            cursor.getString(cursor.getColumnIndex(COL_NOTE_NAME)),
+                            null,
+                            0,
+                            null,
+                            null,
+                            null,
                             cursor.getString(cursor.getColumnIndex(COL_NOTE_TEXT)),
-                            cursor.getString(cursor.getColumnIndex(COL_PHOTO_LINK)),
-                            cursor.getInt(cursor.getColumnIndex(COL_PRIORITY))
+                            cursor.getString(cursor.getColumnIndex(COL_NOTE_DATE)),
+                            null,
+                            null
                     );
                     noteModelArrayList.add(noteModel);
                     cursor.moveToNext();
@@ -1503,12 +1533,53 @@ public class DBHelper extends SQLiteOpenHelper {
             }
 
             return  noteModelArrayList;
+
         }
 
-        public  void deleteNote(int note){
+
+        public ArrayList<NoteModel> getPairNotes(int scheduleId,String scheduleDate) {
+            ArrayList<NoteModel> noteModelArrayList = new ArrayList<>();
+
+            SQLiteDatabase db;
+
+            String pairId = Integer.toString(scheduleId)+scheduleDate;
+            db = getReadableDatabase();
+
+            Cursor cursor;
+            try {
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " +COL_PAIR_ID + " = "+ pairId, null);
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+                    NoteModel noteModel = new NoteModel(
+                            cursor.getString(cursor.getColumnIndex(COL_NOTE_NAME)),
+                            cursor.getString(cursor.getColumnIndex(COL_SENDER_NAME)),
+                            cursor.getInt(cursor.getColumnIndex(COL_IS_DONE)),
+                            null,
+                            null,
+                            null,
+                            cursor.getString(cursor.getColumnIndex(COL_NOTE_TEXT)),
+                            cursor.getString(cursor.getColumnIndex(COL_NOTE_DATE)),
+                            cursor.getString(cursor.getColumnIndex(COL_PAIR_ID)),
+                            null
+                    );
+                    noteModelArrayList.add(noteModel);
+                    cursor.moveToNext();
+                }
+
+            } catch (SQLiteException e) {
+                Log.e("SQLITE DB EXCEPTION", e.toString(), e);
+            }
+
+            return  noteModelArrayList;
+
+        }
+
+        public void deleteNote(int idNote){
             SQLiteDatabase db;
             db = getWritableDatabase();
-            db.delete(TABLE_NAME, COL_ID_NOTE + "=" + note, null);
+            db.delete(TABLE_NAME, COL_ID_NOTE + "=" + idNote, null);
         }
 
 

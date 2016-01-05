@@ -66,7 +66,6 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
                 month = "0" + month;
             daySchedule = DBHelper.SchedulesHelper.getSchedules(context, "" + calendar.get(Calendar.YEAR) + month + day,
                     currentID, isGroup);  //Получение расписания на день
-
             if (daySchedule == null)
                 return positions;   //null - семестр уже закончился
 
