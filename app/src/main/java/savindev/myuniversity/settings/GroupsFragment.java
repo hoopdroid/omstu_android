@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
@@ -20,7 +19,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
-import android.widget.Toast;
+
+import com.github.jorgecastilloprz.FABProgressCircle;
+import com.github.jorgecastilloprz.listeners.FABProgressListener;
+import com.melnykov.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -37,8 +39,10 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private ExpListAdapter adapter;
     private MenuItem refreshItem;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private MenuItem searchItem;
-    private SearchView searchView;
+    private FloatingActionButton fab;
+    private FABProgressCircle fabProgressCircle;
+    private boolean fail = false;
+
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,9 +59,34 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fabProgressCircle = (FABProgressCircle) view.findViewById(R.id.fabProgressCircle);
+        fab.hide();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fabProgressCircle.show();
+                save();
+            }
+        });
+        fabProgressCircle.attachListener(new FABProgressListener() {
+            @Override
+            public void onFABProgressAnimationEnd() {
+
+            }
+        });
+//        fabProgressCircle.attachListener(new FABProgressListener() {
+//            @Override
+//            public void onFABProgressAnimationEnd() {
+//                fab.hide();
+//                fabProgressCircle.hide();
+//            }
+//        });
         parse();
 
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("FINISH_UPDATE"));
+        getActivity().registerReceiver(broadcastReceiverDownloadFinish, new IntentFilter("FINISH_DOWNLOAD"));
 //        MainActivity.setView(view);
         MainActivity.fab.hide();
         return view;
@@ -70,6 +99,18 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
     };
 
+    BroadcastReceiver broadcastReceiverDownloadFinish = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (fail) {
+                fabProgressCircle.hide();
+            } else {
+                fab.hide();
+                fabProgressCircle.hide();
+            }
+        }
+    };
+
     @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(true);
@@ -79,9 +120,10 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.groups_settings, menu);
-        searchItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint("Поиск");
+        searchView.setMaxWidth(getActivity().getResources().getDisplayMetrics().widthPixels / 2);
         searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
             @Override
@@ -102,17 +144,6 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save:
-                save();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
     private void parse() {
         DBHelper dbHelper = DBHelper.getInstance(getActivity().getBaseContext());
         ArrayList<String> faculty = dbHelper.getFacultiesHelper().getFaculties(getActivity());
@@ -129,63 +160,58 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
             models.add(dbHelper.getTeachersHelper().getTeachers(getActivity(), departments.get(i)));
         }
 
-
-        adapter = new ExpListAdapter(getActivity().getApplicationContext(), parents, models);
+        adapter = new ExpListAdapter(getActivity().getApplicationContext(), parents, models, fab);
         list.setAdapter(adapter); //При тыке на пункт меню
     }
 
     public void save() {
-        ArrayList<GroupsModel> addList = adapter.getAddList(); //Запрос на сервер для загрузки, внести в новый список
-        ArrayList<GroupsModel> deleteList = adapter.getDeleteList(); //удалить из БД расписаний и из списка групп
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<GroupsModel> addList = adapter.getAddList(); //Запрос на сервер для загрузки, внести в новый список
+                ArrayList<GroupsModel> deleteList = adapter.getDeleteList(); //удалить из БД расписаний и из списка групп
 
-        if (!addList.isEmpty()) {
-            //Запрос к базе
-            GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), null);
-            if (MainActivity.isNetworkConnected(getActivity())) {
-                refreshItem.setActionView(R.layout.actionbar_progress); //Показать загрузку данных
-                refreshItem.setVisible(true);
-                for (GroupsModel model : addList) {
-                    model.setLastRefresh(getActivity().getResources().getString(R.string.unix)); //Установка даты последнего обновления - нет обновлений
-                }
-                gst.execute(addList.toArray(new GroupsModel[addList.size()])); //Выполняем запрос на получение нужных расписаний
-                try {  //TODO сделать красивое отображение загрузки
-                    if (gst.get() == -1) {
-                        refreshItem.setVisible(false);
+                if (!addList.isEmpty()) {
+                    //Запрос к базе
+                    GetScheduleTask gst = new GetScheduleTask(getActivity().getBaseContext(), null);
+                    if (MainActivity.isNetworkConnected(getActivity())) {
+                        for (GroupsModel model : addList) {
+                            model.setLastRefresh(getActivity().getResources().getString(R.string.unix)); //Установка даты последнего обновления - нет обновлений
+                        }
+                        gst.execute(addList.toArray(new GroupsModel[addList.size()])); //Выполняем запрос на получение нужных расписаний
+                        try {  //TODO сделать красивое отображение загрузки
+                            if (gst.get() == -1)
+                                fail = true;
+                            else
+                                fail = false;
+                        } catch (Exception e) {
+                            fail = true;
+                            e.printStackTrace();
+                        }
                     } else {
-                        refreshItem.setActionView(R.layout.actionbar_finish); //В случае успешной загрузки показать галочку на месте progressbar, через секунду скрыть
-                        new CountDownTimer(500, 500) {
-                            public void onTick(long millisUntilFinished) {
-                            }
-
-                            public void onFinish() {
-                                refreshItem.setVisible(false);
-                            }
-                        }.start();
+                        fail = true;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    //Занести новые данные в список - в getScheduleTask, после успешной загрузки
                 }
-            } else {
-                Toast.makeText(getActivity(), "Не удалось получить списки" + '\n'
-                        + "Проверье соединение с интернетом", Toast.LENGTH_LONG).show();
-            }
-            //Занести новые данные в список - в getScheduleTask, после успешной загрузки
-        }
 
-        if (!deleteList.isEmpty()) { //Если есть группы для удаления - удалить
-            for (GroupsModel model : deleteList) {
-                if(model.isGroup())
-                    DBHelper.SchedulesHelper.deleteGroupSchedule(getActivity().getBaseContext(), model.getId());
-                else
-                    DBHelper.SchedulesHelper.deleteTeacherchedule(getActivity().getBaseContext(), model.getId());
+                if (!deleteList.isEmpty()) { //Если есть группы для удаления - удалить
+                    for (GroupsModel model : deleteList) {
+                        if (model.isGroup())
+                            DBHelper.SchedulesHelper.deleteGroupSchedule(getActivity().getBaseContext(), model.getId());
+                        else
+                            DBHelper.SchedulesHelper.deleteTeacherchedule(getActivity().getBaseContext(), model.getId());
+                    }
+                }
+                adapter.deleteLists(); //Подчистить на случай повторного сохранения
+                getActivity().sendBroadcast(new Intent("FINISH_DOWNLOAD"));
             }
-        }
-        adapter.deleteLists(); //Подчистить на случай повторного сохранения
+        }).start();
     }
 
     @Override
     public void onDetach() {
         getActivity().unregisterReceiver(broadcastReceiver);
+        getActivity().unregisterReceiver(broadcastReceiverDownloadFinish);
         super.onDetach();
     }
 }

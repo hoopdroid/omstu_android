@@ -30,7 +30,6 @@
     </FrameLayout>
 
 
-    <!-- Your FAB implementation -->
     <savindev.myuniversity.Fab
         android:id="@+id/fab"
         style="@style/Widget.MaterialSheetFab.Fab"
