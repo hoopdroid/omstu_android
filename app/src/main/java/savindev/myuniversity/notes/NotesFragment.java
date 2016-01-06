@@ -83,8 +83,8 @@ public class NotesFragment extends Fragment {
 
         //Выбор типа показа заметок
         if(scheduleId==0||date.equals("")){
-        noteModelArrayList =  dbHelper.getNotesHelper().getAllNotes();
-        isPair=false;}// Все заметки из БД
+            noteModelArrayList =  dbHelper.getNotesHelper().getAllNotes();
+            isPair=false;}// Все заметки из БД
         else {
             noteModelArrayList = dbHelper.getNotesHelper().getPairNotes(scheduleId, date);// Заметки к паре
         }
@@ -107,7 +107,7 @@ public class NotesFragment extends Fragment {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-                        //TODO add DONE move
+
                         //TODO Убрать дублирование кода
                         if(isPair) {
                             int note = dbHelper.getNotesHelper().getPairNotes(scheduleId, date).get(position).getNoteId();
@@ -119,12 +119,8 @@ public class NotesFragment extends Fragment {
                             }
                         break;
                     case 1:
-                        //TODO ADD DELETING NOTE (PROBLEM : DELETE BY ? IF BY ID HOW TO SET ID IN NOTE COS ITS AUTOINCREMENT
-
                         if(isPair) {
                             int note = dbHelper.getNotesHelper().getPairNotes(scheduleId, date).get(position).getNoteId();
-                            Log.d("NOTE",Integer.toString(note));
-                            int a =5;
                             dbHelper.getNotesHelper().deleteNote(note);
                             refresh(R.id.pairNotesList); }
                             else {

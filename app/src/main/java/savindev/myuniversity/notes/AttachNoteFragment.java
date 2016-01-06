@@ -4,6 +4,7 @@ package savindev.myuniversity.notes;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,7 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 
-import savindev.myuniversity.AttachActivity;
+import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 
@@ -69,11 +70,13 @@ public class AttachNoteFragment extends Fragment {
 
     public static NoteModel saveNote() {
 
-
+        noteName = AttachActivity.noteName.getText().toString();
+        Log.d("NOTE NAME",noteName);
         noteText = textNote.getText().toString();
         String pairId = Integer.toString(AttachActivity.scheduleId)+AttachActivity.date;
         //TODO null for int = -1 ? =-)
-        return new NoteModel(AttachActivity.noteName.getText().toString(), "username",0,null,null,
+        return new NoteModel(noteName, "username",0,
+               Priority.fromInt(priority.getSelectedItemPosition()),null,
         null,noteText,AttachActivity.time,pairId,null);
 
 

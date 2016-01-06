@@ -7,20 +7,32 @@ public enum Priority {
     MEDIUM("Средний приоритет"),
     LOW("Низкий приоритет");
 
-    private static final String[] names = {"Высокий приоритет",
-            "Средний приоритет","Низкий приоритет"};
-    private final String priority;
+
+    private String priority;
 
     Priority(String priority) {
+
         this.priority = priority;
     }
 
-    public static Priority fromString(String priorityColor)  {
-        return valueOf(priorityColor);
+    public String getPriority(){
+        return  this.priority;
     }
 
+    public static Priority fromString(String priority)  {
+        if (priority != null) {
+            for (Priority b : Priority.values()) {
+                if (priority.equalsIgnoreCase(b.priority)) {
+                    return b;
+                }
+            }
+        }
+        return null;
+    }
+
+
     public static Priority fromInt(int num)  {
-        return fromString(names[num]);
+        return values()[num];
     }
 
     @Override public String toString(){

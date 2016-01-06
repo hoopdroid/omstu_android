@@ -37,10 +37,25 @@ public class NoteListAdapter extends ArrayAdapter<NoteModel> {
         TextView txtTitle = (TextView) rowView.findViewById(R.id.item);
         TextView dateNote = (TextView)rowView.findViewById(R.id.dateTime);
         ImageView priorityLine = (ImageView)rowView.findViewById(R.id.priorityLine);
+
+        switch (noteModelArrayList.get(position).getPriority()){
+
+            case HIGH:
+                priorityLine.setImageResource(R.drawable.line_red);
+                break;
+            case MEDIUM:
+                priorityLine.setImageResource(R.drawable.line_orange);
+                break;
+            case LOW:
+                priorityLine.setImageResource(R.drawable.line_yellow);
+                break;
+        }
+
         if (noteModelArrayList.get(position).getIsDone() == 1){
             priorityLine.setImageResource(R.drawable.line_green);
             txtTitle.setPaintFlags(txtTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             }
+
         txtTitle.setText(noteModelArrayList.get(position).getName());
         dateNote.setText(noteModelArrayList.get(position).getDate());
 

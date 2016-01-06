@@ -35,11 +35,11 @@ public class AttachActivity extends AppCompatActivity {
         noteName = (EditText) findViewById(R.id.noteTitle);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+
             typeAttach = extras.getString("TypeAttach");//тип добавляемого материала TODO переделать в  NoteType
             scheduleId = extras.getInt("scheduleId", 0);
             date = extras.getString("date", "");
             time = extras.getString("time", "");
-
 
         }
         final DBHelper dbHelper = new DBHelper(this);

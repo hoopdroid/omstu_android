@@ -14,7 +14,6 @@ public class NoteModel {
 
 
     private int noteId; // идентификатор заметки
-
     private String name; //имя заметки
     private String text;    //текст заметки
     private NoteType type;  //тип: для дня, для даты, повторяющаяся, мб еще чего придумаем
@@ -43,6 +42,7 @@ public class NoteModel {
     }
 
     public NoteModel(String name, String sender, int isDone, Priority priority, HashSet<Bitmap> pictures, NoteType type, String text, String date, String pairId, Access access) {
+        this.name = name ;
         this.sender = sender;
         this.isDone = isDone;
         this.priority = priority;

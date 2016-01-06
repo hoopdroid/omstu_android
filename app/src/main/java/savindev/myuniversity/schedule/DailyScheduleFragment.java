@@ -148,9 +148,20 @@ public class DailyScheduleFragment extends AbstractSchedule {
 
             //Work with Notes
 
-          if(!models.get(i).getNotes().isEmpty()){
+          if(!models.get(i).getNotes().isEmpty()&&models.get(i).getNotes().get(0).getIsDone()==0){
               scheduleViewHolder.noteLayout.setVisibility(View.VISIBLE);
               scheduleViewHolder.pairNote.setText(models.get(i).getNotes().get(0).getName());
+              switch (models.get(i).getNotes().get(0).getPriority()){
+                  case HIGH:
+                      scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_red_400));
+                      break;
+                  case MEDIUM:
+                      scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_orange_400));
+                      break;
+                  case LOW:
+                      scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_yellow_400));
+                      break;
+              }
 
           }
               else
