@@ -26,7 +26,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
-import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.notes.NotesFragment;
 import savindev.myuniversity.performance.PerformanceFragment;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String username;
     String email;
     MaterialSheetFab materialSheetFab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             } else { //Если интернета нет - предложить запуститься еще раз
                 setContentView(R.layout.activity_main);
-                FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
             }
         } else {
@@ -63,9 +64,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             setSupportActionBar(toolbar);
             getUserSettings();
             initDrawer();
-            DBHelper dbHelper = DBHelper.getInstance(this);
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
-            fab = (Fab)findViewById(R.id.fab);
+            fab = (Fab) findViewById(R.id.fab);
             fab.hide();
             View sheetView = findViewById(R.id.fab_sheet);
             View overlay = findViewById(R.id.overlay);
@@ -73,14 +73,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int fabColor = getResources().getColor(R.color.accent);
 
             // Initialize material sheet FAB
-                    noteadd = (TextView)findViewById(R.id.fab_sheet_item_note);
-                    noteadd.setOnClickListener(this);
-                    materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
+            noteadd = (TextView) findViewById(R.id.fab_sheet_item_note);
+            noteadd.setOnClickListener(this);
+            materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
                     sheetColor, fabColor);
-
-
-
-
         }
     }
 
@@ -120,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
 
-                       Intent i = new Intent(getApplicationContext(),ProfileActivity.class);
+                        Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
                         startActivity(i);
 
                         return false;
@@ -175,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
     }
 
-   void addfragment(int title, Fragment fragment) {
+    void addfragment(int title, Fragment fragment) {
         toolbar.setTitle(title);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
@@ -193,39 +189,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private static String mFragment;
+
     public static String getFragment() {
         return mFragment;
     }
+
     public static void setFragment(String fragment) {
         mFragment = fragment;
     }
+
     private static View view;
+
     public static View getView() {
         return view;
     }
+
     public static void setView(View v) {
         view = v;
     }
+
     private static int openGroup;
     private static boolean openIsGroup;
     private static String openGroupName;
     private static String positionDate;
     private static String positionN;
+
     public static int getOpenGroup() {
         return openGroup;
     }
+
     public static boolean isOpenIsGroup() {
         return openIsGroup;
     }
+
     public static String getOpenGroupName() {
         return openGroupName;
     }
+
     public static String getPositionDate() {
         return positionDate;
     }
+
     public static String getPositionN() {
         return positionN;
     }
+
     public static void clearPositions() {
         positionDate = null;
         positionN = null;
@@ -245,9 +253,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v==noteadd){
-            Intent i = new Intent(getApplicationContext(),AttachActivity.class);
-            i.putExtra("TypeAttach","Note");
+        if (v == noteadd) {
+            Intent i = new Intent(getApplicationContext(), AttachActivity.class);
+            i.putExtra("TypeAttach", "Note");
             startActivity(i);
             materialSheetFab.hideSheet();
         }

@@ -13,6 +13,8 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.melnykov.fab.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -35,12 +37,14 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
     private ArrayList<GroupsModel> deleteList = new ArrayList<>();
     private ArrayList<GroupsModel> addList = new ArrayList<>();
     private GroupsModel main;
+    private FloatingActionButton mFab;
 
     public ExpListAdapter(Context context, ArrayList<String> names,
-                          ArrayList<ArrayList<GroupsModel>> groups) {
+                          ArrayList<ArrayList<GroupsModel>> groups, FloatingActionButton fab) {
         mContext = context;
         mNames = names;
         mGroup = groups;
+        mFab = fab;
 
         //Для выделения элементов, сохранных в расписании ранее
         ArrayList<GroupsModel> oldListModel = DBHelper.UsedSchedulesHelper.getGroupsModelList(context); //Список старых групп
@@ -159,6 +163,17 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
                         mGroup.get(groupPosition).get(childPosition).setSelected(false);
                         deleteGroup(mGroup.get(groupPosition).get(childPosition));
                     }
+                }
+                boolean ae = addList.isEmpty();
+                boolean de = deleteList.isEmpty();
+                boolean f = mFab.isVisible();
+                if (ae && de && f) { //Скрыть, если изменений нет, а кнопка видна
+                    mFab.hide();
+                }
+                if ((!ae ||
+                        !de)
+                        && !f) {//Показать, если изменения есть, а кнопки не видно
+                    mFab.show();
                 }
             }
         });

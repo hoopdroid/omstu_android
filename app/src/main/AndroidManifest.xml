@@ -39,11 +39,11 @@
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.Common" />
         <activity
-            android:name=".AttachActivity"
+            android:name=".notes.AttachActivity"
             android:label="@string/title_activity_attach"
             android:theme="@style/AppTheme.Common" />
         <activity
-            android:name=".PairInfoActivity"
+            android:name=".schedule.PairInfoActivity"
             android:label="@string/title_activity_pair_info"
             android:theme="@style/AppTheme.Common"></activity>
     </application>

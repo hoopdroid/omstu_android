@@ -13,7 +13,6 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 
-import savindev.myuniversity.AttachActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 
@@ -22,7 +21,7 @@ import savindev.myuniversity.db.DBHelper;
  */
 
 //используй модель
-    //делай переменные приватными
+//делай переменные приватными
 public class AttachNoteFragment extends Fragment {
 
     static EditText textNote;
@@ -56,6 +55,7 @@ public class AttachNoteFragment extends Fragment {
 
         dbHelper = new DBHelper(getActivity());
 
+        //CR что за странный вопросик? ты должен знать, что там внутри, вот и параметризуй нормально
         ArrayAdapter<?> adapterPriority =
                 ArrayAdapter.createFromResource(getActivity(), R.array.notePriority, android.R.layout.simple_spinner_item);
         adapterPriority.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -79,9 +79,9 @@ public class AttachNoteFragment extends Fragment {
 
         lesson = lessonName.getSelectedItem().toString();
         noteText = textNote.getText().toString();
-        String pairId = Integer.toString(AttachActivity.scheduleId)+AttachActivity.date;
-        return new NoteModel(AttachActivity.noteName.getText().toString(), "username",0,null,null,
-        null,noteText,AttachActivity.time,pairId,null);
+        String pairId = Integer.toString(AttachActivity.scheduleId) + AttachActivity.date;
+        return new NoteModel(AttachActivity.noteName.getText().toString(), "username", 0, null, null,
+                null, noteText, AttachActivity.time, pairId, null);
 
 
     }

@@ -82,7 +82,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
             if (!isGroup) //Сортировать только для преподавателей
                 daySchedule = groupPacking(daySchedule);
             if (!isLinear) {//Переформировывать только для сетки
-                toGridView(daySchedule, i == 0);
+                toGridView(daySchedule);
             }
             positions.put((GregorianCalendar) calendar.clone(), data.size() + 1 + oldDataSize);
             data.addAll(daySchedule);
@@ -90,7 +90,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
         return positions;
     }
 
-    private ArrayList<ScheduleModel> groupPacking(ArrayList<ScheduleModel> pairs) { //Решение проблемы со множеством групп в одно время у преподавателей
+    private ArrayList<ScheduleModel> groupPacking(ArrayList<ScheduleModel> pairs) { //Решение проблемы со множеством групп в одно время у преподавателей. считается, что у него не может быть несколько пар в одно время - get(0)
         ArrayList<ScheduleModel> schedule = new ArrayList<>();
         ScheduleModel pair;
         int skip = 1;
@@ -99,7 +99,10 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
             while (i + skip < pairs.size() && pairs.get(i).getN().equals(pairs.get(i + skip).getN()) &&
                     pairs.get(i).getPairs().get(0).getName().equals(pairs.get(i + skip).getPairs().get(0).getName()) &&
                     pairs.get(i).getPairs().get(0).isCancelled() == (pairs.get(i + skip).getPairs().get(0).isCancelled())) {
-                pair.getPairs().get(i).setTeacher(pair.getPairs().get(0).getTeacher() + ", " + pairs.get(i + skip).getPairs().get(0).getTeacher());
+                if (pairs.get(i + skip) == null) {
+                    break;
+                }
+                pair.getPairs().get(0).setTeacher(pair.getPairs().get(0).getTeacher() + ", " + pairs.get(i + skip).getPairs().get(0).getTeacher());
                 skip++;
             }
             schedule.add(pair);
@@ -110,8 +113,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
         return schedule;
     }
 
-    private void toGridView(ArrayList<ScheduleModel> pairs, boolean isFirst) { //переформирование для сетки
-        ArrayList<ScheduleModel> schedule = new ArrayList<>();
+    private void toGridView(ArrayList<ScheduleModel> pairs) { //переформирование для сетки
         //Добавить окна
         int i = 0;
         int pairCount = DBHelper.getInstance(context).getPairsHelper().getPairsInDay(context);

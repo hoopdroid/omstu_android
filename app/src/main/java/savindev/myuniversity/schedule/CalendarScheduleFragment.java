@@ -2,7 +2,6 @@ package savindev.myuniversity.schedule;
 
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -33,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import savindev.myuniversity.MainActivity;
-import savindev.myuniversity.PairInfoActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 

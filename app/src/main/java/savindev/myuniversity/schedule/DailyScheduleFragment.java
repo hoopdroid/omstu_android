@@ -1,8 +1,6 @@
 package savindev.myuniversity.schedule;
 
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,8 +21,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import savindev.myuniversity.MainActivity;
-import savindev.myuniversity.NewsFragment;
-import savindev.myuniversity.PairInfoActivity;
 import savindev.myuniversity.R;
 
 public class DailyScheduleFragment extends AbstractSchedule {

@@ -43,17 +43,18 @@ public class NotesFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         final View view = inflater.inflate(R.layout.fragment_notes, container, false);
-        final SwipeMenuListView listView = (SwipeMenuListView)view.findViewById(R.id.listView);
+        final SwipeMenuListView listView = (SwipeMenuListView) view.findViewById(R.id.listView);
 
         MainActivity.fab.show();
 
         Bundle arg = getActivity().getIntent().getExtras();
-        int scheduleId=0;
+        int scheduleId = 0;
         String date = "";
-        if(arg!=null){
-            scheduleId = arg.getInt("scheduleId",0);
-            date = arg.getString("date","");}
-        emptyNotesLayout = (RelativeLayout)view.findViewById(R.id.no_notes);
+        if (arg != null) {
+            scheduleId = arg.getInt("scheduleId", 0);
+            date = arg.getString("date", "");
+        }
+        emptyNotesLayout = (RelativeLayout) view.findViewById(R.id.no_notes);
         SwipeMenuCreator creator = new SwipeMenuCreator() {
 
             @Override
@@ -80,13 +81,14 @@ public class NotesFragment extends Fragment {
         ArrayList<NoteModel> noteModelArrayList;
 
         //Выбор типа показа заметок
-        if(scheduleId==0||date.equals("")){
-        noteModelArrayList =  dbHelper.getNotesHelper().getAllNotes();}// Все заметки из БД
+        if (scheduleId == 0 || date.equals("")) {
+            noteModelArrayList = dbHelper.getNotesHelper().getAllNotes();
+        }// Все заметки из БД
         else
-        noteModelArrayList = dbHelper.getNotesHelper().getPairNotes(scheduleId,date);// Заметки к паре
+            noteModelArrayList = dbHelper.getNotesHelper().getPairNotes(scheduleId, date);// Заметки к паре
 
-        NoteListAdapter adapter=new NoteListAdapter(getActivity(),
-               noteModelArrayList);
+        NoteListAdapter adapter = new NoteListAdapter(getActivity(),
+                noteModelArrayList);
 
         listView.setMenuCreator(creator);
         listView.setAdapter(adapter);
@@ -94,7 +96,7 @@ public class NotesFragment extends Fragment {
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(),"EDIT MOVE DELETE", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "EDIT MOVE DELETE", Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -110,7 +112,7 @@ public class NotesFragment extends Fragment {
                         //TODO ADD DELETING NOTE (PROBLEM : DELETE BY ? IF BY ID HOW TO SET ID IN NOTE COS ITS AUTOINCREMENT
 //                        закомментировала, тбо изменила формат модели. не уверена, что на этом уровне должен быть доступ к id заметок, надо подумать (вопросы синхронизации)
 //                        dbHelper.getNotesHelper().deleteNote(dbHelper.getNotesHelper().getNotes().get(position).getNoteId());
-                      //  refresh();
+                        //  refresh();
                         break;
                 }
                 // false : close the menu; true : not close the menu
@@ -119,30 +121,29 @@ public class NotesFragment extends Fragment {
         });
 
 
-        if(noteModelArrayList.size() == 0)
+        if (noteModelArrayList.size() == 0)
             emptyNotesLayout.setVisibility(View.VISIBLE);
         else
             emptyNotesLayout.setVisibility(View.GONE);
 
-       //TODO Некорректно работает скроллинг на sdk <20 Следует перейти на RecyclerView
+        //TODO Некорректно работает скроллинг на sdk <20 Следует перейти на RecyclerView
         ViewCompat.setNestedScrollingEnabled(listView, true);
 
 
         return view;
     }
 
-    public void refresh(){
-        FragmentManager manager  = getFragmentManager();
+    public void refresh() {
+        FragmentManager manager = getFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
         Fragment newFragment = this;
         this.onDestroy();
         ft.remove(this);
-        ft.replace(R.id.content_main,newFragment);
+        ft.replace(R.id.content_main, newFragment);
         //container is the ViewGroup of current fragment
         ft.addToBackStack(null);
         ft.commit();
     }
-
 
 
 }
