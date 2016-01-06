@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,9 @@ import savindev.myuniversity.db.DBHelper;
 public class NotesFragment extends Fragment {
 
     RelativeLayout emptyNotesLayout;
-
+    int scheduleId;
+    String date;
+    boolean isPair=true;
     public NotesFragment() {
 
     }
@@ -48,8 +51,8 @@ public class NotesFragment extends Fragment {
         MainActivity.fab.show();
 
         Bundle arg = getActivity().getIntent().getExtras();
-        int scheduleId=0;
-        String date = "";
+        scheduleId=0;
+        date = "";
         if(arg!=null){
             scheduleId = arg.getInt("scheduleId",0);
             date = arg.getString("date","");}
@@ -69,8 +72,7 @@ public class NotesFragment extends Fragment {
 
                 SwipeMenuItem deleteItem = new SwipeMenuItem(
                         getActivity());
-                deleteItem.setBackground(new ColorDrawable(getResources().getColor(R.color.md_red_500)));
-                deleteItem.setWidth(200);
+                deleteItem.setBackground(new ColorDrawable(getResources().getColor(R.color.md_red_500)));                deleteItem.setWidth(200);
                 deleteItem.setIcon(R.drawable.ic_delete_white_24dp);
                 menu.addMenuItem(deleteItem);
             }
@@ -81,10 +83,11 @@ public class NotesFragment extends Fragment {
 
         //Выбор типа показа заметок
         if(scheduleId==0||date.equals("")){
-        noteModelArrayList =  dbHelper.getNotesHelper().getAllNotes();}// Все заметки из БД
-        else
-        noteModelArrayList = dbHelper.getNotesHelper().getPairNotes(scheduleId,date);// Заметки к паре
-
+        noteModelArrayList =  dbHelper.getNotesHelper().getAllNotes();
+        isPair=false;}// Все заметки из БД
+        else {
+            noteModelArrayList = dbHelper.getNotesHelper().getPairNotes(scheduleId, date);// Заметки к паре
+        }
         NoteListAdapter adapter=new NoteListAdapter(getActivity(),
                noteModelArrayList);
 
@@ -105,15 +108,31 @@ public class NotesFragment extends Fragment {
                 switch (index) {
                     case 0:
                         //TODO add DONE move
+                        //TODO Убрать дублирование кода
+                        if(isPair) {
+                            int note = dbHelper.getNotesHelper().getPairNotes(scheduleId, date).get(position).getNoteId();
+                            dbHelper.getNotesHelper().setNoteIsDone(note);
+                            refresh(R.id.pairNotesList); }
+                        else {
+                            dbHelper.getNotesHelper().setNoteIsDone(dbHelper.getNotesHelper().getAllNotes().get(position).getNoteId());
+                            refresh(R.id.content_main);
+                            }
                         break;
                     case 1:
                         //TODO ADD DELETING NOTE (PROBLEM : DELETE BY ? IF BY ID HOW TO SET ID IN NOTE COS ITS AUTOINCREMENT
-//                        закомментировала, тбо изменила формат модели. не уверена, что на этом уровне должен быть доступ к id заметок, надо подумать (вопросы синхронизации)
-//                        dbHelper.getNotesHelper().deleteNote(dbHelper.getNotesHelper().getNotes().get(position).getNoteId());
-                      //  refresh();
+
+                        if(isPair) {
+                            int note = dbHelper.getNotesHelper().getPairNotes(scheduleId, date).get(position).getNoteId();
+                            Log.d("NOTE",Integer.toString(note));
+                            int a =5;
+                            dbHelper.getNotesHelper().deleteNote(note);
+                            refresh(R.id.pairNotesList); }
+                            else {
+                            dbHelper.getNotesHelper().deleteNote(dbHelper.getNotesHelper().getAllNotes().get(position).getNoteId());
+                            refresh(R.id.content_main); }
                         break;
                 }
-                // false : close the menu; true : not close the menu
+
                 return false;
             }
         });
@@ -131,14 +150,13 @@ public class NotesFragment extends Fragment {
         return view;
     }
 
-    public void refresh(){
+    public void refresh(int idlayout){
         FragmentManager manager  = getFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
         Fragment newFragment = this;
         this.onDestroy();
         ft.remove(this);
-        ft.replace(R.id.content_main,newFragment);
-        //container is the ViewGroup of current fragment
+        ft.replace(idlayout,newFragment);
         ft.addToBackStack(null);
         ft.commit();
     }

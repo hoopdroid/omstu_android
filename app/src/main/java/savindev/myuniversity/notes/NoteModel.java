@@ -12,7 +12,9 @@ import java.util.HashSet;
 
 public class NoteModel {
 
+
     private int noteId; // идентификатор заметки
+
     private String name; //имя заметки
     private String text;    //текст заметки
     private NoteType type;  //тип: для дня, для даты, повторяющаяся, мб еще чего придумаем
@@ -25,7 +27,8 @@ public class NoteModel {
     private Access access; //режим доступа для расшаривания
 
 
-    public NoteModel(String name, String sender, int isDone, Priority priority, HashSet<Bitmap> pictures, NoteType type, String text, String date, String pairId, Access access) {
+
+    public NoteModel(int noteId,String name, String sender, int isDone, Priority priority, HashSet<Bitmap> pictures, NoteType type, String text, String date, String pairId, Access access) {
         this.name = name;
         this.sender = sender;
         this.isDone = isDone;
@@ -36,6 +39,20 @@ public class NoteModel {
         this.date = date;
         this.pairId = pairId;
         this.access = access;
+        this.noteId = noteId;
+    }
+
+    public NoteModel(String name, String sender, int isDone, Priority priority, HashSet<Bitmap> pictures, NoteType type, String text, String date, String pairId, Access access) {
+        this.sender = sender;
+        this.isDone = isDone;
+        this.priority = priority;
+        this.pictures = pictures;
+        this.type = type;
+        this.text = text;
+        this.date = date;
+        this.pairId = pairId;
+        this.access = access;
+        this.noteId = noteId;
     }
 
     public Access getAccess() {
@@ -79,6 +96,7 @@ public class NoteModel {
     }
 
     public Priority getPriority() {
+
         return priority;
     }
 
@@ -116,5 +134,21 @@ public class NoteModel {
 
     public void setPairId(String pairId) {
         this.pairId = pairId;
+    }
+
+    public int getNoteId() {
+        return noteId;
+    }
+
+    public void setNoteId(int noteId) {
+        this.noteId = noteId;
+    }
+
+    public int getIsDone() {
+        return isDone;
+    }
+
+    public void setIsDone(int isDone) {
+        this.isDone = isDone;
     }
 }

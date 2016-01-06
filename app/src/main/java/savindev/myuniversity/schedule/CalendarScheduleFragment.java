@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -232,12 +231,12 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     case DAY:
                         scheduleViewHolder.pairName.setText(models.get(i).getDate());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
-                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary));
                         break;
                     case DATE:
                         scheduleViewHolder.pairName.setText(models.get(i).getDate());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
-                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary));
                         break;
                     case PAIR:
                         if (!checkedPairFilters(models.get(i))) {
@@ -293,7 +292,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     case MONTH:
                         scheduleViewHolder.pairName.setText(month(models.get(i).getDate()));
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
-                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary));
                         break;
 
                 }

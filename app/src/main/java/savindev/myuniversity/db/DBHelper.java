@@ -1484,7 +1484,7 @@ public class DBHelper extends SQLiteOpenHelper {
             noteRow.put(COL_NOTE_NAME, noteModel.getName());
             noteRow.put(COL_SENDER_NAME, "UserName");
             noteRow.put(COL_IS_DONE, 0);
-          //TODO   noteRow.put(COL_PRIORITY, noteModel.getPriority().toString());//как тут поступать?
+            //TODO   noteRow.put(COL_PRIORITY, noteModel.getPriority().toString());//как тут поступать?
             noteRow.put(COL_TYPE_PAIR, 1);
             noteRow.put(COL_NOTE_TEXT, noteModel.getText());
             noteRow.put(COL_PAIR_ID, noteModel.getPairId());
@@ -1513,6 +1513,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 while (!cursor.isAfterLast()) {
 
                     NoteModel noteModel = new NoteModel(
+                            cursor.getInt(cursor.getColumnIndex(COL_ID_NOTE)),
                             cursor.getString(cursor.getColumnIndex(COL_NOTE_NAME)),
                             null,
                             0,
@@ -1553,6 +1554,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 while (!cursor.isAfterLast()) {
 
                     NoteModel noteModel = new NoteModel(
+                            cursor.getInt(cursor.getColumnIndex(COL_ID_NOTE)),
                             cursor.getString(cursor.getColumnIndex(COL_NOTE_NAME)),
                             cursor.getString(cursor.getColumnIndex(COL_SENDER_NAME)),
                             cursor.getInt(cursor.getColumnIndex(COL_IS_DONE)),
@@ -1581,6 +1583,18 @@ public class DBHelper extends SQLiteOpenHelper {
             db = getWritableDatabase();
             db.delete(TABLE_NAME, COL_ID_NOTE + "=" + idNote, null);
         }
+
+        public void setNoteIsDone(int idNote){
+            SQLiteDatabase db;
+            db = getWritableDatabase();
+            ContentValues isDoneValue = new ContentValues();
+            isDoneValue.put(COL_IS_DONE, 1);
+
+            db.update(TABLE_NAME, isDoneValue,COL_ID_NOTE+ " = "+idNote, null);
+
+        }
+
+
 
 
     }

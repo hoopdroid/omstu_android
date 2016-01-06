@@ -101,13 +101,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void initDrawer() {
 
-        PrimaryDrawerItem itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_schedule).withSelectedIcon(R.drawable.ic_schedule_select);
-        PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_navigation).withSelectedIcon(R.drawable.ic_navigation_select);
-        PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_notes).withSelectedIcon(R.drawable.ic_notes_select);
-        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_news).withSelectedIcon(R.drawable.ic_news_select);
+        PrimaryDrawerItem itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_calendar_clock).withSelectedIcon(R.drawable.ic_schedule_select);
+        PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_map_marker).withSelectedIcon(R.drawable.ic_navigation_select);
+        PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_note).withSelectedIcon(R.drawable.ic_notes_select);
+        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_library_books).withSelectedIcon(R.drawable.ic_news_select);
         PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
         PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
-        SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings).withSelectedIcon(R.drawable.ic_settings_select);
+        SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings_box).withSelectedIcon(R.drawable.ic_settings_select);
 
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()

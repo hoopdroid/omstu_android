@@ -83,7 +83,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="8dp"
-                                android:src="@drawable/ic_teacher"
+                                android:src="@drawable/ic_account"
                                 android:id="@+id/teacherIcon" />
                             <TextView
                                 android:id="@+id/pairTeacher"

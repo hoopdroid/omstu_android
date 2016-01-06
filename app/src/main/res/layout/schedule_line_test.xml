@@ -120,10 +120,10 @@
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true">
                             <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
                                 android:layout_marginLeft="8dp"
-                                android:src="@drawable/ic_teacher"
+                                android:src="@drawable/ic_account"
                                 android:id="@+id/teacherIcon" />
                             <TextView
                                 android:id="@+id/pairTeacher"
@@ -150,8 +150,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                             <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
                                 android:id="@+id/imageView5"
                                 android:layout_gravity="right"
                                 android:src="@drawable/ic_map_marker" />
