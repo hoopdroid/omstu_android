@@ -1004,7 +1004,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db.delete(TABLE_NAME, COL_GROUP_ID + " IN ("+idSchedule+") " +" AND " + COL_TEACHER_ID +" NOT IN ("+select+")", null);
         }
 
-        public  void deleteTeacherSchedule(Context context, int idSchedule) {
+        public static void deleteTeacherchedule(Context context, int idSchedule) {
 
 
             SQLiteDatabase db;
@@ -1529,9 +1529,9 @@ public class DBHelper extends SQLiteOpenHelper {
                     );
                     noteModelArrayList.add(noteModel);
                     cursor.moveToNext();
-
+                    cursor.close();
                 }
-                cursor.close();
+
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
