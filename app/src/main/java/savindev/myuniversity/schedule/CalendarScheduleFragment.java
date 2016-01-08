@@ -2,10 +2,10 @@ package savindev.myuniversity.schedule;
 
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -154,16 +154,16 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         SharedPreferences userInfo;
         FragmentTransaction ft;
         switch (item.getItemId()) {
-            case R.id.cs_detail:
-                userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
-                if (userInfo.getBoolean("openDetails", true)) {
-                    userInfo.edit().putBoolean("openDetails", false).apply();
-                    detailsLayout.setVisibility(View.GONE); //Скрыть подробности
-                } else {
-                    userInfo.edit().putBoolean("openDetails", true).apply();
-                    detailsLayout.setVisibility(View.VISIBLE); //Показать подробности
-                }
-                break;
+           // case R.id.cs_detail:
+             //   userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+            //    if (userInfo.getBoolean("openDetails", true)) {
+            //        userInfo.edit().putBoolean("openDetails", false).apply();
+             //       detailsLayout.setVisibility(View.GONE); //Скрыть подробности
+            //    } else {
+            //        userInfo.edit().putBoolean("openDetails", true).apply();
+            //        detailsLayout.setVisibility(View.VISIBLE); //Показать подробности
+              //  }
+             //   break;
             case R.id.transition:
                 //Переход на листовой вид
                 MainActivity.setOpen(currentID, isGroup, currentGroup); //Запись по id. потом по нему открывать расписание
@@ -221,17 +221,17 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     case DAY:
                         scheduleViewHolder.pairName.setText(models.get(i).getDate());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
-                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
                         break;
                     case DATE:
                         scheduleViewHolder.pairName.setText(models.get(i).getDate());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
-                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
                         break;
                     case PAIR:
                         if (!checkedPairFilters(models.get(i))) {
                             scheduleViewHolder.pairName.setVisibility(View.GONE);
-                            scheduleViewHolder.cv.setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                            scheduleViewHolder.cv.setBackgroundColor(getActivity().getResources().getColor(R.color.primary_light));
                             scheduleViewHolder.cv.setAlpha(0.5f);
                             break;
                         }
@@ -243,12 +243,20 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         else
                             scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName());
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
-                        scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
+                        scheduleViewHolder.pairName.setTextColor(getResources().getColor(R.color.primary_text ));
+                        scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary_light));
                         scheduleViewHolder.pairName.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
+                                if (models.get(scheduleViewHolder.getAdapterPosition()) != null) {
                                     fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()), 0);
+                                    Intent intent = new Intent(context, PairInfoActivity.class);
+                                    intent.putExtra("pairname",scheduleViewHolder.pairName.getText().toString());
+                                    intent.putExtra("pairtime",models.get(i).getDate());
+                                    intent.putExtra("scheduleId",models.get(i).getPairs().get(0).getIdSchedule());
+                                    intent.putExtra("date", models.get(i).getDate());
+                                    startActivity(intent);
+                                }
                             }
                         });
                         scheduleViewHolder.cv.setOnLongClickListener(new View.OnLongClickListener() {
@@ -282,7 +290,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     case MONTH:
                         scheduleViewHolder.pairName.setText(month(models.get(i).getDate()));
                         scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
-                        scheduleViewHolder.pairName.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                        scheduleViewHolder.pairName.setBackgroundColor(Color.WHITE);
                         break;
 
                 }

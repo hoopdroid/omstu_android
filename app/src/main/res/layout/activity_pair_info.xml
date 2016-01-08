@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/coordinatorLayout"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".schedule.PairInfoActivity">
@@ -77,7 +78,7 @@
         android:id="@+id/fab"
         style="@style/Widget.MaterialSheetFab.Fab"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_white_24dp"
+        android:src="@drawable/ic_attach_file_white_24dp"
         app:layout_anchor="@id/toolbar_layout"
         app:layout_anchorGravity="bottom|right" />
 
@@ -108,11 +109,11 @@
                 <TextView
                     android:id="@+id/fab_sheet_item_reminder"
                     style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
-                    android:drawableLeft="@drawable/ic_bell"
-                    android:drawableStart="@drawable/ic_bell"
+                    android:drawableLeft="@drawable/ic_calendar"
+                    android:drawableStart="@drawable/ic_calendar"
                     android:text="@string/fab_add_reminder" />
 
-                <!-- Photo -->
+
                 <TextView
                     android:id="@+id/fab_sheet_item_homework"
                     style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
@@ -120,7 +121,7 @@
                     android:drawableStart="@drawable/ic_book"
                     android:text="@string/fab_add_homework"></TextView>
 
-                <!-- Note -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -129,7 +130,7 @@
                     <TextView
                         android:id="@+id/fab_sheet_item_note"
                         style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
-                        android:drawableLeft="@drawable/ic_notes"
+                        android:drawableLeft="@drawable/ic_note"
                         android:drawableStart="@drawable/ic_notes_select"
                         android:text="@string/fab_add_note"
                         android:textColor="@color/accent"/>

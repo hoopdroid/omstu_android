@@ -1,17 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"  >
 
-    <item
-        android:id="@+id/cs_detail"
-        app:showAsAction="ifRoom|withText"
-        android:title="Подробно">
-    </item>
     <item android:id="@+id/transition"
         android:orderInCategory="100"
         android:title="Список"
-        app:showAsAction="ifRoom|withText"/>
+        android:icon="@drawable/ic_spisok"
+        app:showAsAction="always"/>
+
     <item android:id="@+id/calendar"
         android:orderInCategory="100"
+        android:icon="@drawable/ic_gotodate"
         app:showAsAction="always"
         android:title="" />
 

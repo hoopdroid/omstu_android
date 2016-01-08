@@ -73,8 +73,8 @@
                 <TextView
                     android:id="@+id/fab_sheet_item_reminder"
                     style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
-                    android:drawableLeft="@drawable/ic_bell"
-                    android:drawableStart="@drawable/ic_bell"
+                    android:drawableLeft="@drawable/ic_bell_outline"
+                    android:drawableStart="@drawable/ic_bell_outline"
                     android:text="@string/fab_add_reminder" />
 
                 <!-- Photo -->
@@ -95,7 +95,7 @@
                     <TextView
                         android:id="@+id/fab_sheet_item_note"
                         style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
-                        android:drawableLeft="@drawable/ic_notes"
+                        android:drawableLeft="@drawable/ic_note"
                         android:drawableStart="@drawable/ic_notes_select"
                         android:text="@string/fab_add_note"
                         android:textColor="@color/accent"/>

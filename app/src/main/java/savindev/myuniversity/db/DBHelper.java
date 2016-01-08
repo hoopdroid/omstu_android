@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.notes.NoteModel;
+import savindev.myuniversity.notes.Priority;
 import savindev.myuniversity.schedule.DateUtil;
 import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.schedule.ScheduleModel;
@@ -1003,7 +1004,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db.delete(TABLE_NAME, COL_GROUP_ID + " IN ("+idSchedule+") " +" AND " + COL_TEACHER_ID +" NOT IN ("+select+")", null);
         }
 
-        public static void deleteTeacherchedule(Context context, int idSchedule) {
+        public  void deleteTeacherSchedule(Context context, int idSchedule) {
 
 
             SQLiteDatabase db;
@@ -1478,13 +1479,14 @@ public class DBHelper extends SQLiteOpenHelper {
         public void setPairNote( NoteModel noteModel ) {
 
 
-           SQLiteDatabase sqliteDatabase = getWritableDatabase();
+            SQLiteDatabase sqliteDatabase = getWritableDatabase();
 
             ContentValues noteRow = new ContentValues();
             noteRow.put(COL_NOTE_NAME, noteModel.getName());
             noteRow.put(COL_SENDER_NAME, "UserName");
             noteRow.put(COL_IS_DONE, 0);
-          //TODO   noteRow.put(COL_PRIORITY, noteModel.getPriority().toString());//как тут поступать?
+            noteRow.put(COL_PRIORITY,noteModel.getPriority().toString());
+            //TODO   noteRow.put(COL_PRIORITY, noteModel.getPriority().toString());//как тут поступать?
             noteRow.put(COL_TYPE_PAIR, 1);
             noteRow.put(COL_NOTE_TEXT, noteModel.getText());
             noteRow.put(COL_PAIR_ID, noteModel.getPairId());
@@ -1513,10 +1515,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 while (!cursor.isAfterLast()) {
 
                     NoteModel noteModel = new NoteModel(
+                            cursor.getInt(cursor.getColumnIndex(COL_ID_NOTE)),
                             cursor.getString(cursor.getColumnIndex(COL_NOTE_NAME)),
                             null,
-                            0,
-                            null,
+                            cursor.getInt(cursor.getColumnIndex(COL_IS_DONE)),
+                            Priority.fromString(cursor.getString(cursor.getColumnIndex(COL_PRIORITY))),
                             null,
                             null,
                             cursor.getString(cursor.getColumnIndex(COL_NOTE_TEXT)),
@@ -1526,8 +1529,9 @@ public class DBHelper extends SQLiteOpenHelper {
                     );
                     noteModelArrayList.add(noteModel);
                     cursor.moveToNext();
-                }
 
+                }
+                cursor.close();
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
@@ -1538,6 +1542,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
         public ArrayList<NoteModel> getPairNotes(int scheduleId,String scheduleDate) {
+
             ArrayList<NoteModel> noteModelArrayList = new ArrayList<>();
 
             SQLiteDatabase db;
@@ -1553,10 +1558,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 while (!cursor.isAfterLast()) {
 
                     NoteModel noteModel = new NoteModel(
+                            cursor.getInt(cursor.getColumnIndex(COL_ID_NOTE)),
                             cursor.getString(cursor.getColumnIndex(COL_NOTE_NAME)),
                             cursor.getString(cursor.getColumnIndex(COL_SENDER_NAME)),
                             cursor.getInt(cursor.getColumnIndex(COL_IS_DONE)),
-                            null,
+                            Priority.fromString(cursor.getString(cursor.getColumnIndex(COL_PRIORITY))),
                             null,
                             null,
                             cursor.getString(cursor.getColumnIndex(COL_NOTE_TEXT)),
@@ -1567,6 +1573,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     noteModelArrayList.add(noteModel);
                     cursor.moveToNext();
                 }
+                cursor.close();
 
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
@@ -1581,6 +1588,18 @@ public class DBHelper extends SQLiteOpenHelper {
             db = getWritableDatabase();
             db.delete(TABLE_NAME, COL_ID_NOTE + "=" + idNote, null);
         }
+
+        public void setNoteIsDone(int idNote){
+            SQLiteDatabase db;
+            db = getWritableDatabase();
+            ContentValues isDoneValue = new ContentValues();
+            isDoneValue.put(COL_IS_DONE, 1);
+
+            db.update(TABLE_NAME, isDoneValue,COL_ID_NOTE+ " = "+idNote, null);
+
+        }
+
+
 
 
     }

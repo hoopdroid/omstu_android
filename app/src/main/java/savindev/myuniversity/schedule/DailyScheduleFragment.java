@@ -125,7 +125,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
             } else
                 scheduleViewHolder.teacherLayout.setVisibility(View.VISIBLE);
             if (i == 0 || !models.get(i).getDate().equals(models.get(i - 1).getDate())) {
-                scheduleViewHolder.pairDate.setBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+                scheduleViewHolder.pairDate.setBackgroundColor(ContextCompat.getColor(context, R.color.primary_dark));
                 scheduleViewHolder.pairDateLayout.setVisibility(View.VISIBLE);
             } else {
                 scheduleViewHolder.pairDateLayout.setVisibility(View.GONE);
@@ -148,9 +148,26 @@ public class DailyScheduleFragment extends AbstractSchedule {
 
             //Work with Notes
 
-          if(!models.get(i).getNotes().isEmpty()){
+          if(!models.get(i).getNotes().isEmpty()&&models.get(i).getNotes().get(0).getIsDone()==0){
               scheduleViewHolder.noteLayout.setVisibility(View.VISIBLE);
               scheduleViewHolder.pairNote.setText(models.get(i).getNotes().get(0).getName());
+              switch (models.get(i).getNotes().get(0).getPriority()){
+                  case HIGH:
+                    //  scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_red_400));
+                      scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_red);
+                      scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_red_800));
+                      break;
+                  case MEDIUM:
+                    //  scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_orange_400));
+                      scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_orange);
+                      scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_orange_800));
+                      break;
+                  case LOW:
+                     // scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_yellow_400));
+                      scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_yellow);
+                      scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_yellow_800));
+                      break;
+              }
 
           }
               else

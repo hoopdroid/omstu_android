@@ -3,12 +3,13 @@
 
     <item android:id="@+id/transition"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_calendar"
+        android:icon="@drawable/ic_view_module_white_24dp"
         app:showAsAction="always"
         android:title="" />
 
     <item android:id="@+id/calendar"
         android:orderInCategory="100"
+        android:icon="@drawable/ic_gotodate"
         app:showAsAction="always"
         android:title="" />
 

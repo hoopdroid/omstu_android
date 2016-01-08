@@ -4,6 +4,7 @@ package savindev.myuniversity.notes;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 
+import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 
@@ -21,12 +23,11 @@ import savindev.myuniversity.db.DBHelper;
  */
 
 //используй модель
-//делай переменные приватными
+    //делай переменные приватными
 public class AttachNoteFragment extends Fragment {
 
     static EditText textNote;
     static Spinner priority;
-    static Spinner lessonName;
     SharedPreferences settings;
     static int userGroup;
     DBHelper dbHelper;
@@ -44,31 +45,23 @@ public class AttachNoteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_attach_note, container, false);
+        View view = inflater.inflate(R.layout.fragment_attach_pair_note, container, false);
 
         textNote = (EditText) view.findViewById(R.id.textNote);
         priority = (Spinner) view.findViewById(R.id.priority);
-        lessonName = (Spinner) view.findViewById(R.id.lessonName);
+
 
         settings = getActivity().getSharedPreferences("UserInfo", 0);
         userGroup = settings.getInt("UserGroup", 0);
 
         dbHelper = new DBHelper(getActivity());
 
-        //CR что за странный вопросик? ты должен знать, что там внутри, вот и параметризуй нормально
-        ArrayAdapter<?> adapterPriority =
-                ArrayAdapter.createFromResource(getActivity(), R.array.notePriority, android.R.layout.simple_spinner_item);
-        adapterPriority.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter <Priority> adapterPriority = new ArrayAdapter<Priority>(getActivity(), android.R.layout.simple_spinner_dropdown_item, Priority.values());
 
-        ArrayList<String> listLessons = new ArrayList(dbHelper.getSchedulesHelper().
-                getGroupLessons(getActivity(), userGroup, true));
 
-        ArrayAdapter<?> adapterLessonName = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_item, listLessons);
-        adapterLessonName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         priority.setAdapter(adapterPriority);
-        lessonName.setAdapter(adapterLessonName);
+
 
 
         return view;
@@ -77,11 +70,14 @@ public class AttachNoteFragment extends Fragment {
 
     public static NoteModel saveNote() {
 
-        lesson = lessonName.getSelectedItem().toString();
+        noteName = AttachActivity.noteName.getText().toString();
+        Log.d("NOTE NAME",noteName);
         noteText = textNote.getText().toString();
-        String pairId = Integer.toString(AttachActivity.scheduleId) + AttachActivity.date;
-        return new NoteModel(AttachActivity.noteName.getText().toString(), "username", 0, null, null,
-                null, noteText, AttachActivity.time, pairId, null);
+        String pairId = Integer.toString(AttachActivity.scheduleId)+AttachActivity.date;
+        //TODO null for int = -1 ? =-)
+        return new NoteModel(noteName, "username",0,
+               Priority.fromInt(priority.getSelectedItemPosition()),null,
+        null,noteText,AttachActivity.time,pairId,null);
 
 
     }

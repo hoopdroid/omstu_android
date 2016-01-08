@@ -50,7 +50,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="75dp"
-        android:id="@+id/imageView2"
+        android:id="@+id/priorityLine"
         android:src="@drawable/line_red"
         android:layout_below="@+id/dateTime"
         android:layout_alignParentLeft="true"
