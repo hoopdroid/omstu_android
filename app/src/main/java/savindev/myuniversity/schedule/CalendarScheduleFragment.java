@@ -4,6 +4,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -47,12 +48,14 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private TextView number, time, name, teacher, auditory, type;
     private View drawerView;
     private Button next;
+    private SharedPreferences settings;
+    private boolean fullText;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
 
         if (view == null) {//Если данные существуют:
-            SharedPreferences userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+            settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
             view = inflater.inflate(R.layout.fragment_calendar_schedule, container, false);
             drawerView = inflater.inflate(R.layout.filters_drawer, container, false);
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
@@ -60,33 +63,48 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             isLinear = false;
 
             detailsLayout = (LinearLayout) view.findViewById(R.id.detailll);
-            next = (Button)view.findViewById(R.id.next);
-            if (userInfo.getBoolean("openDetails", true)) {
+            next = (Button) view.findViewById(R.id.next);
+            if (settings.getBoolean("openDetails", true)) {
                 detailsLayout.setVisibility(View.VISIBLE); //Скрыть подробности
             } else {
                 detailsLayout.setVisibility(View.GONE); //Показать подробности
             }
 
+            fullText = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT &&
+                    settings.getBoolean("full_vertical", false) ||
+                    getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
+                            settings.getBoolean("full_horisontal", false));
+
             scheduleList = (RecyclerView) view.findViewById(R.id.calendarSchedule);
             int pairCount = DBHelper.getInstance(getActivity()).getPairsHelper().getPairsInDay(getActivity());
             //*2 + 2: *2 - каждая пара занимает двойной размер, +2 - дополнительные поля нормального размера на дату и день недели
-            glm = new GridLayoutManager(getActivity(), pairCount * 2 + 2); //2 поля на дату и день недели
+            if (fullText)
+                 glm = new GridLayoutManager(getActivity(), pairCount * 2 + 2); //2 поля на дату и день недели
+            else
+                glm = new GridLayoutManager(getActivity(), pairCount + 2); //2 поля на дату и день недели
             scheduleList.setLayoutManager(glm);
             adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
             glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() { //Установка длины ячейки
                 @Override
                 public int getSpanSize(int position) {
-                    switch (adapter.getItemViewType(position)) {
-                        case ScheduleAdapter.VIEW_PAIR:
-                            return 2;
-                        case ScheduleAdapter.VIEW_DATE:
-                            return 1;
-                        case ScheduleAdapter.VIEW_DAY:
-                            return 1;
+                    if (fullText)
+                        switch (adapter.getItemViewType(position)) {
+                            case ScheduleAdapter.VIEW_PAIR:
+                                return 2;
+                            case ScheduleAdapter.VIEW_DATE:
+                                return 1;
+                            case ScheduleAdapter.VIEW_DAY:
+                                return 1;
+                            case ScheduleAdapter.VIEW_MONTH:
+                                return glm.getSpanCount();
+                            default:
+                                return 0;
+                        }
+                    else switch (adapter.getItemViewType(position)) {
                         case ScheduleAdapter.VIEW_MONTH:
                             return glm.getSpanCount();
                         default:
-                            return 0;
+                            return 1;
                     }
                 }
             });
@@ -154,16 +172,16 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         SharedPreferences userInfo;
         FragmentTransaction ft;
         switch (item.getItemId()) {
-           // case R.id.cs_detail:
-             //   userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+            // case R.id.cs_detail:
+            //   userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
             //    if (userInfo.getBoolean("openDetails", true)) {
             //        userInfo.edit().putBoolean("openDetails", false).apply();
-             //       detailsLayout.setVisibility(View.GONE); //Скрыть подробности
+            //       detailsLayout.setVisibility(View.GONE); //Скрыть подробности
             //    } else {
             //        userInfo.edit().putBoolean("openDetails", true).apply();
             //        detailsLayout.setVisibility(View.VISIBLE); //Показать подробности
-              //  }
-             //   break;
+            //  }
+            //   break;
             case R.id.transition:
                 //Переход на листовой вид
                 MainActivity.setOpen(currentID, isGroup, currentGroup); //Запись по id. потом по нему открывать расписание
@@ -232,28 +250,32 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         if (!checkedPairFilters(models.get(i))) {
                             scheduleViewHolder.pairName.setVisibility(View.GONE);
                             scheduleViewHolder.cv.setBackgroundColor(getActivity().getResources().getColor(R.color.primary_light));
-                            scheduleViewHolder.cv.setAlpha(0.5f);
+                            scheduleViewHolder.cv.setAlpha(0.25f);
                             break;
                         }
                         scheduleViewHolder.cv.setCardBackgroundColor(Color.WHITE);
                         scheduleViewHolder.cv.setAlpha(1f);
                         //Если проверка на фильтрацию пройдена, показать пару
-                        if (models.get(i).getPairs().get(0).getSubgroup() != 0)
-                            scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName() + ", п/г " + models.get(i).getPairs().get(0).getSubgroup());
-                        else
-                            scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName());
-                        scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
-                        scheduleViewHolder.pairName.setTextColor(getResources().getColor(R.color.primary_text ));
-                        scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary_light));
+                        if (fullText) {
+                            if (models.get(i).getPairs().get(0).getSubgroup() != 0)
+                                scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName() + ", п/г " + models.get(i).getPairs().get(0).getSubgroup());
+                            else
+                                scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName());
+                            scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
+                            scheduleViewHolder.pairName.setTextColor(getResources().getColor(R.color.primary_text));
+                            scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary_light));
+                        } else {
+                            scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary));
+                        }
                         scheduleViewHolder.pairName.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if (models.get(scheduleViewHolder.getAdapterPosition()) != null) {
                                     fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()), 0);
                                     Intent intent = new Intent(context, PairInfoActivity.class);
-                                    intent.putExtra("pairname",scheduleViewHolder.pairName.getText().toString());
-                                    intent.putExtra("pairtime",models.get(i).getDate());
-                                    intent.putExtra("scheduleId",models.get(i).getPairs().get(0).getIdSchedule());
+                                    intent.putExtra("pairname", scheduleViewHolder.pairName.getText().toString());
+                                    intent.putExtra("pairtime", models.get(i).getDate());
+                                    intent.putExtra("scheduleId", models.get(i).getPairs().get(0).getIdSchedule());
                                     intent.putExtra("date", models.get(i).getDate());
                                     startActivity(intent);
                                 }
@@ -358,7 +380,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             next.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    fillDetailsLayout(model, (num+1)%model.getPairs().size());
+                    fillDetailsLayout(model, (num + 1) % model.getPairs().size());
                 }
             });
         } else

@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -67,7 +66,6 @@ public abstract class AbstractSchedule extends DialogFragment
     protected GridLayoutManager glm;
     private boolean loading = true;
     protected boolean isLinear;
-    private int lastFirstVisiblePosition;
     private TreeMap<GregorianCalendar, Integer> positions;
     private AlertDialog calendarDialog;
 
@@ -79,7 +77,6 @@ public abstract class AbstractSchedule extends DialogFragment
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.add(Calendar.DAY_OF_MONTH, -1); //Чтобы не пропускать день при работе в цикле
-        SharedPreferences setting = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
         usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
         main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
 
@@ -225,7 +222,6 @@ public abstract class AbstractSchedule extends DialogFragment
             @Override
             public void onSelectedDayChange(CalendarView view, int year,
                                             int month, int dayOfMonth) {
-                String selectedDate = (month + 1) + "-" + dayOfMonth + "-" + year + " ";
                 int p = getPostition(new GregorianCalendar(year, month, dayOfMonth));
                 if (p != 0)
                     scheduleList.scrollToPosition(p + 1);
@@ -356,7 +352,6 @@ public abstract class AbstractSchedule extends DialogFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SharedPreferences settings;
         FragmentTransaction ft;
         switch (item.getItemId()) {
             case 100:
@@ -385,11 +380,6 @@ public abstract class AbstractSchedule extends DialogFragment
         getActivity().unregisterReceiver(broadcastReceiverLMT);
         super.onDetach();
     }
-
-    protected void notifyAdapter() {
-        adapter.notifyDataSetChanged();
-    }
-
 
     //Нерабочий код - попытка сохранить позицию recyclerView при повороте
 //    @Override

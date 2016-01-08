@@ -1,7 +1,6 @@
 package savindev.myuniversity.settings;
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -33,12 +32,10 @@ import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 public class SettingsFragment extends Fragment {
 
 
-    private FragmentTransaction ft;
     private int lastPosition;
     private MenuItem refreshItem;
     private GroupsFragment groups;
     private GetUniversityInfoTask guit;
-    private Fragment mFragment;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,65 +77,34 @@ public class SettingsFragment extends Fragment {
                             }
                         }
                         if (DBRequest.isUniversityInfoThere(getActivity())) { //если выполнено успешно или ключ существует
-                            settings.setBackgroundColor(Color.WHITE); //перекрасить выделенный элемент
                             settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                             lastPosition = position;
-                            if (getResources().getConfiguration().orientation ==
-                                    Configuration.ORIENTATION_LANDSCAPE) {
-//                                ft = getFragmentManager().beginTransaction();
-//                                if (mFragment == null) {
-//                                    mFragment = Fragment.instantiate(getActivity(), GroupsFragment.class.getName());
-//                                    ft.replace(R.id.frgmCont, mFragment, "groups").commit();
-//                                } else {
-//                                    if (mFragment.isDetached()) {
-//                                        ft.attach(mFragment);
-//                                    }
-//                                }
-
-
-                                settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
-                                ft = getFragmentManager().beginTransaction();
-                                ft.replace(R.id.frgmCont, new GroupsFragment());
-                                ft.commit();
-                            }
                             //Запустить активность/фрагмент для выбора группы
                             if (getResources().getConfiguration().orientation ==
                                     Configuration.ORIENTATION_PORTRAIT) {
                                 Intent intent = new Intent(getActivity(), GroupsActivity.class);
                                 startActivity(intent);
                             } else {
+                                settings.setBackgroundColor(Color.WHITE);
+                                settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                                 getFragmentManager().beginTransaction().replace(R.id.frgmCont, groups).commit();
                             }
                         }
                         break;
                     case 1:
-                        settings.setBackgroundColor(Color.WHITE);
                         settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
-                                Configuration.ORIENTATION_LANDSCAPE) {
+                                Configuration.ORIENTATION_PORTRAIT) {
+                            Intent intent = new Intent(getActivity(), VitalizationActivity.class);
+                            startActivity(intent);
+                        } else {
+                            settings.setBackgroundColor(Color.WHITE);
                             settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                            getFragmentManager().beginTransaction().replace(R.id.frgmCont, new VitalizationFragment()).commit();
                         }
                         break;
-                    case 2:
-                        settings.setBackgroundColor(Color.WHITE);
-                        settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
-                        lastPosition = position;
-                        if (getResources().getConfiguration().orientation ==
-                                Configuration.ORIENTATION_LANDSCAPE) {
-                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
-                        }
-                        break;
-                    case 3:
-                        settings.setBackgroundColor(Color.WHITE);
-                        settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
-                        lastPosition = position;
-                        if (getResources().getConfiguration().orientation ==
-                                Configuration.ORIENTATION_LANDSCAPE) {
-                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
-                        }
-                        break;
-                    case 4: //Тестовая функция, перевод порта
+                    case 2: //Тестовая функция, перевод порта
                         settings.setBackgroundColor(Color.WHITE);
                         settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;

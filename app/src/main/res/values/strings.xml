@@ -4,6 +4,7 @@
 
     <string name="activity_registration">Вход в систему</string>
     <string name="title_activity_settings">Настройки</string>
+    <string name="title_activity_vitalization">Внешний вид</string>
 
     <string name="action_settings">Settings</string>
     <string name="hint_name">Имя</string>
