@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,7 +24,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 
 import java.util.ArrayList;
@@ -42,20 +40,18 @@ import savindev.myuniversity.db.DBHelper;
 
 public class CalendarScheduleFragment extends AbstractSchedule {
 
-    private LinearLayout filtersLayout, detailsLayout;
+    private LinearLayout detailsLayout;
     private ArrayList<String> filterType, filterName;
     private SparseBooleanArray chosenType, chosenName;
     private ListView pairNames, pairTypes;
     private TextView number, time, name, teacher, auditory, type;
     private View drawerView;
-    private Drawer drawer;
     private Button next;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
 
         if (view == null) {//Если данные существуют:
-            int monthCount = 0;
             SharedPreferences userInfo = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
             view = inflater.inflate(R.layout.fragment_calendar_schedule, container, false);
             drawerView = inflater.inflate(R.layout.filters_drawer, container, false);
@@ -145,12 +141,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             }
         });
 
-
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        DrawerBuilder b = new DrawerBuilder(getActivity());
-        drawer = b.withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).buildForFragment();
-//        drawer.getDrawerLayout().setVisibility(View.GONE);
-
+        new DrawerBuilder(getActivity()).withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).append(MainActivity.getDrawer());
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -244,7 +235,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                             scheduleViewHolder.cv.setAlpha(0.5f);
                             break;
                         }
-                        scheduleViewHolder.cv.setBackgroundColor(Color.WHITE);
+                        scheduleViewHolder.cv.setCardBackgroundColor(Color.WHITE);
                         scheduleViewHolder.cv.setAlpha(1f);
                         //Если проверка на фильтрацию пройдена, показать пару
                         if (models.get(i).getPairs().get(0).getSubgroup() != 0)
@@ -311,7 +302,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 if (chosenType != null) //Первый вызов до формирования chosenType
                     for (int j = 0; j < chosenType.size(); j++) { //Выделен ли такой тип
                         if (chosenType.valueAt(j) && model.getPairs().get(0).getType().equals(filterType.get(chosenType.keyAt(j)))) {//Если имеется такая запись в выделенных
-                            int a = 3;
                             break type;
                         }
                     }
@@ -322,7 +312,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 if (chosenName != null)
                     for (int j = 0; j < chosenName.size(); j++) { //Выделено ли такое имя
                         if (chosenName.valueAt(j) && model.getPairs().get(0).getName().equals(filterName.get(chosenName.keyAt(j)))) {//Если имеется такая запись в выделенных
-                            int a = 3;
                             break name;
                         }
                     }
@@ -394,13 +383,9 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         });
     }
 
-
-
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onDestroy() {
+        drawerView.setVisibility(View.GONE);
+        super.onDestroy();
     }
-
-
-
 }
