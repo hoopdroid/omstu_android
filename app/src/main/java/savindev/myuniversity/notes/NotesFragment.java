@@ -6,6 +6,8 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +23,8 @@ import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
@@ -32,7 +36,7 @@ import savindev.myuniversity.db.DBHelper;
 
 
 public class NotesFragment extends Fragment {
-
+    CoordinatorLayout coordinatorLayout;
     RelativeLayout emptyNotesLayout;
     int scheduleId;
     String date;
@@ -47,7 +51,7 @@ public class NotesFragment extends Fragment {
 
         final View view = inflater.inflate(R.layout.fragment_notes, container, false);
         final SwipeMenuListView listView = (SwipeMenuListView)view.findViewById(R.id.listView);
-
+        coordinatorLayout = (CoordinatorLayout)view.findViewById(R.id.coordinatorLayout);
         MainActivity.fab.show();
 
         Bundle arg = getActivity().getIntent().getExtras();
@@ -66,14 +70,15 @@ public class NotesFragment extends Fragment {
                         getActivity());
 
                 openItem.setBackground(new ColorDrawable(getResources().getColor(R.color.primary)));
-                openItem.setWidth(200);
+                openItem.setWidth(250);
                 openItem.setIcon(R.drawable.ic_done_white_24dp);
                 menu.addMenuItem(openItem);
 
                 SwipeMenuItem deleteItem = new SwipeMenuItem(
                         getActivity());
-                deleteItem.setBackground(new ColorDrawable(getResources().getColor(R.color.md_red_500)));                deleteItem.setWidth(200);
+                deleteItem.setBackground(new ColorDrawable(getResources().getColor(R.color.md_red_800)));                deleteItem.setWidth(200);
                 deleteItem.setIcon(R.drawable.ic_delete_white_24dp);
+                deleteItem.setWidth(250);
                 menu.addMenuItem(deleteItem);
             }
         };
@@ -110,20 +115,26 @@ public class NotesFragment extends Fragment {
 
                         //TODO Убрать дублирование кода
                         if(isPair) {
+
                             int note = dbHelper.getNotesHelper().getPairNotes(scheduleId, date).get(position).getNoteId();
                             dbHelper.getNotesHelper().setNoteIsDone(note);
-                            refresh(R.id.pairNotesList); }
+                            setSnackBar(false);
+                            refresh(R.id.pairNotesList);
+                            }
                         else {
                             dbHelper.getNotesHelper().setNoteIsDone(dbHelper.getNotesHelper().getAllNotes().get(position).getNoteId());
+                            setSnackBar(false);
                             refresh(R.id.content_main);
                             }
                         break;
                     case 1:
                         if(isPair) {
                             int note = dbHelper.getNotesHelper().getPairNotes(scheduleId, date).get(position).getNoteId();
+                            setSnackBar(true);
                             dbHelper.getNotesHelper().deleteNote(note);
                             refresh(R.id.pairNotesList); }
                             else {
+                            setSnackBar(true);
                             dbHelper.getNotesHelper().deleteNote(dbHelper.getNotesHelper().getAllNotes().get(position).getNoteId());
                             refresh(R.id.content_main); }
                         break;
@@ -157,6 +168,24 @@ public class NotesFragment extends Fragment {
         ft.commit();
     }
 
+    public Snackbar setSnackBar(boolean delete){
+        String message = "Заметка удалена!";
+        if(!delete)
+            message = "Задача выполнена, вы молодец!";
+        Snackbar snackbar = Snackbar
+                .make(getView(),message, Snackbar.LENGTH_LONG);
+               // .setAction("ОТМЕНИТЬ", new View.OnClickListener() {
+                 //   @Override
+                   // public void onClick(View view) {
+                     //   Snackbar snackbar1 = Snackbar.make(getView(), "Заметка восстановлена!", Snackbar.LENGTH_SHORT);
+                       // snackbar1.show();
+                    //}
+                //});
+
+
+        snackbar.show();
+        return snackbar;
+    }
 
 
 }

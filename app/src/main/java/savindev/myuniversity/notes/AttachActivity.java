@@ -3,6 +3,7 @@ package savindev.myuniversity.notes;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
+import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 
@@ -20,6 +22,8 @@ import savindev.myuniversity.db.DBHelper;
 
 //CR public? non-modifier? PRIVATE
 public class AttachActivity extends AppCompatActivity {
+
+
     public static EditText noteName;
     String typeAttach;
     Toolbar toolbar;
@@ -49,7 +53,10 @@ public class AttachActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 dbHelper.getNotesHelper().setPairNote(AttachNoteFragment.saveNote());
+                Intent reloadActivity = new Intent(getApplicationContext(), MainActivity.class);
                 finish();
+                MainActivity.mainActivity.finish();
+                startActivity(reloadActivity);
 
             }
         });

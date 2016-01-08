@@ -6,6 +6,7 @@
     card_view:cardBackgroundColor="@android:color/white"
     card_view:cardElevation="1sp"
     card_view:cardUseCompatPadding="true"
+    card_view:cardPreventCornerOverlap="true"
     android:paddingLeft="16dp"
     android:paddingRight="16dp">
 
@@ -18,17 +19,18 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="48dp"
-        android:background="@color/primary"
+        android:background="@color/primary_dark"
         android:id="@+id/pairDateLayout">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/pairDate"
+            android:padding="8dp"
             android:paddingLeft="16dp"
             android:text="30.11.2015"
             android:textSize="16dp"
-            android:alpha = ".8"
+            android:alpha = ".5"
             android:textColor="#ffffff"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
@@ -188,26 +190,34 @@
 
         <Space
             android:layout_width="fill_parent"
-            android:layout_height="16dp" />
+            android:layout_height="8dp" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@color/primary_light"
-            android:visibility="gone"
+            android:visibility="visible"
+            android:gravity="right"
             android:id="@+id/noteLayout">
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginLeft="16dp"
-                android:src="@drawable/ic_note"/>
-            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_note"
+                android:alpha = ".5"
+                android:id="@+id/pairNoteImage" />
+           <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/pairNote"
-                android:layout_marginLeft="16dp"
-                android:text="Сделать лабораторную работу"/>
-        </LinearLayout>
+               android:text="Сделать лабораторную работу"
+               android:alpha = ".5"
+                android:textStyle="bold"
+               android:layout_marginRight="8dp"
+               android:layout_centerVertical="true"
+               android:layout_toRightOf="@+id/pairNoteImage"
+               android:layout_toEndOf="@+id/pairNoteImage" />
+
+        </RelativeLayout>
+
 
     </LinearLayout>
 
