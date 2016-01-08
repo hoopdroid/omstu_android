@@ -386,6 +386,10 @@ public abstract class AbstractSchedule extends DialogFragment
         super.onDetach();
     }
 
+    protected void notifyAdapter() {
+        adapter.notifyDataSetChanged();
+    }
+
 
     //Нерабочий код - попытка сохранить позицию recyclerView при повороте
 //    @Override

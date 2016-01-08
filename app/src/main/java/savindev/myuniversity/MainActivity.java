@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String username;
     String email;
     MaterialSheetFab materialSheetFab;
+    static Drawer result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
                     sheetColor, fabColor);
         }
+    }
+
+    public static Drawer getDrawer() {
+        return result;
     }
 
     @Override
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .withSelectionListEnabledForSingleProfile(false)
                 .build();
 
-        Drawer result = new DrawerBuilder()
+        result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withAccountHeader(headerResult)
