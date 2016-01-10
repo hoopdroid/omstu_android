@@ -33,6 +33,7 @@ import java.util.List;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.settings.Colores;
 
 /**
  * Класс, отображающий расписание на определенный срок в виде сетки с предметами. Имеет различные методы фильтрации предметов
@@ -50,6 +51,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private Button next;
     private SharedPreferences settings;
     private boolean fullText;
+    private float textSize;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
@@ -73,13 +75,16 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             fullText = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT &&
                     settings.getBoolean("full_vertical", false) ||
                     getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
-                            settings.getBoolean("full_horisontal", false));
+                            settings.getBoolean("full_horisontal", true));
+            textSize = getActivity().getResources().getDisplayMetrics().widthPixels/96 + 8/3;
+
+            colores = Colores.valueOf(settings.getString("calendar", "CALENDAR_NOT_ALLOCATED"));
 
             scheduleList = (RecyclerView) view.findViewById(R.id.calendarSchedule);
             int pairCount = DBHelper.getInstance(getActivity()).getPairsHelper().getPairsInDay(getActivity());
             //*2 + 2: *2 - каждая пара занимает двойной размер, +2 - дополнительные поля нормального размера на дату и день недели
             if (fullText)
-                 glm = new GridLayoutManager(getActivity(), pairCount * 2 + 2); //2 поля на дату и день недели
+                glm = new GridLayoutManager(getActivity(), pairCount * 2 + 2); //2 поля на дату и день недели
             else
                 glm = new GridLayoutManager(getActivity(), pairCount + 2); //2 поля на дату и день недели
             scheduleList.setLayoutManager(glm);
@@ -232,6 +237,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
         @Override
         public void onBindViewHolder(final ScheduleViewHolder scheduleViewHolder, final int i) {
+            scheduleViewHolder.pairName.setTextSize(textSize);
             if (models.get(i) == null) {// Окно, точно пара
                 scheduleViewHolder.pairName.setVisibility(View.INVISIBLE);
             } else
@@ -249,24 +255,24 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     case PAIR:
                         if (!checkedPairFilters(models.get(i))) {
                             scheduleViewHolder.pairName.setVisibility(View.GONE);
-                            scheduleViewHolder.cv.setBackgroundColor(getActivity().getResources().getColor(R.color.primary_light));
-                            scheduleViewHolder.cv.setAlpha(0.25f);
+                            scheduleViewHolder.pairName.setAlpha(0.25f);
                             break;
                         }
                         scheduleViewHolder.cv.setCardBackgroundColor(Color.WHITE);
                         scheduleViewHolder.cv.setAlpha(1f);
                         //Если проверка на фильтрацию пройдена, показать пару
+                        scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
+                        colored(scheduleViewHolder.pairName, models.get(i).getPairs().get(0));
                         if (fullText) {
                             if (models.get(i).getPairs().get(0).getSubgroup() != 0)
                                 scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName() + ", п/г " + models.get(i).getPairs().get(0).getSubgroup());
                             else
                                 scheduleViewHolder.pairName.setText(models.get(i).getPairs().get(0).getName());
-                            scheduleViewHolder.pairName.setVisibility(View.VISIBLE);
                             scheduleViewHolder.pairName.setTextColor(getResources().getColor(R.color.primary_text));
-                            scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary_light));
-                        } else {
-                            scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary));
                         }
+//                        } else {
+////                            scheduleViewHolder.pairName.setBackgroundColor(getResources().getColor(R.color.primary));
+//                        }
                         scheduleViewHolder.pairName.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -292,19 +298,22 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                             }
                         });
                         if (models.get(i).getPairs().size() > 1) { //Есть пара-дубль TODO сделать универсальную систему на любое число пар
-                            if (models.get(i).getPairs().get(0).getSubgroup() != 0)
-                                scheduleViewHolder.dublPairName.setText(models.get(i).getPairs().get(1).getName() + ", п/г " + models.get(i).getPairs().get(1).getSubgroup());
-                            else
-                                scheduleViewHolder.dublPairName.setText(models.get(i).getPairs().get(1).getName());
-                            scheduleViewHolder.dublPairName.setVisibility(View.VISIBLE);
-                            scheduleViewHolder.dublPairName.setBackgroundColor(Color.WHITE);
-                            scheduleViewHolder.dublPairName.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
-                                        fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()), 1);
-                                }
-                            });
+                            colored(scheduleViewHolder.dublPairName, models.get(i).getPairs().get(0));
+                            if (fullText) {
+                                if (models.get(i).getPairs().get(0).getSubgroup() != 0)
+                                    scheduleViewHolder.dublPairName.setText(models.get(i).getPairs().get(1).getName() + ", п/г " + models.get(i).getPairs().get(1).getSubgroup());
+                                else
+                                    scheduleViewHolder.dublPairName.setText(models.get(i).getPairs().get(1).getName());
+                                scheduleViewHolder.dublPairName.setVisibility(View.VISIBLE);
+                                scheduleViewHolder.dublPairName.setBackgroundColor(Color.WHITE);
+                                scheduleViewHolder.dublPairName.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (models.get(scheduleViewHolder.getAdapterPosition()) != null)
+                                            fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()), 1);
+                                    }
+                                });
+                            }
                         } else {
                             scheduleViewHolder.dublPairName.setVisibility(View.GONE);
                         }
@@ -316,6 +325,20 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                         break;
 
                 }
+        }
+
+        private void colored(TextView tv, ScheduleModel.Pair pair) {
+            if (color == null)
+                if (fullText)
+                    color = getActivity().getResources().getIntArray(R.array.pairs_colors_light);
+                else
+                    color = getActivity().getResources().getIntArray(R.array.pairs_colors);
+            if (colores == Colores.CALENDAR_NOT_ALLOCATED)
+                tv.setBackgroundColor(getResources().getColor(R.color.primary_light));
+            if (colores == Colores.CALENDAR_BY_TYPE) {
+                tv.setBackgroundColor(color[filterType.indexOf(pair.getType())]);
+            }
+
         }
 
         private boolean checkedPairFilters(ScheduleModel model) {

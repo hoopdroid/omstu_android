@@ -36,22 +36,22 @@ public class VitalizationFragment extends Fragment {
         sPref = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
         vertical.setChecked(sPref.getBoolean("full_vertical", false));
         horisontal.setChecked(sPref.getBoolean("full_horisontal", false));
-        switch (sPref.getString("calendar", "")) {
-            case "calendarByType":
+        switch (sPref.getString("calendar", "CALENDAR_NOT_ALLOCATED")) {
+            case "CALENDAR_BY_TYPE":
                 calendarByType.setChecked(true);
                 break;
-            case "calendarNotAllocated":
+            case "CALENDAR_NOT_ALLOCATED":
                 calendarNotAllocated.setChecked(true);
                 break;
             default:
                 calendarNotAllocated.setChecked(true);
                 break;
         }
-        switch (sPref.getString("daily", "")) {
-            case "dailybyType":
+        switch (sPref.getString("daily", "DAILY_NOT_ALLOCATED")) {
+            case "DAILY_BY_TYPE":
                 dailyByType.setChecked(true);
                 break;
-            case "dailyNotAllocated":
+            case "DAILY_NOT_ALLOCATED":
                 dailyNotAllocated.setChecked(true);
                 break;
             default:
@@ -71,24 +71,24 @@ public class VitalizationFragment extends Fragment {
 //            case R.id.radio0:
 //                ed.putString("calendar", "radio0"); break;
             case R.id.calendar_by_type:
-                ed.putString("calendar", "calendarByType");
+                ed.putString("calendar", "CALENDAR_BY_TYPE");
                 break;
 //            case R.id.radio2:
 //                ed.putString("calendar", "radio2"); break;
             case R.id.calendar_not_allocated:
-                ed.putString("calendar", "calendarNotAllocated");
+                ed.putString("calendar", "CALENDAR_NOT_ALLOCATED");
                 break;
         }
         switch (daily.getCheckedRadioButtonId()) {
 //            case R.id.RadioButton01:
 //                ed.putString("daily", "RadioButton01"); break;
             case R.id.daily_by_type:
-                ed.putString("daily", "dailyByType");
+                ed.putString("daily", "DAILY_BY_TYPE");
                 break;
 //            case R.id.RadioButton03:
 //                ed.putString("daily", "RadioButton03"); break;
             case R.id.daily_not_allocated:
-                ed.putString("daily", "dailyNotAllocated");
+                ed.putString("daily", "DAILY_NOT_ALLOCATED");
                 break;
         }
         ed.apply();

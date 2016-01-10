@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="primary">#66BB6A</color>
-  <color name="primary_dark">#4CAF50</color>
-  <color name="primary_light">#C8E6C9</color>
-  <color name="accent">#F9A825</color>
-  <color name="primary_text">#212121</color>
-  <color name="secondary_text">#727272</color>
-  <color name="icons">#FFFFFF</color>
-  <color name="divider">#B6B6B6</color>
+    <color name="primary">#66BB6A</color>
+    <color name="primary_dark">#4CAF50</color>
+    <color name="primary_light">#C8E6C9</color>
+    <color name="accent">#F9A825</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#B6B6B6</color>
+
+    <array name="pairs_colors">
+        <item>#4d7198</item>
+        <item>#ffb02e</item>
+        <item>#425e17</item>
+        <item>#421e25</item>
+    </array>
+    <array name="pairs_colors_light">
+        <item>#4d719855</item>
+        <item>#ffb02e55</item>
+        <item>#425e1755</item>
+        <item>#421e2555</item>
+    </array>
 </resources>
 

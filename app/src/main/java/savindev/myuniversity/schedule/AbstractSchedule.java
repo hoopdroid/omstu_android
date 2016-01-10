@@ -41,6 +41,7 @@ import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
 import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
+import savindev.myuniversity.settings.Colores;
 import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
@@ -68,6 +69,8 @@ public abstract class AbstractSchedule extends DialogFragment
     protected boolean isLinear;
     private TreeMap<GregorianCalendar, Integer> positions;
     private AlertDialog calendarDialog;
+    protected Colores colores;
+    protected int color[];
 
     protected View preInitializeData(LayoutInflater inflater, ViewGroup container) { //Объявление общей информации при загрузке фрагмента
         View view = null;

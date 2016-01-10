@@ -1,8 +1,8 @@
 package savindev.myuniversity.schedule;
 
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,11 +22,14 @@ import java.util.concurrent.ExecutionException;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.settings.Colores;
 
 public class DailyScheduleFragment extends AbstractSchedule {
     /**
      * Класс, отображающий расписание на определенный срок в виде списка предметов с параметрами
      */
+    private ArrayList<String> values;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,22 +45,29 @@ public class DailyScheduleFragment extends AbstractSchedule {
             adapter = new ScheduleAdapter(new ArrayList<ScheduleModel>());
             isLinear = true;
             scheduleList.setLayoutManager(llm);
+
+            colores = Colores.valueOf(getActivity().getSharedPreferences(
+                    "settings", Context.MODE_PRIVATE).getString("daily", "DAILY_NOT_ALLOCATED"));
+            switch (colores) {
+                case DAILY_BY_TYPE:
+                    values = new ArrayList<>(DBHelper.getInstance(getActivity()).getSchedulesHelper().getGroupLessonsTypes(getActivity(), currentID, isGroup));
+            }
+
             postInitializeData();
 
             if (MainActivity.getPositionDate() != null) {
                 String date = MainActivity.getPositionDate();
-                String n = MainActivity.getPositionN();
                 try { //Костыль, чтобы сначала получились и обработались данные, а потом пустило к позиции
                     lmt.onPostExecute(lmt.get());
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
                 GregorianCalendar c = new GregorianCalendar();
-                        c.set(Integer.parseInt(date.substring(0,4)), Integer.parseInt(date.substring(4,6)),
+                c.set(Integer.parseInt(date.substring(0, 4)), Integer.parseInt(date.substring(4, 6)),
                         Integer.parseInt(date.substring(6)));
                 int p = getPostition(c);
                 if (p != 0)
-                    scheduleList.scrollToPosition(p-1);
+                    scheduleList.scrollToPosition(p - 1);
                 MainActivity.clearPositions();
             }
         }
@@ -72,7 +82,6 @@ public class DailyScheduleFragment extends AbstractSchedule {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SharedPreferences settings;
         FragmentTransaction ft;
         switch (item.getItemId()) {
             case R.id.transition:
@@ -100,7 +109,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
         }
 
         @Override
-        public void onBindViewHolder(final ScheduleViewHolder scheduleViewHolder,final int i) {
+        public void onBindViewHolder(final ScheduleViewHolder scheduleViewHolder, final int i) {
 
 
             scheduleViewHolder.pairNumber.setText(models.get(i).getN());
@@ -131,49 +140,52 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 scheduleViewHolder.pairDateLayout.setVisibility(View.GONE);
             }
 
-
             scheduleViewHolder.cv.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
 
                     Intent intent = new Intent(context, PairInfoActivity.class);
-                    intent.putExtra("pairname",scheduleViewHolder.pairName.getText());
-                    intent.putExtra("pairtime",scheduleViewHolder.pairDate.getText().toString().substring(0,5)+" "
-                            +scheduleViewHolder.pairDayWeek.getText().toString()+" "+scheduleViewHolder.pairTime.getText().toString().substring(0,5));
-                     intent.putExtra("scheduleId",models.get(i).getPairs().get(0).getIdSchedule());
+                    intent.putExtra("pairname", scheduleViewHolder.pairName.getText());
+                    intent.putExtra("pairtime", scheduleViewHolder.pairDate.getText().toString().substring(0, 5) + " "
+                            + scheduleViewHolder.pairDayWeek.getText().toString() + " " + scheduleViewHolder.pairTime.getText().toString().substring(0, 5));
+                    intent.putExtra("scheduleId", models.get(i).getPairs().get(0).getIdSchedule());
                     intent.putExtra("date", models.get(i).getDate());
                     startActivity(intent);
 
                 }
             });
 
+            if (color == null)
+                color = getActivity().getResources().getIntArray(R.array.pairs_colors_light);
+            switch (colores) {
+                case DAILY_BY_TYPE:
+                    scheduleViewHolder.pairNumber.setBackgroundColor(color[values.indexOf(models.get(i).getPairs().get(0).getType())]);
+                    scheduleViewHolder.pairTime.setBackgroundColor(color[values.indexOf(models.get(i).getPairs().get(0).getType())]);
+                    break;
+            }
+
             //Work with Notes
-
-          if(!models.get(i).getNotes().isEmpty()&&models.get(i).getNotes().get(0).getIsDone()==0){
-              scheduleViewHolder.noteLayout.setVisibility(View.VISIBLE);
-              scheduleViewHolder.pairNote.setText(models.get(i).getNotes().get(0).getName());
-              switch (models.get(i).getNotes().get(0).getPriority()){
-                  case HIGH:
-                    //  scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_red_400));
-                      scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_red);
-                      scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_red_800));
-                      break;
-                  case MEDIUM:
-                    //  scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_orange_400));
-                      scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_orange);
-                      scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_orange_800));
-                      break;
-                  case LOW:
-                     // scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_yellow_400));
-                      scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_yellow);
-                      scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_yellow_800));
-                      break;
-              }
-
-          }
-              else
-              scheduleViewHolder.noteLayout.setVisibility(View.GONE);
-
-
+            if (!models.get(i).getNotes().isEmpty() && models.get(i).getNotes().get(0).getIsDone() == 0) {
+                scheduleViewHolder.noteLayout.setVisibility(View.VISIBLE);
+                scheduleViewHolder.pairNote.setText(models.get(i).getNotes().get(0).getName());
+                switch (models.get(i).getNotes().get(0).getPriority()) {
+                    case HIGH:
+                        //  scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_red_400));
+                        scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_red);
+                        scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_red_800));
+                        break;
+                    case MEDIUM:
+                        //  scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_orange_400));
+                        scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_orange);
+                        scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_orange_800));
+                        break;
+                    case LOW:
+                        // scheduleViewHolder.noteLayout.setBackgroundColor(getResources().getColor(R.color.md_yellow_400));
+                        scheduleViewHolder.pairNoteImage.setImageResource(R.drawable.ic_attach_note_yellow);
+                        scheduleViewHolder.pairNote.setTextColor(getResources().getColor(R.color.md_yellow_800));
+                        break;
+                }
+            } else
+                scheduleViewHolder.noteLayout.setVisibility(View.GONE);
         }
     }
 
