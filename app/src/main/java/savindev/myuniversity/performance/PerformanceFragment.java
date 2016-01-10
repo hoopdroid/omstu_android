@@ -2,18 +2,13 @@ package savindev.myuniversity.performance;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -21,15 +16,12 @@ import android.widget.Toast;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.thin.downloadmanager.DownloadRequest;
-import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -111,49 +103,52 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
 
     private void download() {
         if (MainActivity.isNetworkConnected(getActivity())) {
-            String url = getActivity().getResources().getString(R.string.uri) + "getRaitingFile?idProgressRaitingFile=" + mainId;
-            Uri downloadUri = Uri.parse(url);
-            final String destFolder = "/" + mainName + ".xlsx";
-            final Uri destinationUri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                    + destFolder);
-            pbar.setVisibility(View.VISIBLE);
-            DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
-                    .setDestinationURI(destinationUri)
-                    .setPriority(DownloadRequest.Priority.LOW)
-                    .setDownloadListener(new DownloadStatusListener() {
-                        @Override
-                        public void onDownloadComplete(int id) {
-                            pbar.setProgress(100);
-                            download.setText("Открыть");
-                            download.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    MimeTypeMap mime = MimeTypeMap.getSingleton();
-                                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                                            + destFolder);
-                                    Intent intent = new Intent();
-                                    intent.setAction(Intent.ACTION_VIEW);
-                                    Uri uri = Uri.fromFile(file);
-                                    intent.setDataAndType(uri, mime.getMimeTypeFromExtension("xlsx"));
-                                    startActivity(intent);
-                                }
-                            });
-                        }
+            DownloadModel model = new DownloadModel(mainId, mainName, mainId);
+            new DownloadRaitingTask(pbar, model, getActivity(), download).execute();
 
-                        @Override
-                        public void onDownloadFailed(int id, int errorCode, String errorMessage) {
-                            Toast.makeText(getActivity(), "Не удалось", Toast.LENGTH_SHORT).show();
-                            Log.i("myuniversity", "Ошибка от сервера, запрос getPerfomance, текст:"
-                                    + errorMessage);
-                            pbar.setProgress(0);
-                        }
-
-                        @Override
-                        public void onProgress(int id, long totalBytes, long arg3, int progress) {
-                            pbar.setProgress(progress);
-                        }
-                    });
-            downloadManager.add(downloadRequest);
+//            String url = getActivity().getResources().getString(R.string.uri) + "getRaitingFile?idProgressRaitingFile=" + mainId;
+//            Uri downloadUri = Uri.parse(url);
+//            final String destFolder = "/" + mainName + ".xlsx";
+//            final Uri destinationUri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//                    + destFolder);
+//            pbar.setVisibility(View.VISIBLE);
+//            DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
+//                    .setDestinationURI(destinationUri)
+//                    .setPriority(DownloadRequest.Priority.LOW)
+//                    .setDownloadListener(new DownloadStatusListener() {
+//                        @Override
+//                        public void onDownloadComplete(int id) {
+//                            pbar.setProgress(100);
+//                            download.setText("Открыть");
+//                            download.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    MimeTypeMap mime = MimeTypeMap.getSingleton();
+//                                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//                                            + destFolder);
+//                                    Intent intent = new Intent();
+//                                    intent.setAction(Intent.ACTION_VIEW);
+//                                    Uri uri = Uri.fromFile(file);
+//                                    intent.setDataAndType(uri, mime.getMimeTypeFromExtension("xlsx"));
+//                                    startActivity(intent);
+//                                }
+//                            });
+//                        }
+//
+//                        @Override
+//                        public void onDownloadFailed(int id, int errorCode, String errorMessage) {
+//                            Toast.makeText(getActivity(), "Не удалось", Toast.LENGTH_SHORT).show();
+//                            Log.i("myuniversity", "Ошибка от сервера, запрос getPerfomance, текст:"
+//                                    + errorMessage);
+//                            pbar.setProgress(0);
+//                        }
+//
+//                        @Override
+//                        public void onProgress(int id, long totalBytes, long arg3, int progress) {
+//                            pbar.setProgress(progress);
+//                        }
+//                    });
+//            downloadManager.add(downloadRequest);
         } else {
             Toast.makeText(getActivity(), "Нет интернета", Toast.LENGTH_SHORT).show();
         }
