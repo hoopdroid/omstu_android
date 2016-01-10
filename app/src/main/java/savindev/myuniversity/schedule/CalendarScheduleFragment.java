@@ -57,6 +57,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         View view = preInitializeData(inflater, container);
 
         if (view == null) {//Если данные существуют:
+            MainActivity.fab.hide();
             settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
             view = inflater.inflate(R.layout.fragment_calendar_schedule, container, false);
             drawerView = inflater.inflate(R.layout.filters_drawer, container, false);
@@ -279,7 +280,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                                 if (models.get(scheduleViewHolder.getAdapterPosition()) != null) {
                                     fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()), 0);
                                     Intent intent = new Intent(context, PairInfoActivity.class);
-                                    intent.putExtra("pairname", scheduleViewHolder.pairName.getText().toString());
+                                    intent.putExtra("pairname", models.get(i).getPairs().get(0).getName());
                                     intent.putExtra("pairtime", models.get(i).getDate());
                                     intent.putExtra("scheduleId", models.get(i).getPairs().get(0).getIdSchedule());
                                     intent.putExtra("date", models.get(i).getDate());

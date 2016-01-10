@@ -144,11 +144,13 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 public void onClick(View v) {
 
                     Intent intent = new Intent(context, PairInfoActivity.class);
-                    intent.putExtra("pairname", scheduleViewHolder.pairName.getText());
+                    intent.putExtra("pairname", models.get(i).getPairs().get(0).getName());
                     intent.putExtra("pairtime", scheduleViewHolder.pairDate.getText().toString().substring(0, 5) + " "
                             + scheduleViewHolder.pairDayWeek.getText().toString() + " " + scheduleViewHolder.pairTime.getText().toString().substring(0, 5));
                     intent.putExtra("scheduleId", models.get(i).getPairs().get(0).getIdSchedule());
                     intent.putExtra("date", models.get(i).getDate());
+                    intent.putExtra("teacher", models.get(i).getPairs().get(0).getTeacher());
+                    intent.putExtra("place", models.get(i).getPairs().get(0).getClassroom());
                     startActivity(intent);
 
                 }
