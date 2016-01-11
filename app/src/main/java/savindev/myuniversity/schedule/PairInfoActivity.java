@@ -24,14 +24,15 @@ import savindev.myuniversity.notes.NotesFragment;
 
 public class PairInfoActivity extends AppCompatActivity implements View.OnClickListener {
 //Приватные, блин, приватные!!
-    String pairName;
-    String pairInfo;
-    int scheduleId;
-    String date;
-    CollapsingToolbarLayout collapsingToolbarLayout;
-    TextView title, subtitle;
-    TextView noteadd;
-    MaterialSheetFab materialSheetFab;
+    private String pairName;
+    private String pairInfo;
+    private String pairMoreInfo;
+    private int scheduleId;
+    private String date;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private TextView title, subtitle,subtitle2;
+    private TextView noteadd;
+    private MaterialSheetFab materialSheetFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
         if (b != null) {
             pairName = b.getString("pairname");
             pairInfo = b.getString("pairtime");
+            pairMoreInfo =b.getString("teacher") + " ауд. " + b.getString("place");
             scheduleId = b.getInt("scheduleId");
             date = b.getString("date");
         }
@@ -59,10 +61,12 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         title = (TextView) findViewById(R.id.title);
         subtitle = (TextView) findViewById(R.id.subtitle);
+        subtitle2 = (TextView) findViewById(R.id.subtitle2);
 
         collapsingToolbarLayout.setTitle("");
         title.setText(pairName);
         subtitle.setText(pairInfo);
+        subtitle2.setText(pairMoreInfo);
         toolbar.setTitle("");
         addfragment(new NotesFragment());
         initSheetFab();

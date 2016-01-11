@@ -44,8 +44,13 @@ public class SettingsFragment extends Fragment {
         setRetainInstance(true); //Запрет на пересоздание объекта
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
         final ListView settings = (ListView) view.findViewById(R.id.settingsView);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                R.layout.settings_item, getResources().getStringArray(R.array.settings_array));
+        Integer[] imageId = {
+                R.drawable.ic_calendar_blank_grey600_36dp,
+                R.drawable.ic_weather_sunny_grey600_36dp,
+                R.drawable.ic_information_outline_grey600_36dp,
+        };
+        SettingsListAdapter adapter = new SettingsListAdapter(getActivity(),
+                getResources().getStringArray(R.array.settings_array),imageId);
         settings.setAdapter(adapter);
         groups = new GroupsFragment();
         //При тыке на пункт меню
@@ -105,7 +110,7 @@ public class SettingsFragment extends Fragment {
                         }
                         break;
                     case 2: //Тестовая функция, перевод порта
-                        settings.setBackgroundColor(Color.WHITE);
+                        /*settings.setBackgroundColor(Color.WHITE);
                         settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
@@ -114,6 +119,7 @@ public class SettingsFragment extends Fragment {
                         }
                         Intent intent = new Intent(getActivity(), Test.class);
                         startActivity(intent);
+                        */
                         break;
                     default:
                         break;

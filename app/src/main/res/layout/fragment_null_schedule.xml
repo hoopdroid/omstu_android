@@ -1,35 +1,56 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="fill_parent"
+    android:layout_marginTop="32dp"
     android:orientation="vertical" >
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_firstlaunch"
+        android:layout_gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/num"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
+        android:layout_marginTop="8dp"
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Здесь могло бы быть Ваше основное расписание. Возможно, это первый запуск программы. Для отображения расписания необходимо авторизоваться или выбрать группу вручную."
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:text="Для отображения расписания необходимо авторизоваться или выбрать группу вручную."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_gravity="center_horizontal" />
 
     <Button
         android:id="@+id/log_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Залогиниться"
-        android:layout_gravity="center_horizontal" />
+        android:text="Авторизация"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"
+        android:background="#ffffff"
+        android:textColor="@color/primary"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/set_id"
-        android:layout_width="wrap_content"
+        android:layout_width="122dp"
         android:layout_height="wrap_content"
-        android:text="В настройки"
-        android:layout_gravity="center_horizontal" />
+        android:text="Выбрать расписание"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"
+        android:background="#ffffff"
+        android:textColor="@color/primary"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/upd_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Обновить"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:background="#ffffff"
+        android:textColor="@color/primary"
+        android:textStyle="bold" />
 
 </LinearLayout>

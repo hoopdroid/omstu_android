@@ -2,6 +2,7 @@ package savindev.myuniversity.schedule;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,6 +44,7 @@ import savindev.myuniversity.serverTasks.GetScheduleTask;
 import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 import savindev.myuniversity.settings.Colores;
 import savindev.myuniversity.settings.GroupsActivity;
+import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 /**
@@ -296,6 +298,7 @@ public abstract class AbstractSchedule extends DialogFragment
                 startActivity(intent);
                 break;
             case R.id.set_id:
+                /*TODO НЕ РАБОТАЕТ
                 if (!DBRequest.isUniversityInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
                         GetUniversityInfoTask guit = new GetUniversityInfoTask(getActivity().getBaseContext(), null);
@@ -316,12 +319,21 @@ public abstract class AbstractSchedule extends DialogFragment
                 if (!DBRequest.isUniversityInfoThere(getActivity())) {
                     intent = new Intent(getActivity(), GroupsActivity.class);
                     startActivity(intent);
-                }
+                }*/
+                MainActivity.toolbar.setTitle("Настройки");
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction;
+                fragmentTransaction = fragmentManager
+                        .beginTransaction();
+                fragmentTransaction.replace(R.id.content_main, new SettingsFragment());
+                fragmentTransaction.commit();
+
+
                 break;
             case R.id.upd_id:
                 // обновить окно
-                android.app.FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction()
+                android.app.FragmentManager fragmentManag = getFragmentManager();
+                fragmentManag.beginTransaction()
                         .replace(R.id.content_main, new DailyScheduleFragment()).commit();
                 break;
         }

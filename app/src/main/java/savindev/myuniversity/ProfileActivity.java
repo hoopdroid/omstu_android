@@ -14,6 +14,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.dexafree.materialList.card.Card;
+import com.dexafree.materialList.card.OnButtonClickListener;
+import com.dexafree.materialList.card.provider.BasicImageButtonsCardProvider;
+import com.dexafree.materialList.view.MaterialListView;
+
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
@@ -40,7 +45,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
 
-        String username = settings.getString("UserFirstName","")+ " "+settings.getString("UserMiddleName","") +" " +settings.getString("UserLastName","");
+        String username = settings.getString("UserFirstName","")+" " +settings.getString("UserLastName","");
 
         toolbar.setTitle(username);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -73,6 +78,8 @@ public class ProfileActivity extends AppCompatActivity {
                 alert.show();
             }
         });
+
+
     }
     private void deleteUserPreferences(){
 

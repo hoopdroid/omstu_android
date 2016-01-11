@@ -34,7 +34,8 @@ public class NoteListAdapter extends ArrayAdapter<NoteModel> {
 
         View rowView=inflater.inflate(R.layout.notelist, null, true);
 
-        TextView txtTitle = (TextView) rowView.findViewById(R.id.item);
+        TextView nameTitle = (TextView) rowView.findViewById(R.id.item);
+        TextView textTitle = (TextView) rowView.findViewById(R.id.textitem);
         TextView dateNote = (TextView)rowView.findViewById(R.id.dateTime);
         ImageView priorityLine = (ImageView)rowView.findViewById(R.id.priorityLine);
 
@@ -53,11 +54,12 @@ public class NoteListAdapter extends ArrayAdapter<NoteModel> {
 
         if (noteModelArrayList.get(position).getIsDone() == 1){
             priorityLine.setImageResource(R.drawable.line_green);
-            txtTitle.setPaintFlags(txtTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            nameTitle.setPaintFlags(nameTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             }
 
-        txtTitle.setText(noteModelArrayList.get(position).getName());
+        nameTitle.setText(noteModelArrayList.get(position).getName());
         dateNote.setText(noteModelArrayList.get(position).getDate());
+        textTitle.setText(noteModelArrayList.get(position).getText());
 
         return rowView;
 

@@ -284,6 +284,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                                     intent.putExtra("pairtime", models.get(i).getDate());
                                     intent.putExtra("scheduleId", models.get(i).getPairs().get(0).getIdSchedule());
                                     intent.putExtra("date", models.get(i).getDate());
+                                    intent.putExtra("teacher", models.get(i).getPairs().get(0).getTeacher());
+                                    intent.putExtra("place", models.get(i).getPairs().get(0).getClassroom());
                                     startActivity(intent);
                                 }
                             }

@@ -10,6 +10,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +71,7 @@ public class NotesFragment extends Fragment {
                         getActivity());
 
                 openItem.setBackground(new ColorDrawable(getResources().getColor(R.color.primary)));
-                openItem.setWidth(250);
+                openItem.setWidth(dp2px(90));
                 openItem.setIcon(R.drawable.ic_done_white_24dp);
                 menu.addMenuItem(openItem);
 
@@ -78,7 +79,7 @@ public class NotesFragment extends Fragment {
                         getActivity());
                 deleteItem.setBackground(new ColorDrawable(getResources().getColor(R.color.md_red_800)));                deleteItem.setWidth(200);
                 deleteItem.setIcon(R.drawable.ic_delete_white_24dp);
-                deleteItem.setWidth(250);
+                deleteItem.setWidth(dp2px(90));
                 menu.addMenuItem(deleteItem);
             }
         };
@@ -187,6 +188,11 @@ public class NotesFragment extends Fragment {
         return snackbar;
     }
 
+
+    private int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics());
+    }
 
 }
 

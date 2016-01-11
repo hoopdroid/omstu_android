@@ -55,14 +55,10 @@
     <string-array name="settings_array">
         <item>Отображаемые расписания</item>
         <item>Внешний вид</item>
-        <item>Настройки сервера(dev)</item>
+        <item>О приложении</item>
     </string-array>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_attach">AttachActivity</string>
-
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
     <string-array name="notePriority">
@@ -71,7 +67,7 @@
         <item>Низкий</item>
     </string-array>
     <string name="title_activity_pair_info">Занятие</string>
-
+    <string name="findClassroom">на карте</string>
 
 
 </resources>
