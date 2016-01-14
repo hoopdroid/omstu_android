@@ -189,7 +189,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 cursor.moveToNext();
 
             }
-
+            cursor.close();
             return daysinweek;
 
         }
@@ -394,9 +394,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public String getSemesterEndDate(Context context, int idSemester) {
+        public String getSemesterEndDate(Context context, String date) {
             String endDate = "";
+            int idSemester;
 
+            idSemester = getNumSemesterFromDate(date);
             DBHelper dbHelper = DBHelper.getInstance(context);
             SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
             String find = "SELECT " + COL_END_DATE + " FROM  " + TABLE_NAME + " WHERE " + COL_ID_SEMESTER + " = " + idSemester;
@@ -410,6 +412,65 @@ public class DBHelper extends SQLiteOpenHelper {
             }
             cursor.close();
             return endDate;
+        }
+
+
+        public String getSemesterBeginDate(Context context, String date) {
+            String beginDate = "";
+            int idSemester;
+
+            idSemester = getNumSemesterFromDate(date);
+
+            DBHelper dbHelper = DBHelper.getInstance(context);
+            SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
+            String find = "SELECT " + COL_BEGIN_DATE + " FROM  " + TABLE_NAME + " WHERE " + COL_ID_SEMESTER + " = " + idSemester;
+            Cursor cursor = sqLiteDatabase.rawQuery(find, null);
+
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast()) {
+                beginDate = cursor.getString(cursor.getColumnIndex(COL_BEGIN_DATE));
+                cursor.moveToNext();
+            }
+            cursor.close();
+            return beginDate;
+        }
+
+        public int getNumSemesterFromDate(String date) {
+            int num=0;
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+            SQLiteDatabase database = getReadableDatabase();
+
+            /*
+             Получаем пару beginDate + endDate -> если date входит в этот диапозон получаем idSemester
+             Если не входит переходим курсором на след семестр
+             Выводим 0 в случае если ничего не нашли
+             */
+
+            String find = "SELECT * FROM " + TABLE_NAME;
+            Cursor cursor = database.rawQuery(find, null);
+
+            cursor.moveToFirst();
+            try {
+            while (!cursor.isAfterLast()) {
+
+                    if(format.parse(date).compareTo(format.parse(
+                            DateUtil.formatStandart(cursor.getString(cursor.getColumnIndex(COL_BEGIN_DATE))))) >=0
+                            && format.parse(date).
+                            compareTo(format.parse
+                                    (DateUtil.formatStandart(cursor.getString(cursor.getColumnIndex(COL_END_DATE))))) <=0){
+                        num = cursor.getInt(cursor.getColumnIndex(COL_ID_SEMESTER));
+                    }
+                        cursor.moveToNext();
+
+            }
+            cursor.close();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+            return num;
         }
     }
 
@@ -844,9 +905,10 @@ public class DBHelper extends SQLiteOpenHelper {
                     //TODO test all variants of work dataalreadyornot function)) {
                     try {
                         firstPair = true;
-                        beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
-                        endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
                         previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
+                        beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
+                        endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, previousValue))); //конец семестра
+
                         while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // если дата начала пары раньше конца семестра
                             firstPair = false;
                             ContentValues scheduleRow = new ContentValues();
@@ -897,7 +959,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             try {
                 beginDate = format.parse(date);
-                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, 1))); //конец семестра
+                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, date))); //конец семестра
                 if(beginDate.compareTo(endDate) >= 0)
                     return null;
 
@@ -1529,9 +1591,9 @@ public class DBHelper extends SQLiteOpenHelper {
                     );
                     noteModelArrayList.add(noteModel);
                     cursor.moveToNext();
-                    cursor.close();
-                }
 
+                }
+                cursor.close();
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }

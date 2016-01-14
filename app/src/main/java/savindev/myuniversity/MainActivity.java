@@ -9,8 +9,10 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -26,10 +28,12 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.notes.NotesFragment;
 import savindev.myuniversity.performance.PerformanceFragment;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
+import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 import savindev.myuniversity.welcomescreen.NotInternetFragment;
@@ -39,10 +43,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static MainActivity mainActivity ;
     public static Toolbar toolbar;
     public static Fab fab;
-    TextView noteadd;
-    String username;
-    String email;
-    MaterialSheetFab materialSheetFab;
+    private TextView noteAdd;
+    private TextView homeworkAdd;
+    private TextView reminderAdd;
+    private String username;
+    private String email;
+    private MaterialSheetFab materialSheetFab;
     static Drawer result;
 
     @Override
@@ -55,16 +61,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
                 this.finish();
                 startActivity(intent);
-            } else { //Если интернета нет - предложить запуститься еще раз
+            } else {
                 setContentView(R.layout.activity_main);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
-            }
-        } else {
+                fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();}
+
+            } else {
+
             setContentView(R.layout.activity_main);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
-            toolbar.setTitle("Расписание");
+            toolbar.setTitle("");
             getUserSettings();
             initDrawer();
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
@@ -75,11 +82,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int sheetColor = getResources().getColor(R.color.md_white_1000);
             int fabColor = getResources().getColor(R.color.accent);
 
-            // Initialize material sheet FAB
-            noteadd = (TextView) findViewById(R.id.fab_sheet_item_note);
-            noteadd.setOnClickListener(this);
+            noteAdd = (TextView) findViewById(R.id.fab_sheet_item_note);
+            homeworkAdd = (TextView) findViewById(R.id.fab_sheet_item_homework);
+            reminderAdd = (TextView) findViewById(R.id.fab_sheet_item_reminder);
+            noteAdd.setOnClickListener(this);
+            homeworkAdd.setOnClickListener(this);
+            reminderAdd.setOnClickListener(this);
             materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
                     sheetColor, fabColor);
+            DBHelper dbHelper = new DBHelper(this);
+
+            Log.d("SEMESTER NUMBER",Integer.toString(dbHelper.getSemestersHelper().getNumSemesterFromDate("20150910")));
+
         }
     }
 
@@ -98,11 +112,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void getUserSettings() {
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
-        username = settings.getString("UserFirstName", "Вы не") + " " + settings.getString("UserLastName", "авторизовались");
-        email = settings.getString("email", "войдите в систему");
+        username = settings.getString("UserFirstName", "") + " " + settings.getString("UserLastName", "");
+        email = settings.getString("email", "");
     }
 
-    void initDrawer() {
+    private void initDrawer() {
 
         PrimaryDrawerItem itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_calendar_clock).withSelectedIcon(R.drawable.ic_schedule_select);
         PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_map_marker).withSelectedIcon(R.drawable.ic_navigation_select);
@@ -112,25 +126,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings_box).withSelectedIcon(R.drawable.ic_settings_select);
 
-        // Create the AccountHeader
-        AccountHeader headerResult = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withHeaderBackground(R.drawable.drawer_header)
-                .addProfiles(
-                        new ProfileDrawerItem().withName(username).withEmail(email).withIcon(getResources().getDrawable(R.drawable.ic_account_circle_white_48dp))
-                )
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+        AccountHeader headerResult;
 
-                        Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-                        startActivity(i);
+        if(username.equals("")||email.equals("")){
+                    headerResult = new AccountHeaderBuilder()
+                    .withActivity(this)
+                    .withHeaderBackground(R.drawable.drawer_header)
+                    .build();
+        }
 
-                        return false;
-                    }
-                })
-                .withSelectionListEnabledForSingleProfile(false)
-                .build();
+        else {
+            headerResult = new AccountHeaderBuilder()
+                    .withActivity(this)
+                    .withHeaderBackground(R.drawable.drawer_header)
+                    .addProfiles(
+                            new ProfileDrawerItem().withName(username).withEmail(email).withIcon(getResources().getDrawable(R.drawable.ic_account_circle_white_48dp))
+                    )
+                    .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                        @Override
+                        public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+
+                            Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
+                            startActivity(i);
+
+                            return false;
+                        }
+                    })
+                    .withSelectionListEnabledForSingleProfile(false)
+                    .build();
+        }
 
         result = new DrawerBuilder()
                 .withActivity(this)
@@ -179,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
     }
 
-   void addfragment(int title, Fragment fragment) {
+   public void addfragment(int title, Fragment fragment) {
         toolbar.setTitle(title);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
@@ -261,18 +285,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v == noteadd) {
+        if (v == noteAdd) {
             Intent i = new Intent(getApplicationContext(), AttachActivity.class);
             i.putExtra("TypeAttach", "Note");
             startActivity(i);
             materialSheetFab.hideSheet();
+        }
+        if( v == homeworkAdd || v == reminderAdd){
+            showDevSnackBar(v);
         }
     }
 
     public void refreshActivity(){
 
         this.finish();
+    }
 
-
+    private void showDevSnackBar(View v){
+        Snackbar snackbar = Snackbar
+                .make(v,"К сожалению, пока можно добавить только заметку", Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 }

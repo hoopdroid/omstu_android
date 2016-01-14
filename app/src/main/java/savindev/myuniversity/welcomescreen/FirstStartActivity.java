@@ -64,8 +64,10 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
             case R.id.btnSkip:
                 SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 settings.edit().putBoolean("isFirstStart", false);
+                settings.edit().putBoolean("isFirstSettings", true);
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putBoolean("isFirstStart", false);
+                editor.putBoolean("isFirstSetti gs", true);
                 editor.commit();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 this.finish();

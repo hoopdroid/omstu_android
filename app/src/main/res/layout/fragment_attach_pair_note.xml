@@ -101,7 +101,9 @@
                android:layout_height="wrap_content"
                android:text="Напоминать мне"
                android:layout_marginLeft="32dp"
-               android:layout_toRightOf="@id/image3"/>
+               android:layout_toRightOf="@id/image3"
+               android:checked="false"
+               android:id="@+id/setReminderCheckBox" />
 
         </RelativeLayout>
 
@@ -127,7 +129,8 @@
                 android:text="Добавить фотографию"
                 android:layout_toRightOf="@id/image4"
                 android:layout_marginLeft="32dp"
-                android:background="@color/md_white_1000"/>
+                android:background="@color/md_white_1000"
+                android:id="@+id/attachPhotoBtn" />
 
         </RelativeLayout>
 

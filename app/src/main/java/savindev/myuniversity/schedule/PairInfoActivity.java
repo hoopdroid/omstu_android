@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -32,6 +33,8 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private TextView title, subtitle,subtitle2;
     private TextView noteadd;
+    private TextView homeworkAdd;
+    private TextView reminderAdd;
     private MaterialSheetFab materialSheetFab;
 
     @Override
@@ -106,7 +109,13 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
             finish();
             materialSheetFab.hideSheet();
         }
-    }
+
+        if(v==homeworkAdd||v==reminderAdd) {
+            showDevSnackBar(v);
+        }
+        }
+
+
 
 
     private void initSheetFab() {
@@ -117,9 +126,14 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
         int sheetColor = getResources().getColor(R.color.md_white_1000);
         int fabColor = getResources().getColor(R.color.accent);
 
-        // Initialize material sheet FAB
+        // Инициализация меню добавления заметк
         noteadd = (TextView) findViewById(R.id.fab_sheet_item_note);
         noteadd.setOnClickListener(this);
+        homeworkAdd = (TextView) findViewById(R.id.fab_sheet_item_homework);
+        homeworkAdd.setOnClickListener(this);
+        reminderAdd = (TextView) findViewById(R.id.fab_sheet_item_reminder);
+        reminderAdd.setOnClickListener(this);
+
         materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
                 sheetColor, fabColor);
         materialSheetFab.setEventListener(new MaterialSheetFabEventListener() {
@@ -163,6 +177,12 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
         });
 
         return true;
+    }
+
+    private void showDevSnackBar(View view){
+        Snackbar snackbar = Snackbar
+                .make(view,"К сожалению, пока можно добавить только заметку", Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 
 }

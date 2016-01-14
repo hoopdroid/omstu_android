@@ -18,6 +18,8 @@
             android:paddingBottom="8dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
+            android:dividerHeight="0dp"
+            android:divider="@null"
             android:paddingTop="8dp" />
 
     </android.support.v4.widget.SwipeRefreshLayout>

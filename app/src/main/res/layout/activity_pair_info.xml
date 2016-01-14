@@ -69,33 +69,6 @@
                         android:textColor="@android:color/white"
                         android:textSize="15dp"
                         android:textIsSelectable="true" />
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        >
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_map_marker_radius_white_24dp"
-                            android:id="@+id/imageView6"
-                            android:layout_centerVertical="true"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true" />
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="24dp"
-                            android:text="@string/findClassroom"
-                            android:textColor="@color/primary"
-                            android:background="@color/md_white_1000"
-                            android:layout_alignParentTop="true"
-                            android:layout_toRightOf="@+id/imageView6"
-                            android:layout_toEndOf="@+id/imageView6" />
-
-
-
-                    </RelativeLayout>
 
 
                 </LinearLayout>

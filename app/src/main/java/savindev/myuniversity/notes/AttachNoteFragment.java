@@ -4,11 +4,14 @@ package savindev.myuniversity.notes;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -26,18 +29,20 @@ import savindev.myuniversity.db.DBHelper;
     //делай переменные приватными
 public class AttachNoteFragment extends Fragment {
 
-    static EditText textNote;
-    static Spinner priority;
-    SharedPreferences settings;
-    static int userGroup;
-    DBHelper dbHelper;
-    static String lesson;
-    static String noteText;
-    static String noteName;
-    static int priorityItem;
+    protected static EditText textNote;
+    protected static Spinner priority;
+    private SharedPreferences settings;
+    protected static int userGroup;
+    private DBHelper dbHelper;
+    protected static String lesson;
+    protected static String noteText;
+    protected   static String noteName;
+    private Button attachPhoto;
+    private CheckBox reminderBox;
+    protected static int priorityItem;
 
     public AttachNoteFragment() {
-        // Required empty public constructor
+
     }
 
 
@@ -49,6 +54,20 @@ public class AttachNoteFragment extends Fragment {
 
         textNote = (EditText) view.findViewById(R.id.textNote);
         priority = (Spinner) view.findViewById(R.id.priority);
+        attachPhoto = (Button)view.findViewById(R.id.attachPhotoBtn);
+        reminderBox = (CheckBox)view.findViewById(R.id.setReminderCheckBox);
+        attachPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDevSnackBar();
+            }
+        });
+        reminderBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDevSnackBar();
+            }
+        });
 
 
         settings = getActivity().getSharedPreferences("UserInfo", 0);
@@ -57,9 +76,6 @@ public class AttachNoteFragment extends Fragment {
         dbHelper = new DBHelper(getActivity());
 
         ArrayAdapter <Priority> adapterPriority = new ArrayAdapter<Priority>(getActivity(), android.R.layout.simple_spinner_dropdown_item, Priority.values());
-
-
-
         priority.setAdapter(adapterPriority);
 
 
@@ -80,6 +96,12 @@ public class AttachNoteFragment extends Fragment {
         null,noteText,AttachActivity.time,pairId,null);
 
 
+    }
+
+    private void showDevSnackBar(){
+        Snackbar snackbar = Snackbar
+                .make(getView(),"Функция в разработке =)", Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 
 }
