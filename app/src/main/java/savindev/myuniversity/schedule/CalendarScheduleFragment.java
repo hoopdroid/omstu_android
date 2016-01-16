@@ -190,6 +190,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             //   break;
             case R.id.transition:
                 //Переход на листовой вид
+                settings.edit().putString("lastOpenSchedule", "list").apply();
                 MainActivity.setOpen(currentID, isGroup, currentGroup); //Запись по id. потом по нему открывать расписание
                 ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();

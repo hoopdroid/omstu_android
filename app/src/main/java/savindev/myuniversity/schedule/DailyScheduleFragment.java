@@ -86,6 +86,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
         switch (item.getItemId()) {
             case R.id.transition:
                 //Переход на календарный вид
+                getActivity().getSharedPreferences("settings", 0).edit().putString("lastOpenSchedule", "grid").apply();
                 MainActivity.setOpen(currentID, isGroup, currentGroup); //Запись по id. потом по нему открывать расписание
                 ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new CalendarScheduleFragment()).commit();

@@ -138,9 +138,6 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 return false;
             }
         });
-        refreshItem = menu.findItem(R.id.download_pb);
-        refreshItem.setActionView(R.layout.actionbar_progress);
-        refreshItem.setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

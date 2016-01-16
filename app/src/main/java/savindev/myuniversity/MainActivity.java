@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,19 +27,18 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
-import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.notes.NotesFragment;
 import savindev.myuniversity.performance.PerformanceFragment;
+import savindev.myuniversity.schedule.CalendarScheduleFragment;
 import savindev.myuniversity.schedule.DailyScheduleFragment;
-import savindev.myuniversity.settings.GroupsActivity;
 import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 import savindev.myuniversity.welcomescreen.NotInternetFragment;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static MainActivity mainActivity ;
+    public static MainActivity mainActivity;
     public static Toolbar toolbar;
     public static Fab fab;
     private TextView noteAdd;
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivity=this;
+        mainActivity = this;
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         if (settings.getBoolean("isFirstStart", true)) {
             if (isNetworkConnected(getApplication())) {
@@ -64,9 +62,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 setContentView(R.layout.activity_main);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();}
+                fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
+            }
 
-            } else {
+        } else {
 
             setContentView(R.layout.activity_main);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -90,10 +89,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             reminderAdd.setOnClickListener(this);
             materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
                     sheetColor, fabColor);
-            DBHelper dbHelper = new DBHelper(this);
-
-            Log.d("SEMESTER NUMBER",Integer.toString(dbHelper.getSemestersHelper().getNumSemesterFromDate("20150910")));
-
         }
     }
 
@@ -128,14 +123,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         AccountHeader headerResult;
 
-        if(username.equals("")||email.equals("")){
-                    headerResult = new AccountHeaderBuilder()
+        if (username.equals("") || email.equals("")) {
+            headerResult = new AccountHeaderBuilder()
                     .withActivity(this)
                     .withHeaderBackground(R.drawable.drawer_header)
                     .build();
-        }
-
-        else {
+        } else {
             headerResult = new AccountHeaderBuilder()
                     .withActivity(this)
                     .withHeaderBackground(R.drawable.drawer_header)
@@ -176,7 +169,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         switch (position) {
 
                             case 1:
-                                addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
+                                if (getSharedPreferences("settings", 0).getString("lastOpenSchedule", "list").equals("list"))
+                                    addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
+                                else
+                                    addfragment(R.string.drawer_schedule, new CalendarScheduleFragment());
                                 break;
                             case 2:
                                 addfragment(R.string.drawer_navigator, new WelcomeFragment());
@@ -203,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
     }
 
-   public void addfragment(int title, Fragment fragment) {
+    public void addfragment(int title, Fragment fragment) {
         toolbar.setTitle(title);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
@@ -218,26 +214,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ConnectivityManager cm = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         return ni != null;
-    }
-
-    private static String mFragment;
-
-    public static String getFragment() {
-        return mFragment;
-    }
-
-    public static void setFragment(String fragment) {
-        mFragment = fragment;
-    }
-
-    private static View view;
-
-    public static View getView() {
-        return view;
-    }
-
-    public static void setView(View v) {
-        view = v;
     }
 
     private static int openGroup;
@@ -291,19 +267,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(i);
             materialSheetFab.hideSheet();
         }
-        if( v == homeworkAdd || v == reminderAdd){
+        if (v == homeworkAdd || v == reminderAdd) {
             showDevSnackBar(v);
         }
     }
 
-    public void refreshActivity(){
-
-        this.finish();
-    }
-
-    private void showDevSnackBar(View v){
+    private void showDevSnackBar(View v) {
         Snackbar snackbar = Snackbar
-                .make(v,"К сожалению, пока можно добавить только заметку", Snackbar.LENGTH_LONG);
+                .make(v, "К сожалению, пока можно добавить только заметку", Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 }

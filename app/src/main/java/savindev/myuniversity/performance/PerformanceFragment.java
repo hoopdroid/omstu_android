@@ -4,19 +4,17 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +36,6 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
     private ProgressBar pbar;
     private int mainId;
     private String mainName;
-    private ThinDownloadManager downloadManager;
     private Button download;
 
     @Override
@@ -51,7 +48,8 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
             public void run() {
                 final int TIMEOUT_MILLISEC = 5000;
                 //TODO метод для получения id нашего вуза
-                String url = getActivity().getResources().getString(R.string.uri) + "getRaitingFileList?idUniversity=1&lastRefresh=20000101000000";
+                String url = getActivity().getResources().getString(R.string.uri) + "getRaitingFileList?idUniversity=1&lastRefresh="
+                        + getActivity().getResources().getString(R.string.unix);
                 OkHttpClient client = new OkHttpClient();
                 client.setConnectTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
                 client.setReadTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
@@ -59,16 +57,26 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
                 try {
                     Response response = client.newCall(request).execute();
                     JSONArray array = new JSONObject(response.body().string()).getJSONArray("CONTENT");
-                    for (int index = 0; index < array.length(); ++index) {
+                    for (int index = 0; index < array.length(); index++) {
                         JSONObject object = array.getJSONObject(index);
-                        final int idGroup = object.optInt("ID_GROUP", 0);
-                        final int ID_PROGRESS_RAITNG_FILE = object.optInt("ID_PROGRESS_RAITNG_FILE", 0);
-                        final String name = object.optString("FILE_NAME", "");
-                        final DownloadModel model = new DownloadModel(idGroup, name, ID_PROGRESS_RAITNG_FILE);
-                        if (idGroup == mainGroupId) {
-                            mainId = ID_PROGRESS_RAITNG_FILE;
-                            mainName = name;
+                        final int ESTIMATION_POINT_NUMBER = object.optInt("ESTIMATION_POINT_NUMBER");
+                        final String ESTIMATION_POINT_NAME = object.optString("ESTIMATION_POINT_NAME", "");
+                        final JSONArray files = object.getJSONArray("RAITING_FILES");
+                        ArrayList<PointModel> points = new ArrayList<>();
+                        int ii = files.length();
+                        for (int i = 0; i < files.length(); i++) {
+                            JSONObject object1 = files.getJSONObject(i);
+                            final int idGroup = object1.optInt("ID_GROUP", 0);
+                            final int ID_PROGRESS_RAITNG_FILE = object1.optInt("ID_PROGRESS_RAITNG_FILE", 0);
+                            final String name = object1.optString("FILE_NAME", "");
+                            final PointModel model = new PointModel(idGroup, name, ID_PROGRESS_RAITNG_FILE);
+                            if (idGroup == mainGroupId) {
+                                mainId = ID_PROGRESS_RAITNG_FILE;
+                                mainName = name;
+                            }
+                            points.add(model);
                         }
+                        final DownloadModel model = new DownloadModel(points, ESTIMATION_POINT_NAME, ESTIMATION_POINT_NUMBER);
                         models.add(model);
                     }
                 } catch (IOException | JSONException e) {
@@ -86,24 +94,25 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
             download.setVisibility(View.VISIBLE);
             download.setOnClickListener(this);
         }
-        downloadManager = new ThinDownloadManager(DOWNLOAD_THREAD_POOL_SIZE); //Для загрузки файлов
 
         //Заполнение списка групп
-        RecyclerView performance = (RecyclerView) view.findViewById(R.id.perfomance);
-        performance.setLayoutManager(new LinearLayoutManager(getActivity()));
+        ExpandableListView performance = (ExpandableListView) view.findViewById(R.id.perfomance);
         try {
             downloadList.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        PerformanceListAdapter adapter = new PerformanceListAdapter(downloadManager, getActivity().getApplicationContext(), models);
+        DownloadPerformanceAdapter adapter = new DownloadPerformanceAdapter(getActivity().getApplicationContext(), models);
         performance.setAdapter(adapter);
+
+
+
         return view;
     }
 
     private void download() {
         if (MainActivity.isNetworkConnected(getActivity())) {
-            DownloadModel model = new DownloadModel(mainId, mainName, mainId);
+            PointModel model = new PointModel(mainId, mainName, mainId);
             new DownloadRaitingTask(pbar, model, getActivity(), download).execute();
 
 //            String url = getActivity().getResources().getString(R.string.uri) + "getRaitingFile?idProgressRaitingFile=" + mainId;
@@ -164,10 +173,5 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    public class PerformanceListAdapter extends DownloadListAdapter {
-        public PerformanceListAdapter(ThinDownloadManager downloadManager, Context context, ArrayList<DownloadModel> downloadModels) {
-            super(downloadManager, context, downloadModels, true);
-        }
-    }
 
 }

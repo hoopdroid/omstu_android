@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -298,7 +299,6 @@ public abstract class AbstractSchedule extends DialogFragment
                 startActivity(intent);
                 break;
             case R.id.set_id:
-                /*TODO НЕ РАБОТАЕТ
                 if (!DBRequest.isUniversityInfoThere(getActivity())) {
                     if (MainActivity.isNetworkConnected(getActivity())) {
                         GetUniversityInfoTask guit = new GetUniversityInfoTask(getActivity().getBaseContext(), null);
@@ -319,7 +319,7 @@ public abstract class AbstractSchedule extends DialogFragment
                 if (!DBRequest.isUniversityInfoThere(getActivity())) {
                     intent = new Intent(getActivity(), GroupsActivity.class);
                     startActivity(intent);
-                }*/
+                }
                 MainActivity.toolbar.setTitle("Настройки");
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction;
@@ -341,9 +341,11 @@ public abstract class AbstractSchedule extends DialogFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem item = menu.findItem(R.id.calendar); //Установка текущей даты для навигационного календаря
-        GregorianCalendar c = new GregorianCalendar();
-        item.setTitle(c.get(Calendar.DAY_OF_MONTH) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            MenuItem item = menu.findItem(R.id.calendar); //Установка текущей даты для навигационного календаря
+            GregorianCalendar c = new GregorianCalendar();
+            item.setTitle(c.get(Calendar.DAY_OF_MONTH) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
+        }
 
         //Если имеются используемые расписания
         if (!(usedList == null || usedList.isEmpty())) {
@@ -410,7 +412,6 @@ public abstract class AbstractSchedule extends DialogFragment
 ////            } else {
 ////                glm.scrollToPosition(lastFirstVisiblePosition);
 ////            }
-//            int a = 3;
 //            return;
 //        }
 //    }
@@ -426,7 +427,7 @@ public abstract class AbstractSchedule extends DialogFragment
 //            lastFirstVisiblePosition = ((GridLayoutManager) scheduleList.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
 //        }
 //        outState.putInt("recycle_position", lastFirstVisiblePosition);
-//        int a = 3;
+
 //    }
 
 

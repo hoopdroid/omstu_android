@@ -25,12 +25,12 @@ import savindev.myuniversity.R;
 
 public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
     private ProgressBar progressBar;
-    private DownloadModel model;
+    private PointModel model;
     private Context context;
     private View cv;
     private File file;
 
-    public DownloadRaitingTask(ProgressBar progressBar, DownloadModel model, Context context, View cv) {
+    public DownloadRaitingTask(ProgressBar progressBar, PointModel model, Context context, View cv) {
         this.progressBar = progressBar;
         this.model = model;
         this.context = context;
@@ -55,8 +55,7 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
             HttpURLConnection c = (HttpURLConnection) u.openConnection();
             c.setConnectTimeout(TIMEOUT_MILLISEC);
             c.connect();
-//            int lengthOfFile = c.getContentLength();
-            int lengthOfFile = 12500;
+            int lengthOfFile = c.getContentLength();
             //this is where the file will be seen after the download
             file = new File(
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), model.getName() + ".xlsx");
@@ -71,7 +70,7 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
             int len1;
             long total = 0;
             while ((len1 = in.read(buffer)) > 0) {
-                total += len1; //total = total + len1
+                total += len1;
                 publishProgress("" + (int) ((total * 100) / lengthOfFile));
                 f.write(buffer, 0, len1);
             }
@@ -87,6 +86,7 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
                 e.printStackTrace();
             }
         }
+        model.setFileUri(Uri.fromFile(file));
         return true;
     }
 
