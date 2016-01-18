@@ -27,6 +27,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.notes.NotesFragment;
 import savindev.myuniversity.performance.PerformanceFragment;
@@ -127,6 +128,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             headerResult = new AccountHeaderBuilder()
                     .withActivity(this)
                     .withHeaderBackground(R.drawable.drawer_header)
+                    .addProfiles(
+                            new ProfileDrawerItem().withName("Войдите в систему").withIcon(getResources().getDrawable(R.drawable.accountalert))
+                    )
+                    .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                        @Override
+                        public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+
+                            Intent authIntent = new Intent (getApplicationContext(), FirstStartActivity.class);
+                            deleteUserPreferences();
+                            startActivity(authIntent);
+                            MainActivity.mainActivity.finish();//убиваем instance активит
+                            return false;
+                        }
+                    })
+                    .withSelectionListEnabledForSingleProfile(false)
                     .build();
         } else {
             headerResult = new AccountHeaderBuilder()
@@ -256,6 +272,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static void setPosition(String positionDate, String positionN) {
         MainActivity.positionDate = positionDate;
         MainActivity.positionN = positionN;
+    }
+
+
+    private void deleteUserPreferences(){
+        DBHelper dbHelper = DBHelper.getInstance(this);
+        dbHelper.getUsedSchedulesHelper().deleteMainSchedule(this);
+        SharedPreferences.Editor editor = getSharedPreferences("UserInfo", Context.MODE_PRIVATE).edit();
+        editor.remove("UserLastName");
+        editor.remove("UserFirstName");
+        editor.remove("UserMiddleName");
+        editor.remove("UserGroup");
+        editor.remove("email");
+        editor.remove("password");
+        editor.remove("UserId").commit();
     }
 
 

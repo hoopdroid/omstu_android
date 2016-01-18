@@ -37,6 +37,8 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
         protected TextView pairNote;
         protected ImageView pairNoteImage;
         protected CardView cv;
+        protected LinearLayout scheduleLineContainer;
+
 
         protected TextView dublPairName;
 
@@ -58,6 +60,7 @@ public abstract class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapt
             pairNoteImage = (ImageView) itemView.findViewById(R.id.pairNoteImage);
             noteLayout = (RelativeLayout)itemView.findViewById(R.id.noteLayout);
             dublPairName = (TextView) itemView.findViewById(R.id.dublPairName);
+            scheduleLineContainer = (LinearLayout) itemView.findViewById(R.id.schedulePairContainer);
 
         }
     }

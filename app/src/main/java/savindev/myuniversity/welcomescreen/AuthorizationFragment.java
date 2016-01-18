@@ -61,7 +61,7 @@ public class AuthorizationFragment extends Fragment {
 
                 SharedPreferences settings = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 settings.edit().putBoolean("isFirstStart", false).apply();
-
+                settings.edit().putBoolean("isAuthorized", true).apply();
                 submitForm();
             }
         });

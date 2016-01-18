@@ -10,16 +10,16 @@
     <color name="divider">#B6B6B6</color>
 
     <array name="pairs_colors">
-        <item>#4d7198</item>
-        <item>#ffb02e</item>
-        <item>#425e17</item>
-        <item>#421e25</item>
+        <item>#FFC107</item>
+        <item>#E91E63</item>
+        <item>#00BCD4</item>
+        <item>#FF5722</item>
     </array>
     <array name="pairs_colors_light">
-        <item>#4d719855</item>
-        <item>#ffb02e55</item>
-        <item>#425e1755</item>
-        <item>#421e2555</item>
+        <item>#FFEE58</item>
+        <item>#CE93D8</item>
+        <item>#80DEEA</item>
+        <item>#FF8A65</item>
     </array>
 </resources>
 

@@ -42,6 +42,7 @@ public class SettingsFragment extends Fragment {
     private MenuItem refreshItem;
     private GroupsFragment groups;
     private GetUniversityInfoTask guit;
+    public SharedPreferences settingsPref;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,11 +57,27 @@ public class SettingsFragment extends Fragment {
                 R.drawable.ic_account_search,
                 R.drawable.ic_information_outline_grey600_36dp,
         };
+
+        String [] settingsArray = getResources().getStringArray(R.array.settings_array);
+
         SettingsListAdapter adapter = new SettingsListAdapter(getActivity(),
-                getResources().getStringArray(R.array.settings_array),imageId);
+                settingsArray,imageId);
         settings.setAdapter(adapter);
         groups = new GroupsFragment();
         //При тыке на пункт меню
+
+        settingsPref = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+
+        if(settingsPref.getBoolean("isAuthorized",false)){
+            imageId[2]=R.drawable.ic_exit_to_app_grey600_36dp;
+            settingsArray[2] = "Выйти из профиля";
+        }
+        else {
+            imageId[2] = R.drawable.ic_account_search;
+            settingsArray[2] = "Авторизоваться";
+        }
+
+
         settings.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
@@ -130,6 +147,9 @@ public class SettingsFragment extends Fragment {
                         */
                         break;
                     case 2: // Возможность перейти на авторизацию через настройку( убираем профаил в header поэтому нужная вещь)
+                        settingsPref.edit().putBoolean("isAuthorized", false);
+                        SharedPreferences.Editor edit = settingsPref.edit();
+                        edit.putBoolean("isAuthorized", false);
                         Intent authIntent = new Intent (getActivity(), FirstStartActivity.class);
                         deleteUserPreferences();
                         startActivity(authIntent);

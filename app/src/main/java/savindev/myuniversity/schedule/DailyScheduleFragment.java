@@ -3,6 +3,7 @@ package savindev.myuniversity.schedule;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -76,8 +77,12 @@ public class DailyScheduleFragment extends AbstractSchedule {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.daily_schedule, menu);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            inflater.inflate(R.menu.daily_schedule, menu);}
+        else
+            inflater.inflate(R.menu.daily_schedule_old_api, menu);
         super.onCreateOptionsMenu(menu, inflater);
+
     }
 
     @Override
@@ -161,8 +166,8 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 color = getActivity().getResources().getIntArray(R.array.pairs_colors_light);
             switch (colores) {
                 case DAILY_BY_TYPE:
-                    scheduleViewHolder.pairNumber.setBackgroundColor(color[values.indexOf(models.get(i).getPairs().get(0).getType())]);
-                    scheduleViewHolder.pairTime.setBackgroundColor(color[values.indexOf(models.get(i).getPairs().get(0).getType())]);
+                    scheduleViewHolder.scheduleLineContainer.setBackgroundColor(color[values.indexOf(models.get(i).getPairs().get(0).getType())]);
+                   // scheduleViewHolder.pairTime.setBackgroundColor(color[values.indexOf(models.get(i).getPairs().get(0).getType())]);
                     break;
             }
 

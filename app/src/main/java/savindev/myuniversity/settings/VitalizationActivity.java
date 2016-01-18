@@ -26,7 +26,7 @@ public class VitalizationActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-        getSupportActionBar().setTitle("Визуализация");
+        getSupportActionBar().setTitle("Внешний вид");
 
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.container, new VitalizationFragment());

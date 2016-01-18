@@ -960,6 +960,7 @@ public class DBHelper extends SQLiteOpenHelper {
             try {
                 beginDate = format.parse(date);
                 endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, date))); //конец семестра
+                int a =5;
                 if(beginDate.compareTo(endDate) >= 0)
                     return null;
 

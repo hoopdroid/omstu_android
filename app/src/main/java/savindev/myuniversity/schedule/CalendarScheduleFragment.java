@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -52,6 +53,9 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private SharedPreferences settings;
     private boolean fullText;
     private float textSize;
+
+
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
@@ -168,10 +172,21 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         new DrawerBuilder(getActivity()).withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).append(MainActivity.getDrawer());
     }
 
+
+
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.calendar_schedule, menu);
+
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            inflater.inflate(R.menu.calendar_schedule, menu);}
+        else
+            inflater.inflate(R.menu.calendar_schedule_old_api, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
+
+
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -48,9 +48,14 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View v) {
+        SharedPreferences settings;
         switch (v.getId()) {
             case R.id.btnSignin:
                 //SlideToDown();
+                settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                settings.edit().putBoolean("isAuthorized", true);
+                SharedPreferences.Editor edit = settings.edit();
+                edit.putBoolean("isAuthorized", true);
                 btnSignin.setVisibility(View.GONE);
                 btnSkip.setWidth(100);
                 ResizeIcon();
@@ -62,12 +67,13 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
                 transaction.commit();
                 break;
             case R.id.btnSkip:
-                SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
                 settings.edit().putBoolean("isFirstStart", false);
                 settings.edit().putBoolean("isFirstSettings", true);
+                settings.edit().putBoolean("isAuthorized", true);
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putBoolean("isFirstStart", false);
-                editor.putBoolean("isFirstSetti gs", true);
+                editor.putBoolean("isFirstSettings", true);
                 editor.commit();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 this.finish();

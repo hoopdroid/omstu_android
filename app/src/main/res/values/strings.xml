@@ -43,8 +43,8 @@
         <item>Настройки</item>
         <item>Авторизация</item>
     </string-array>
-    <!--<string name="uri">http://83.220.169.40:1342/MyUniversity/api/v1.0/</string>-->
-    <string name="uri">http://178.74.102.58:1342/MyUniversity/api/v1.0/</string>
+    <string name="uri">http://83.220.169.40:1342/MyUniversity/api/v1.0/</string>
+    <!--string name="uri">http://178.74.102.58:1342/MyUniversity/api/v1.0/</string>-->
     <string name="uri_test">http://178.74.102.58:4586/MyUniversity/api/v1.0/</string>
     <string name="uri_test2">http://178.74.102.58:1342/MyUniversity/api/v1.0/</string>
     <string name="unix">19700101000000</string>
