@@ -1,9 +1,9 @@
 package savindev.myuniversity.performance;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +32,6 @@ import savindev.myuniversity.R;
  * На альфа- и бета-версии содержит список с возможностью скачать рейтинг
  */
 public class PerformanceFragment extends Fragment implements View.OnClickListener {
-    private static final int DOWNLOAD_THREAD_POOL_SIZE = 5;
     private ProgressBar pbar;
     private int mainId;
     private String mainName;

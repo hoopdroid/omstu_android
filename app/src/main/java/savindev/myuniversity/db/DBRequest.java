@@ -8,9 +8,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-/**
- * Created by ilyas on 20.11.2015.
- */
+
 public class DBRequest {
 
     public DBRequest() {

@@ -1,6 +1,6 @@
 package savindev.myuniversity.schedule;
 
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -54,9 +54,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private boolean fullText;
     private float textSize;
 
-
-
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
 
@@ -82,6 +79,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
                             settings.getBoolean("full_horisontal", true));
             textSize = getActivity().getResources().getDisplayMetrics().widthPixels/96 + 8/3;
+            if (fullText)
+                textSize += 2;
 
             colores = Colores.valueOf(settings.getString("calendar", "CALENDAR_NOT_ALLOCATED"));
 
@@ -272,7 +271,6 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     case PAIR:
                         if (!checkedPairFilters(models.get(i))) {
                             scheduleViewHolder.pairName.setVisibility(View.GONE);
-                            scheduleViewHolder.pairName.setAlpha(0.25f);
                             break;
                         }
                         scheduleViewHolder.cv.setCardBackgroundColor(Color.WHITE);
@@ -311,7 +309,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                             public boolean onLongClick(View v) {
                                 MainActivity.setPosition(models.get(scheduleViewHolder.getAdapterPosition()).getDate(),
                                         models.get(scheduleViewHolder.getAdapterPosition()).getN());
-                                FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                                 ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
                                 return false;
                             }
@@ -441,7 +439,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             @Override
             public void onClick(View v) {
                 MainActivity.setPosition(model.getDate(), model.getN());
-                FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new DailyScheduleFragment()).commit();
             }
         });

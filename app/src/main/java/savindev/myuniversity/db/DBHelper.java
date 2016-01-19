@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.notes.NoteModel;
 import savindev.myuniversity.notes.Priority;
@@ -951,16 +950,9 @@ public class DBHelper extends SQLiteOpenHelper {
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
             Date beginDate = null;
             Date endDate = null;
-
-
-
-
-
-
             try {
                 beginDate = format.parse(date);
                 endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, date))); //конец семестра
-                int a =5;
                 if(beginDate.compareTo(endDate) >= 0)
                     return null;
 
@@ -990,10 +982,7 @@ public class DBHelper extends SQLiteOpenHelper {
                         nameGroup = dbHelper.getTeachersHelper().getTeacherById(context, cursor.getInt(cursor.getColumnIndex(COL_TEACHER_ID)));
                     }
 
-                    if (cursor.getInt(cursor.getColumnIndex(COL_IS_CANCELLED)) == 1)
-                        isCancelled = true;
-                    else
-                        isCancelled = false;
+                    isCancelled = cursor.getInt(cursor.getColumnIndex(COL_IS_CANCELLED)) == 1;
 
                     int idPair = cursor.getInt(cursor.getColumnIndex(COL_PAIR_ID));
 
@@ -1661,10 +1650,6 @@ public class DBHelper extends SQLiteOpenHelper {
             db.update(TABLE_NAME, isDoneValue,COL_ID_NOTE+ " = "+idNote, null);
 
         }
-
-
-
-
     }
 
 

@@ -1,7 +1,7 @@
 package savindev.myuniversity.settings;
 
 import android.annotation.TargetApi;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -149,7 +148,7 @@ public class SettingsFragment extends Fragment {
                     case 2: // Возможность перейти на авторизацию через настройку( убираем профаил в header поэтому нужная вещь)
                         settingsPref.edit().putBoolean("isAuthorized", false);
                         SharedPreferences.Editor edit = settingsPref.edit();
-                        edit.putBoolean("isAuthorized", false);
+                        edit.putBoolean("isAuthorized", false).apply();
                         Intent authIntent = new Intent (getActivity(), FirstStartActivity.class);
                         deleteUserPreferences();
                         startActivity(authIntent);
@@ -183,7 +182,7 @@ public class SettingsFragment extends Fragment {
         editor.remove("UserGroup");
         editor.remove("email");
         editor.remove("password");
-        editor.remove("UserId").commit();
+        editor.remove("UserId").apply();
     }
 
     //TODO Сделать обработку для API<17

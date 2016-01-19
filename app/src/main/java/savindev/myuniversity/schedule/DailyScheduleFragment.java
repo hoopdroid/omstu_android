@@ -1,6 +1,6 @@
 package savindev.myuniversity.schedule;
 
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -93,7 +93,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 //Переход на календарный вид
                 getActivity().getSharedPreferences("settings", 0).edit().putString("lastOpenSchedule", "grid").apply();
                 MainActivity.setOpen(currentID, isGroup, currentGroup); //Запись по id. потом по нему открывать расписание
-                ft = getFragmentManager().beginTransaction();
+                ft = getActivity().getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.content_main, new CalendarScheduleFragment()).commit();
                 break;
             default:

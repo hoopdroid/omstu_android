@@ -2,7 +2,7 @@ package savindev.myuniversity.welcomescreen;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -60,8 +60,8 @@ public class FirstStartActivity extends AppCompatActivity implements View.OnClic
                 btnSkip.setWidth(100);
                 ResizeIcon();
                 authorizationFragment = new AuthorizationFragment();
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
                 transaction.replace(R.id.login_fragment, authorizationFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();

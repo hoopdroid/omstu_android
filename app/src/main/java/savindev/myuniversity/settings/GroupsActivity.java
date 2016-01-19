@@ -1,6 +1,6 @@
 package savindev.myuniversity.settings;
 
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -28,14 +28,14 @@ public class GroupsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
 
-         settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-         editor = settings.edit();
+        settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        editor = settings.edit();
 
         setContentView(R.layout.container);
         Bundle titleBundle = getIntent().getExtras();
-        String toolbarTitle="Расписания";
-        if(titleBundle!=null)
-        toolbarTitle =  titleBundle.getString("Title","Отображаемые расписания");
+        String toolbarTitle = "Расписания";
+        if (titleBundle != null)
+            toolbarTitle = titleBundle.getString("Title", "Отображаемые расписания");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -53,7 +53,7 @@ public class GroupsActivity extends AppCompatActivity {
         });
         getSupportActionBar().setTitle(toolbarTitle);
 
-        FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.container, new GroupsFragment());
         fragmentTransaction.commit();
 

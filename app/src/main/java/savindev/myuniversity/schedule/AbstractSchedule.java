@@ -1,9 +1,6 @@
 package savindev.myuniversity.schedule;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -332,7 +332,7 @@ public abstract class AbstractSchedule extends DialogFragment
                 break;
             case R.id.upd_id:
                 // обновить окно
-                android.app.FragmentManager fragmentManag = getFragmentManager();
+                FragmentManager fragmentManag = getFragmentManager();
                 fragmentManag.beginTransaction()
                         .replace(R.id.content_main, new DailyScheduleFragment()).commit();
                 break;
