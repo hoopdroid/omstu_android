@@ -132,20 +132,9 @@ public class SettingsFragment extends Fragment {
                             getFragmentManager().beginTransaction().replace(R.id.frgmCont, new VitalizationFragment()).commit();
                         }
                         break;
-                    case 3://TODO Добавить информацию о приложении
-                        //Тестовая функция, перевод порта
-                        /*settings.setBackgroundColor(Color.WHITE);
+                    case 2: // Возможность перейти на авторизацию через настройку( убираем профаил в header поэтому нужная вещь)
                         settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
                         lastPosition = position;
-                        if (getResources().getConfiguration().orientation ==
-                                Configuration.ORIENTATION_LANDSCAPE) {
-                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
-                        }
-                        Intent intent = new Intent(getActivity(), Test.class);
-                        startActivity(intent);
-                        */
-                        break;
-                    case 2: // Возможность перейти на авторизацию через настройку( убираем профаил в header поэтому нужная вещь)
                         settingsPref.edit().putBoolean("isAuthorized", false);
                         SharedPreferences.Editor edit = settingsPref.edit();
                         edit.putBoolean("isAuthorized", false).apply();
@@ -153,6 +142,19 @@ public class SettingsFragment extends Fragment {
                         deleteUserPreferences();
                         startActivity(authIntent);
                         MainActivity.mainActivity.finish();//убиваем instance активит
+                        break;
+                    case 3://О приложении
+                        settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                        lastPosition = position;
+                        if (getResources().getConfiguration().orientation ==
+                                Configuration.ORIENTATION_PORTRAIT) {
+                            Intent intent = new Intent(getActivity(), AboutActivity.class);
+                            startActivity(intent);
+                        } else {
+                            settings.setBackgroundColor(Color.WHITE);
+                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+                            getFragmentManager().beginTransaction().replace(R.id.frgmCont, new AboutFragment()).commit();
+                        }
                         break;
                     default:
                         break;
@@ -173,8 +175,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void deleteUserPreferences(){
-        DBHelper dbHelper = DBHelper.getInstance(getActivity());
-        dbHelper.getUsedSchedulesHelper().deleteMainSchedule(getActivity());
+        DBHelper.UsedSchedulesHelper.deleteMainSchedule(getActivity());
         SharedPreferences.Editor editor = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE).edit();
         editor.remove("UserLastName");
         editor.remove("UserFirstName");

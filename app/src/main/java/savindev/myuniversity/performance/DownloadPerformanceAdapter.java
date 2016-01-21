@@ -5,28 +5,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ProgressBar;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import co.mobiwise.library.ProgressLayout;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 
 public class DownloadPerformanceAdapter extends BaseExpandableListAdapter {
 
-    private ArrayList<DownloadModel> mModels;
+    private ArrayList<RaitingModel> mModels;
     private Context mContext;
 
-    public DownloadPerformanceAdapter(Context context, ArrayList<DownloadModel> models) {
+    public DownloadPerformanceAdapter(Context context, ArrayList<RaitingModel> models) {
         mContext = context;
         mModels = models;
     }
@@ -83,9 +83,9 @@ public class DownloadPerformanceAdapter extends BaseExpandableListAdapter {
     }
 
     static class ViewHolder {
+        public ProgressLayout pl;
         public TextView textView;
-        public ProgressBar pBar;
-        public CardView cv;
+        public ImageView img;
     }
 
     @Override
@@ -95,20 +95,21 @@ public class DownloadPerformanceAdapter extends BaseExpandableListAdapter {
         View view = inflater.inflate(R.layout.download_view, null);
         final ViewHolder holder = new ViewHolder();
         holder.textView = (TextView) view.findViewById(R.id.name);
-        holder.pBar = (ProgressBar) view.findViewById(R.id.progress);
-        holder.cv = (CardView) view.findViewById(R.id.cv);
+        holder.img = (ImageView) view.findViewById(R.id.image);
+        holder.pl = (ProgressLayout) view.findViewById(R.id.progressLayout);
         if (mModels.get(groupPosition).getPoints().get(childPosition).getFileUri() == null) {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (MainActivity.isNetworkConnected(mContext)) {
-                        new DownloadRaitingTask(holder.pBar, mModels.get(groupPosition).getPoints().get(childPosition), mContext, view).execute();
+                        new DownloadRaitingTask(holder.pl, mModels.get(groupPosition).getPoints().get(childPosition), mContext, view).execute();
                     } else {
                         Toast.makeText(mContext, "Нет интернета", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
-            holder.pBar.setVisibility(View.INVISIBLE);
+            holder.pl.cancel();
+            holder.textView.setText("скачать " + mModels.get(groupPosition).getPoints().get(childPosition).getName());
         }
         else {
             view.setOnClickListener(new View.OnClickListener() {
@@ -125,11 +126,12 @@ public class DownloadPerformanceAdapter extends BaseExpandableListAdapter {
                         mContext.getApplicationContext().startActivity(intent);
                 }
             });
-            holder.pBar.setVisibility(View.VISIBLE);
-            holder.pBar.setProgress(100);
+            holder.pl.setCurrentProgress(100);
+            holder.img.setImageResource(R.drawable.galochka);
+            holder.textView.setText("открыть " + mModels.get(groupPosition).getPoints().get(childPosition).getName());
         }
         view.setTag(holder);
-        holder.textView.setText(mModels.get(groupPosition).getPoints().get(childPosition).getName());
+
         return view;
     }
 

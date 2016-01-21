@@ -1,11 +1,9 @@
 package savindev.myuniversity.settings;
 
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -37,21 +35,13 @@ import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private ExpandableListView list;
     private ExpListAdapter adapter;
-    private MenuItem refreshItem;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private FloatingActionButton fab;
     private FABProgressCircle fabProgressCircle;
     private boolean fail = false;
 
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-//        if (MainActivity.getFragment() != null && MainActivity.getFragment().equals("groups")) {
-//            return MainActivity.getView();
-//        }
-//        MainActivity.setFragment("groups");
         setRetainInstance(true);
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_groups_settings, container, false);
@@ -76,18 +66,10 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
             }
         });
-//        fabProgressCircle.attachListener(new FABProgressListener() {
-//            @Override
-//            public void onFABProgressAnimationEnd() {
-//                fab.hide();
-//                fabProgressCircle.hide();
-//            }
-//        });
         parse();
 
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("FINISH_UPDATE"));
         getActivity().registerReceiver(broadcastReceiverDownloadFinish, new IntentFilter("FINISH_DOWNLOAD"));
-//        MainActivity.setView(view);
         MainActivity.fab.hide();
         return view;
     }
@@ -176,11 +158,8 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             model.setLastRefresh(getActivity().getResources().getString(R.string.unix)); //Установка даты последнего обновления - нет обновлений
                         }
                         gst.execute(addList.toArray(new GroupsModel[addList.size()])); //Выполняем запрос на получение нужных расписаний
-                        try {  //TODO сделать красивое отображение загрузки
-                            if (gst.get() == -1)
-                                fail = true;
-                            else
-                                fail = false;
+                        try {
+                            fail = gst.get() == -1;
                         } catch (Exception e) {
                             fail = true;
                             e.printStackTrace();

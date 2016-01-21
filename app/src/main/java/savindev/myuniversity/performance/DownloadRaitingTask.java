@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.view.View;
 import android.webkit.MimeTypeMap;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.File;
@@ -20,18 +19,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import co.mobiwise.library.ProgressLayout;
 import savindev.myuniversity.R;
 
 
 public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
-    private ProgressBar progressBar;
+    private ProgressLayout pl;
     private PointModel model;
     private Context context;
     private View cv;
     private File file;
 
-    public DownloadRaitingTask(ProgressBar progressBar, PointModel model, Context context, View cv) {
-        this.progressBar = progressBar;
+    public DownloadRaitingTask(ProgressLayout pl, PointModel model, Context context, View cv) {
+        this.pl = pl;
         this.model = model;
         this.context = context;
         this.cv = cv;
@@ -39,8 +39,7 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar.setProgress(0);
+        pl.setCurrentProgress(0);
     }
 
     @Override
@@ -91,13 +90,13 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
     }
 
     protected void onProgressUpdate(String[] progress) {
-        progressBar.setProgress(Integer.parseInt(progress[0]));
+        pl.setCurrentProgress(Integer.parseInt(progress[0]));
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
         if (result) {
-            progressBar.setProgress(100);
+            pl.setCurrentProgress(100);
             if (cv.getId() == R.id.download_my_perf)
                 ((TextView)cv).setText("Открыть");
             cv.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +116,7 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
             });
         }
         else
-            progressBar.setProgress(0);
+            pl.cancel();
     }
 
 

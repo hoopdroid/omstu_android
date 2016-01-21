@@ -9,16 +9,16 @@ import android.view.View;
 import savindev.myuniversity.R;
 
 
-public class GroupsActivity extends AppCompatActivity {
+public class AboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.container);
         Bundle titleBundle = getIntent().getExtras();
-        String toolbarTitle = "Расписания";
+        String toolbarTitle = "О программе";
         if (titleBundle != null)
-            toolbarTitle = titleBundle.getString("Title", "Отображаемые расписания");
+            toolbarTitle = titleBundle.getString("Title", "О программе");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -30,14 +30,12 @@ public class GroupsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 onBackPressed();
                 finish();
-
-
             }
         });
         getSupportActionBar().setTitle(toolbarTitle);
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.container, new GroupsFragment());
+        fragmentTransaction.replace(R.id.container, new AboutFragment());
         fragmentTransaction.commit();
     }
 }
