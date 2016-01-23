@@ -2,7 +2,9 @@ package savindev.myuniversity.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -148,6 +150,16 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Если расписание файлом - скачать файл
+                if (mGroup.get(groupPosition).get(childPosition).isFileSchedule()) { //Расписание в файле. сразу предложить скачать
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    String url = mContext.getResources().getString(R.string.uri) + "getScheduleFile?idGroup=" +
+                            mGroup.get(groupPosition).get(childPosition).getId();
+                    i.setData(Uri.parse(url));
+                    mContext.startActivity(i);
+                    return;
+                }
+                //Иначе добавить\удалить в список скачивания
                 if (main == null || !(mGroup.get(groupPosition).get(childPosition).getId() == main.getId() &&
                         mGroup.get(groupPosition).get(childPosition).isGroup() == main.isGroup())) { //Выполнять только для не главной группы
                     if (!mGroup.get(groupPosition).get(childPosition).isSelected()) {

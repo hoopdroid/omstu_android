@@ -304,14 +304,15 @@ public class DBHelper extends SQLiteOpenHelper {
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
 
             for (int i = 0; i < teachersNameList.size(); i++) {
+                //TODO false только для компиляции, добавить параметр в базу и брать его оттуда
                 GroupsModel groupsModel = new GroupsModel(
                         teachersNameList.get(i),
                         Integer.parseInt(teacherIdList.get(i).toString()),
+                        false,
                         false
                 );
                 groupsModelArrayList.add(groupsModel);
             }
-            int a = 5;
             return groupsModelArrayList;
         }
 
@@ -629,16 +630,16 @@ public class DBHelper extends SQLiteOpenHelper {
             ArrayList<String> groupNameList = DBRequest.getList(context, TABLE_NAME, COL_GROUP_NAME, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
             ArrayList groupIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_GROUP, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
-            int g = 5;
             for (int i = 0; i < groupNameList.size(); i++) {
+                //TODO false только для компиляции, добавить параметр в базу и брать его оттуда
                 GroupsModel groupsModel = new GroupsModel(
                         groupNameList.get(i),
                         Integer.parseInt(groupIdList.get(i).toString()),
+                        false,
                         true
                 );
                 groupsModelArrayList.add(groupsModel);
             }
-            int a = 5;
             return groupsModelArrayList;
 
         }

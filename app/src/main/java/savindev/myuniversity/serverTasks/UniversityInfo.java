@@ -123,13 +123,15 @@ public class UniversityInfo {
         public final int PAIR_NUMBER;
         public final String PAIR_BEGIN_TIME;
         public final String PAIR_END_TIME;
+        public final boolean IS_FILE_SCHEDULE;
         public final boolean IS_DELETED;
 
-        public PAIR(int ID_PAIR, int PAIR_NUMBER, String PAIR_BEGIN_TIME, String PAIR_END_TIME, boolean IS_DELETED) {
+        public PAIR(int ID_PAIR, int PAIR_NUMBER, String PAIR_BEGIN_TIME, String PAIR_END_TIME, boolean IS_FILE_SCHEDULE, boolean IS_DELETED) {
             this.ID_PAIR = ID_PAIR;
             this.PAIR_NUMBER = PAIR_NUMBER;
             this.PAIR_BEGIN_TIME = PAIR_BEGIN_TIME;
             this.PAIR_END_TIME = PAIR_END_TIME;
+            this.IS_FILE_SCHEDULE = IS_FILE_SCHEDULE;
             this.IS_DELETED = IS_DELETED;
         }
 
@@ -138,8 +140,9 @@ public class UniversityInfo {
             final int PAIR_NUMBER = object.optInt("PAIR_NUMBER", 0);
             final String PAIR_BEGIN_TIME = object.optString("PAIR_BEGIN_TIME", "");
             final String PAIR_END_TIME = object.optString("PAIR_END_TIME", "");
+            final boolean IS_FILE_SCHEDULE = object.optBoolean("IS_FILE_SCHEDULE", false);
             final boolean IS_DELETED = object.optBoolean("IS_DELETED", false);
-            return new PAIR(ID_PAIR, PAIR_NUMBER, PAIR_BEGIN_TIME, PAIR_END_TIME, IS_DELETED);
+            return new PAIR(ID_PAIR, PAIR_NUMBER, PAIR_BEGIN_TIME, PAIR_END_TIME, IS_FILE_SCHEDULE, IS_DELETED);
         }
 
         public static ArrayList<PAIR> fromJson(final JSONArray array) {

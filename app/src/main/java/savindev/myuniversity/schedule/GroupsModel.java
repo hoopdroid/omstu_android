@@ -10,6 +10,20 @@ public class GroupsModel {
     private boolean isGroup;
     private String name;
     private String lastRefresh;
+
+    public boolean isFileSchedule() {
+        return isFileSchedule;
+    }
+
+    public void setFileSchedule(boolean fileSchedule) {
+        isFileSchedule = fileSchedule;
+    }
+
+    public void setGroup(boolean group) {
+        isGroup = group;
+    }
+
+    private boolean isFileSchedule;
     private boolean selected;
 
     public GroupsModel(String name, int id, boolean isGroup, String lastRefresh) {
@@ -19,9 +33,10 @@ public class GroupsModel {
         this.lastRefresh = lastRefresh;
     }
 
-    public GroupsModel(String name, int id, boolean isGroup) {
+    public GroupsModel(String name, int id, boolean isFileSchedule, boolean isGroup) {
         this.name = name;
         this.id = id;
+        this.isFileSchedule = isFileSchedule;
         this.isGroup = isGroup;
     }
 

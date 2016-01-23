@@ -1,4 +1,4 @@
-package savindev.myuniversity.performance;
+package savindev.myuniversity.serverTasks;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +10,12 @@ import android.os.Environment;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,16 +26,18 @@ import java.util.List;
 
 import co.mobiwise.library.ProgressLayout;
 import savindev.myuniversity.R;
+import savindev.myuniversity.performance.PointModel;
 
 
-public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
+public class DownloadFileTask extends AsyncTask<Void, String, Boolean> {
     private ProgressLayout pl;
     private PointModel model;
     private Context context;
     private View cv;
     private File file;
+    private JSONObject json;
 
-    public DownloadRaitingTask(ProgressLayout pl, PointModel model, Context context, View cv) {
+    public DownloadFileTask(ProgressLayout pl, PointModel model, Context context, View cv) {
         this.pl = pl;
         this.model = model;
         this.context = context;
@@ -62,6 +69,7 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
                 file.createNewFile();
             }
             f = new FileOutputStream(file);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             //file input is from the url
             InputStream in = c.getInputStream();
             //here’s the download code
@@ -71,9 +79,17 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
             while ((len1 = in.read(buffer)) > 0) {
                 total += len1;
                 publishProgress("" + (int) ((total * 100) / lengthOfFile));
-                f.write(buffer, 0, len1);
+//                f.write(buffer, 0, len1);
+                baos.write(buffer, 0, len1);
             }
 
+            try {
+                json = new JSONObject(baos.toString("UTF-8")); //Получилось преобразовать в json - значит, в файле ошибка
+                return false;
+            } catch (JSONException e) {
+                //Если не получилось, все ок и у нас файл
+                f.write(baos.toByteArray());
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -98,7 +114,7 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
         if (result) {
             pl.setCurrentProgress(100);
             if (cv.getId() == R.id.download_my_perf)
-                ((TextView)cv).setText("Открыть");
+                ((TextView) cv).setText("Открыть");
             cv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -114,9 +130,15 @@ public class DownloadRaitingTask extends AsyncTask<Void, String, Boolean> {
                         context.getApplicationContext().startActivity(intent);
                 }
             });
-        }
-        else
+        } else {
+            if (json != null) {
+                String type = json.optString("STATE");
+                String message = json.optJSONObject("CONTENT").optString("ERROR_MESSAGE");
+                Toast.makeText(context, type + ": " + message, Toast.LENGTH_LONG).show();
+            }
             pl.cancel();
+
+        }
     }
 
 

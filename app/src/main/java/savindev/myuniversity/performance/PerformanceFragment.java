@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import co.mobiwise.library.ProgressLayout;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.serverTasks.DownloadFileTask;
 import savindev.myuniversity.serverTasks.GetRaitingFileListTask;
 
 /**
@@ -149,7 +150,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
             refreshing = false;
         }
         if (MainActivity.isNetworkConnected(getActivity())) {
-            new DownloadRaitingTask(pl, main, getActivity(), download).execute();
+            new DownloadFileTask(pl, main, getActivity(), download).execute();
         } else {
             Toast.makeText(getActivity(), "Нет интернета", Toast.LENGTH_SHORT).show();
         }

@@ -20,6 +20,7 @@ import java.util.List;
 import co.mobiwise.library.ProgressLayout;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.serverTasks.DownloadFileTask;
 
 public class DownloadPerformanceAdapter extends BaseExpandableListAdapter {
 
@@ -102,7 +103,7 @@ public class DownloadPerformanceAdapter extends BaseExpandableListAdapter {
                 @Override
                 public void onClick(View view) {
                     if (MainActivity.isNetworkConnected(mContext)) {
-                        new DownloadRaitingTask(holder.pl, mModels.get(groupPosition).getPoints().get(childPosition), mContext, view).execute();
+                        new DownloadFileTask(holder.pl, mModels.get(groupPosition).getPoints().get(childPosition), mContext, view).execute();
                     } else {
                         Toast.makeText(mContext, "Нет интернета", Toast.LENGTH_SHORT).show();
                     }
