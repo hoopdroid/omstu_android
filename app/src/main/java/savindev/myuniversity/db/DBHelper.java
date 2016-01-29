@@ -399,6 +399,13 @@ public class DBHelper extends SQLiteOpenHelper {
             int idSemester;
 
             idSemester = getNumSemesterFromDate(date);
+
+            /*
+                Проверяем вхождение даты в интервал семестра
+             */
+            if(idSemester==0)
+                return null;
+
             DBHelper dbHelper = DBHelper.getInstance(context);
             SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
             String find = "SELECT " + COL_END_DATE + " FROM  " + TABLE_NAME + " WHERE " + COL_ID_SEMESTER + " = " + idSemester;
@@ -953,7 +960,12 @@ public class DBHelper extends SQLiteOpenHelper {
             Date endDate = null;
             try {
                 beginDate = format.parse(date);
-                endDate = format.parse(DateUtil.formatStandart(dbHelper.getSemestersHelper().getSemesterEndDate(context, date))); //конец семестра
+                String findendDate = dbHelper.getSemestersHelper().getSemesterEndDate(context, date);
+                if(findendDate!=null)
+                endDate = format.parse(DateUtil.formatStandart(findendDate));
+                else
+                    return null;
+                    //конец семестра
                 if(beginDate.compareTo(endDate) >= 0)
                     return null;
 

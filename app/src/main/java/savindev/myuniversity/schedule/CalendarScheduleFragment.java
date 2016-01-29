@@ -175,7 +175,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             inflater.inflate(R.menu.calendar_schedule, menu);
         } else
             inflater.inflate(R.menu.calendar_schedule_old_api, menu);
@@ -287,12 +287,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                                 if (models.get(scheduleViewHolder.getAdapterPosition()) != null) {
                                     fillDetailsLayout(models.get(scheduleViewHolder.getAdapterPosition()), 0);
                                     Intent intent = new Intent(context, PairInfoActivity.class);
-                                    intent.putExtra("pairname", models.get(i).getPairs().get(0).getName());
+                                    intent.putExtra("schedulemodel",models.get(i));
                                     intent.putExtra("pairtime", models.get(i).getDate());
-                                    intent.putExtra("scheduleId", models.get(i).getPairs().get(0).getIdSchedule());
-                                    intent.putExtra("date", models.get(i).getDate());
-                                    intent.putExtra("teacher", models.get(i).getPairs().get(0).getTeacher());
-                                    intent.putExtra("place", models.get(i).getPairs().get(0).getClassroom());
                                     startActivity(intent);
                                 }
                             }
@@ -348,7 +344,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                 else
                     color = getActivity().getResources().getIntArray(R.array.pairs_colors);
             if (colores == Colores.CALENDAR_NOT_ALLOCATED)
-                tv.setBackgroundColor(getResources().getColor(R.color.primary_light));
+                tv.setBackgroundColor(getResources().getColor(R.color.primary_dark));
             if (colores == Colores.CALENDAR_BY_TYPE) {
                 tv.setBackgroundColor(color[filterType.indexOf(pair.getType())]);
             }

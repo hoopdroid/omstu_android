@@ -13,18 +13,22 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.alexmarken.navigator.my.university.Fragments.NaviMapsFragment;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
 
 import savindev.myuniversity.Fab;
+import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.notes.NotesFragment;
+import savindev.myuniversity.serverTasks.Schedule;
 
 public class PairInfoActivity extends AppCompatActivity implements View.OnClickListener {
-//Приватные, блин, приватные!!
+
     private String pairName;
     private String pairInfo;
     private String pairMoreInfo;
@@ -36,6 +40,7 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
     private TextView homeworkAdd;
     private TextView reminderAdd;
     private MaterialSheetFab materialSheetFab;
+    private Button searchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +48,20 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
 
         setContentView(R.layout.activity_pair_info);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        Bundle b = getIntent().getExtras();
-        if (b != null) {
-            pairName = b.getString("pairname");
-            pairInfo = b.getString("pairtime");
-            pairMoreInfo =b.getString("teacher") + " ауд. " + b.getString("place");
-            scheduleId = b.getInt("scheduleId");
-            date = b.getString("date");
-        }
 
+        searchButton = (Button)findViewById(R.id.btnSearchOnMap);
+
+        Bundle b = getIntent().getExtras();
+        Intent i = getIntent();
+
+        ScheduleModel scheduleModel = i.getParcelableExtra("schedulemodel");
+
+        pairName = scheduleModel.getPairs().get(0).getName();
+        pairInfo = scheduleModel.getStartTime();
+        pairMoreInfo = scheduleModel.getPairs().get(0).getTeacher()+ " ауд. "+ scheduleModel.getPairs().get(0).getClassroom();
+        scheduleId = scheduleModel.getPairs().get(0).getIdSchedule();
+        date = scheduleModel.getDate();
+        pairInfo = b.getString("pairtime");
 
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -73,6 +83,21 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
         toolbar.setTitle("");
         addfragment(new NotesFragment());
         initSheetFab();
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /*
+
+                TODO Здесь будет код для отображения карты
+
+
+                 */
+
+
+            }
+        });
 
     }
 

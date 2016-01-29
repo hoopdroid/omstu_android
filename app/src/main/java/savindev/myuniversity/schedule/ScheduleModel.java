@@ -1,15 +1,20 @@
 package savindev.myuniversity.schedule;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import savindev.myuniversity.notes.NoteModel;
+import savindev.myuniversity.serverTasks.Schedule;
 
 /**
  * Класс-объект для пары
  */
 
-public class ScheduleModel {
+public class ScheduleModel implements Parcelable {
 
     private String date;  //Дата проведения пары, напрямую из объекта
     private String n;  //Номер пары можно получить по ее id из базы PAIRS
@@ -20,6 +25,8 @@ public class ScheduleModel {
     private List<Pair> pairs;
     private ArrayList<NoteModel> notes;
 
+
+
     public ScheduleModel(String n, String startTime, String endTime, String date, boolean isCancelled, List<Pair> pairs, ArrayList<NoteModel> notes) {
         this.n = n;
         this.startTime = startTime;
@@ -29,12 +36,16 @@ public class ScheduleModel {
         this.pairs = pairs;
         this.isCancelled = isCancelled;
         this.notes = notes;
+
+
     }
 
     public ScheduleModel(CellType cellType, String value) { //конструктор с использованием типа ячейки, для расписания-сетки
         this.cellType = cellType;
         this.date = value;
     }
+
+
 
     public void addListItem(List<Pair> pair) {
         pairs.addAll(pair);
@@ -77,7 +88,53 @@ public class ScheduleModel {
         this.notes = notes;
     }
 
-    public static class Pair {
+    private ScheduleModel(Parcel in) { readFromParcel(in); }
+
+    public void readFromParcel(Parcel in) {
+
+        date = in.readString();
+        n = in.readString();
+        startTime = in.readString();
+        endTime = in.readString();
+        isCancelled = in.readByte() != 0;
+        if(pairs==null)
+            pairs = new ArrayList<Pair>();
+        if(notes==null)
+            notes = new ArrayList<NoteModel>();
+        in.readTypedList(pairs,Pair.CREATOR);
+        in.readTypedList(notes,NoteModel.CREATOR);
+    }
+
+    public static final Creator<ScheduleModel> CREATOR = new Creator<ScheduleModel>() {
+        @Override
+        public ScheduleModel createFromParcel(Parcel in) {
+            return new ScheduleModel(in);
+        }
+
+        @Override
+        public ScheduleModel[] newArray(int size) {
+            return new ScheduleModel[size];
+        }
+    };
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(date);
+        dest.writeString(n);
+        dest.writeString(startTime);
+        dest.writeString(endTime);
+        dest.writeByte((byte) (isCancelled ? 1 : 0));
+        dest.writeTypedList(pairs);
+        dest.writeTypedList(notes);
+    }
+
+    public static class Pair implements Parcelable {
         private int idSchedule; //Напрямую из объекта в базе
         private int idPair;//Напрямую из объекта в базе
         private int idGroup;//Напрямую из объекта в базе
@@ -107,6 +164,33 @@ public class ScheduleModel {
             this.type = type;
             this.isCancelled = isCancelled;
         }
+
+        protected Pair(Parcel in) {
+            idSchedule = in.readInt();
+            idPair = in.readInt();
+            idGroup = in.readInt();
+            idTeacher = in.readInt();
+            idClassroom = in.readInt();
+            subgroup = in.readInt();
+            name = in.readString();
+            teacher = in.readString();
+            group = in.readString();
+            classroom = in.readString();
+            type = in.readString();
+            isCancelled = in.readByte() != 0;
+        }
+
+        public static final Creator<Pair> CREATOR = new Creator<Pair>() {
+            @Override
+            public Pair createFromParcel(Parcel in) {
+                return new Pair(in);
+            }
+
+            @Override
+            public Pair[] newArray(int size) {
+                return new Pair[size];
+            }
+        };
 
         public int getSubgroup() {
             return subgroup;
@@ -158,6 +242,28 @@ public class ScheduleModel {
 
         public String getName() {
             return name;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+
+            dest.writeInt(idSchedule);
+            dest.writeInt(idPair);
+            dest.writeInt(idGroup);
+            dest.writeInt(idTeacher);
+            dest.writeInt(idClassroom);
+            dest.writeInt(subgroup);
+            dest.writeString(name);
+            dest.writeString(teacher);
+            dest.writeString(group);
+            dest.writeString(classroom);
+            dest.writeString(type);
+            dest.writeByte((byte) (isCancelled ? 1 : 0));
         }
     }
 }

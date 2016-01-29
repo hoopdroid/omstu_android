@@ -341,7 +341,7 @@ public abstract class AbstractSchedule extends DialogFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT > 22) {
             MenuItem item = menu.findItem(R.id.calendar); //Установка текущей даты для навигационного календаря
             GregorianCalendar c = new GregorianCalendar();
             item.setTitle(c.get(Calendar.DAY_OF_MONTH) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
@@ -359,6 +359,7 @@ public abstract class AbstractSchedule extends DialogFragment
             usedList.add(0, main); //И добавить первым элементом главную запись
             usedList.remove(null);
             SubMenu subMenuGroup = menu.addSubMenu(Menu.NONE, 100, 10, currentGroup);
+            subMenuGroup.setIcon(R.drawable.ic_calendar_text_white_24dp);
             subMenuGroup.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
             for (int i = 0; i < usedList.size(); i++) {
                 subMenuGroup.add(Menu.NONE, 101 + i, Menu.NONE, usedList.get(i).getName());
