@@ -15,6 +15,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+
+import com.alexmarken.navigator.my.university.NavigatorLibrary;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -37,9 +39,11 @@ import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 import savindev.myuniversity.welcomescreen.NotInternetFragment;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        NavigatorLibrary.NavigatorMainEvents{
 
     public static MainActivity mainActivity;
+
     public static Toolbar toolbar;
     public static Fab fab;
     private TextView noteAdd;
@@ -48,11 +52,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String username;
     private String email;
     private MaterialSheetFab materialSheetFab;
-    static Drawer result;
+    static  Drawer result;
+
+    private static NavigatorLibrary naviMain = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mainActivity = this;
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         if (settings.getBoolean("isFirstStart", true)) {
@@ -64,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setContentView(R.layout.activity_main);
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
+
+                naviMain = new NavigatorLibrary(this, this, this);
             }
 
         } else {
@@ -90,20 +99,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             reminderAdd.setOnClickListener(this);
             materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
                     sheetColor, fabColor);
+
+            naviMain = new NavigatorLibrary(this, this, this);
         }
     }
 
     public static Drawer getDrawer() {
         return result;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (materialSheetFab.isSheetVisible()) {
-            materialSheetFab.hideSheet();
-        } else {
-            super.onBackPressed();
-        }
     }
 
     private void getUserSettings() {
@@ -178,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         itemPerformance,
                         new DividerDrawerItem(),
                         itemSettings
+
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -191,7 +194,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     addfragment(R.string.drawer_schedule, new CalendarScheduleFragment());
                                 break;
                             case 2:
-                                addfragment(R.string.drawer_navigator, new WelcomeFragment());
+                                naviMain.onNavigationItemSelected(2);
+                                fab.hide();
                                 break;
                             case 3:
                                 addfragment(R.string.drawer_notes, new NotesFragment());
@@ -207,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 break;
                             case 8:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
+                                break;
+                            case 9:
+                                naviMain.onNavigationItemSelected(4);
                                 break;
                         }
                         return false;
@@ -307,4 +314,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .make(v, "К сожалению, пока можно добавить только заметку", Snackbar.LENGTH_LONG);
         snackbar.show();
     }
+
+    @Override
+    public void onBackPressed() {
+        if (naviMain.fragmentStore.getPreviousFragment() == null)
+            super.onBackPressed();
+        else {
+            naviMain.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onSlideFragment(android.support.v4.app.FragmentTransaction transaction, android.support.v4.app.Fragment fragment) {
+        transaction.replace(R.id.content_main, fragment).commit();
+    }
+
+    @Override
+    public void postOnAttach(String title) {
+        toolbar.setTitle(title);
+    }
+
 }

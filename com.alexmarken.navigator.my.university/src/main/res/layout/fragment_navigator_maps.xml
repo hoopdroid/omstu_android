@@ -1,0 +1,444 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin_0dp"
+    android:paddingRight="@dimen/activity_horizontal_margin_0dp"
+    android:paddingTop="@dimen/activity_vertical_margin_0dp"
+    android:paddingBottom="@dimen/activity_vertical_margin_0dp"
+    tools:context=".NavigatorLibrary">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:scrollbars="horizontal|vertical"
+        android:id="@+id/mapslayout">
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp"
+        android:id="@+id/linearLayout13">
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/ibZoomPlus"
+            android:background="@drawable/button_zoom_plus"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"/>
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/ibZoomMinus"
+            android:layout_gravity="center"
+            android:background="@drawable/button_zoom_minus"
+            android:layout_below="@+id/ibZoomPlus"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="5dp" />
+
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:layout_below="@+id/ibZoomMinus"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/round_corner"
+            android:id="@+id/rlStagelist"
+            android:layout_centerInParent="true">
+
+            <NumberPicker
+                android:layout_width="50dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/npStage"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:layoutMode="opticalBounds" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="180dp"
+        android:id="@+id/rlBottom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="-6dp"
+        android:layout_marginRight="-6dp"
+        android:layout_marginLeft="-6dp"
+        android:background="@drawable/round_corner_black">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:id="@+id/scrollviewinfo"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:fillViewport="false"
+            android:layout_marginTop="40dp"
+            android:clickable="false">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/rlBuffer"
+                android:clickable="true">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Text"
+                    android:id="@+id/textViewMapDescr"
+                    android:layout_marginLeft="19dp"
+                    android:layout_marginStart="19dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:textColor="#FFFFFF"
+                    android:clickable="true" />
+
+            </RelativeLayout>
+        </ScrollView>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Сюда"
+            android:id="@+id/btnNaviDialogTo"
+            android:layout_alignParentBottom="true"
+            android:layout_alignRight="@+id/scrollviewinfo"
+            android:layout_alignEnd="@+id/scrollviewinfo" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Путь отсюда"
+            android:id="@+id/btnNaviDialogFrom"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/btnNaviDialogTo"
+            android:layout_toStartOf="@+id/btnNaviDialogTo" />
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/btnArrow"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/arrow_down"
+            android:layout_marginRight="10dp"
+            android:clickable="false" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:id="@+id/rlTop"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/llTop"
+            android:background="@drawable/round_corner_black"
+            android:clickable="false"
+            android:alpha="0"
+            android:visibility="invisible">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:animateLayoutChanges="true"
+                android:id="@+id/llTop_0"
+                android:layout_weight="0"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/linearLayout5"
+                android:layout_toEndOf="@+id/linearLayout5"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="0dp"
+                android:clickable="false">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/llfilterSteps"
+                    android:clickable="true">
+
+                    <Button
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/btnfilterSteps"
+                        android:layout_gravity="center"
+                        android:background="@drawable/btn_steps_0"
+                        android:clickable="false" />
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Лестницы"
+                        android:id="@+id/tvfilterSteps"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/llfilterAuditory"
+                    android:clickable="true">
+
+                    <Button
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/btnfilterAuditory"
+                        android:layout_gravity="center"
+                        android:background="@drawable/btn_auditory_0"
+                        android:layout_marginLeft="10dp"
+                        android:clickable="false" />
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Аудитории"
+                        android:id="@+id/tvfilterAuditory"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:textColor="#66BB6A" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:animateLayoutChanges="true"
+                android:id="@+id/llTop_1"
+                android:layout_weight="0"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/linearLayout5"
+                android:layout_toEndOf="@+id/linearLayout5"
+                android:layout_marginLeft="0dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/llfilterWC"
+                    android:clickable="true">
+
+                    <Button
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/btnfilterWC"
+                        android:layout_gravity="center"
+                        android:background="@drawable/btn_wc_0"
+                        android:clickable="false" />
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Уборные"
+                        android:id="@+id/tvfilterWC"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/llfilterNavi"
+                    android:clickable="true">
+
+                    <Button
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/btnfilterNavi"
+                        android:layout_gravity="center"
+                        android:background="@drawable/btn_location_0"
+                        android:layout_marginLeft="10dp"
+                        android:clickable="false" />
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Навигация"
+                        android:id="@+id/tvfilterNavi"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/round_corner"
+            android:id="@+id/linearLayout6"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnFIlter"
+                android:layout_weight="1"
+                android:background="@drawable/filter18" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="110dp"
+        android:id="@+id/lrNavigatePanel"
+        android:background="@drawable/round_corner_black"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="-6dp"
+        android:layout_marginTop="-6dp"
+        android:layout_marginRight="-6dp"
+        android:alpha="0"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/round_corner"
+                android:id="@+id/linearLayout17"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="0.5">
+
+                <TextView
+                    android:layout_width="65dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Откуда:"
+                    android:id="@+id/textView9"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="#FFFFFF"
+                    android:singleLine="true"
+                    android:textSize="16dp"
+                    android:gravity="right" />
+
+                <AutoCompleteTextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/tvAuditoryA"
+                    android:layout_weight="1"
+                    android:textColor="#FFFFFF"
+                    android:singleLine="true"
+                    android:textSize="16dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/round_corner"
+                android:layout_below="@+id/linearLayout17"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginRight="5dp"
+                android:layout_weight="0.5">
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Куда:"
+                    android:id="@+id/textView10"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="#FFFFFF"
+                    android:singleLine="true"
+                    android:textSize="16dp"
+                    android:gravity="right" />
+
+                <AutoCompleteTextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/tvAuditoryB"
+                    android:layout_weight="1"
+                    android:textColor="#FFFFFF"
+                    android:singleLine="true"
+                    android:textSize="16dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:text="Найти"
+            android:id="@+id/btnLocationOk"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp" />
+
+        <Button
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:text="Отмена"
+            android:id="@+id/btnLocationCancel"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="10dp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
