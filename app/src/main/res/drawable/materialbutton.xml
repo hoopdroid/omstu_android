@@ -1,9 +1,6 @@
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/primary">
-    <item>
-        <shape xmlns:android="http://schemas.android.com/apk/res/android">
-            <corners android:radius="0dp" />
-            <solid android:color="@color/primary" />
-        </shape>
-    </item>
-</ripple>
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@color/primary_light"/> <!-- pressed -->
+    <item android:state_focused="true" android:drawable="@color/primary_light"/> <!-- focused -->
+    <item android:drawable="@color/primary"/> <!-- default -->
+</selector>

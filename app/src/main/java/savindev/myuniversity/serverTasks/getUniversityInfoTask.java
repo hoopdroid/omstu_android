@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.squareup.okhttp.OkHttpClient;
@@ -21,8 +22,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
 
 /**
@@ -34,10 +37,12 @@ import savindev.myuniversity.db.DBHelper;
  * После запроса на сервер информация разбирается с помощью подклассов класса Parsers
  */
 public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
+
     private Context context;
     private int errorCode = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SharedPreferences settings;
+
 
     public GetUniversityInfoTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
         super();
@@ -129,6 +134,12 @@ public class GetUniversityInfoTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean data) { //Предупреждение, если список пустой
+        if(FirstStartActivity.btnSkip!=null)
+        FirstStartActivity.btnSkip.setEnabled(true);
+
+        if(FirstStartActivity.progressBar!=null)
+            FirstStartActivity.progressBar.setVisibility(View.GONE);
+
         if (mSwipeRefreshLayout != null) { //Если вызывалось из фрагмента настроек групп
             mSwipeRefreshLayout.setRefreshing(false); //Завершить показывать прогресс
             if (data && errorCode != 1) { //Имеется новое содержимое, обновить данные
