@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -217,6 +218,7 @@ public class DBHelper extends SQLiteOpenHelper {
             uninfoRow.put(DBHelper.UniversityInfoHelper.COL_SHORTNAME, init.UNIVERSITY_SHORTNAME);
             uninfoRow.put(DBHelper.UniversityInfoHelper.COL_DAYS_IN_WEEK, init.DAYS_IN_WEEK);
             sqliteDatabase.insert(DBHelper.UniversityInfoHelper.TABLE_NAME, null, uninfoRow);
+            sqliteDatabase.close();
         }
     }
 
@@ -246,23 +248,43 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void setTeachers(Context context, UniversityInfo init) {
 
+
+            /*
+
+            Переход на SQLite Statement ускоряет insert в базу в 2 раза
+            по сравнению с ContentValues
+
+             */
+
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
 
-            ContentValues teacherRow = new ContentValues();
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_TEACHER+", "+COL_ID_DEPARTMENT+", "+
+                    COL_TEACHER_LASTNAME+", "+COL_TEACHER_FIRSTNAME+", "+COL_TEACHER_MIDDLENAME+", "+
+                    COL_TEACHER_GENDER+")"+" VALUES (?, ?, ?, ?, ?, ?)";
+
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.TEACHERS.size(); index++) {
                 if (!init.TEACHERS.get(index).IS_DELETED) {
-                    teacherRow.put(DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
-                    teacherRow.put(DBHelper.TeachersHelper.COL_ID_DEPARTMENT, init.TEACHERS.get(index).ID_DEPARTMENT);
-                    teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_LASTNAME, init.TEACHERS.get(index).TEACHER_LASTNAME);
-                    teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_FIRSTNAME, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
-                    teacherRow.put(DBHelper.TeachersHelper.COL_TEACHER_MIDDLENAME, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
-                    sqliteDatabase.insert(DBHelper.TeachersHelper.TABLE_NAME, null, teacherRow);
+                    stmt.bindLong    (1,init.TEACHERS.get(index).ID_TEACHER);
+                    stmt.bindLong    (2, init.TEACHERS.get(index).ID_DEPARTMENT);
+                    stmt.bindString  (3, init.TEACHERS.get(index).TEACHER_LASTNAME);
+                    stmt.bindString  (4, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
+                    stmt.bindString  (5, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
+                    stmt.bindString  (6, init.TEACHERS.get(index).GENDER);
+                    stmt.execute();
+                    stmt.clearBindings();
+
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.TeachersHelper.TABLE_NAME, DBHelper.TeachersHelper.COL_ID_TEACHER, init.TEACHERS.get(index).ID_TEACHER);
                 }
+
             }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
+
         }
 
 
@@ -382,6 +404,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.SemestersHelper.TABLE_NAME, DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
                 }
+                sqliteDatabase.close();
             }
         }
 
@@ -406,7 +429,7 @@ public class DBHelper extends SQLiteOpenHelper {
             if(idSemester==0)
                 return null;
 
-            DBHelper dbHelper = DBHelper.getInstance(context);
+            DBHelper dbHelper = new DBHelper(context);
             SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
             String find = "SELECT " + COL_END_DATE + " FROM  " + TABLE_NAME + " WHERE " + COL_ID_SEMESTER + " = " + idSemester;
             Cursor cursor = sqLiteDatabase.rawQuery(find, null);
@@ -460,7 +483,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             cursor.moveToFirst();
             try {
-            while (!cursor.isAfterLast()) {
+                while (!cursor.isAfterLast()) {
 
                     if(format.parse(date).compareTo(format.parse(
                             DateUtil.formatStandart(cursor.getString(cursor.getColumnIndex(COL_BEGIN_DATE))))) >=0
@@ -469,13 +492,13 @@ public class DBHelper extends SQLiteOpenHelper {
                                     (DateUtil.formatStandart(cursor.getString(cursor.getColumnIndex(COL_END_DATE))))) <=0){
                         num = cursor.getInt(cursor.getColumnIndex(COL_ID_SEMESTER));
                     }
-                        cursor.moveToNext();
+                    cursor.moveToNext();
 
+                }
+                cursor.close();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-            cursor.close();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
             return num;
         }
@@ -520,6 +543,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.PairsHelper.TABLE_NAME, DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
                 }
             }
+            sqliteDatabase.close();
         }
 
         public int getPairsInDay(Context context){
@@ -626,6 +650,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.GroupsHelper.TABLE_NAME, DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
                 }
             }
+            sqliteDatabase.close();
         }
 
 
@@ -710,6 +735,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.FacultiesHelper.TABLE_NAME, DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
                 }
             }
+            sqliteDatabase.close();
         }
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -771,6 +797,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.DepartmentsHelper.TABLE_NAME, DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
                 }
             }
+            sqliteDatabase.close();
         }
 
         public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -897,9 +924,21 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void setSchedule(Context context, ArrayList<Schedule> schedule) {
 
+            /*
+
+            Переход на SQLite Statement ускоряет insert в базу в 2 раза
+            по сравнению с ContentValues
+
+             */
+
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_SCHEDULE_ID+", "+COL_PAIR_ID+", "+
+                    COL_GROUP_ID+", "+COL_TEACHER_ID+", "+COL_DISCIPLINE_NAME+", "+
+                    COL_DISCIPLINE_TYPE+", "+COL_SCHEDULE_DATE+", "+
+                    COL_CLASSROOM_ID+", "+COL_SUBGROUP_NUMBER+", "+
+                    COL_IS_CANCELLED+")"+" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
             String previousValue = "";
@@ -907,9 +946,11 @@ public class DBHelper extends SQLiteOpenHelper {
             Date endDate = null;
             boolean firstPair;
 
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+
             for (int index = 0; index < schedule.size(); index++) {
                 if (!schedule.get(index).IS_DELETED) {
-                    //TODO test all variants of work dataalreadyornot function)) {
+
                     try {
                         firstPair = true;
                         previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
@@ -918,21 +959,22 @@ public class DBHelper extends SQLiteOpenHelper {
 
                         while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // если дата начала пары раньше конца семестра
                             firstPair = false;
-                            ContentValues scheduleRow = new ContentValues();
-                            scheduleRow.put(SchedulesHelper.COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
-                            scheduleRow.put(SchedulesHelper.COL_PAIR_ID, schedule.get(index).ID_PAIR);
-                            scheduleRow.put(SchedulesHelper.COL_GROUP_ID, schedule.get(index).ID_GROUP);
-                            scheduleRow.put(SchedulesHelper.COL_TEACHER_ID, schedule.get(index).ID_TEACHER);
-                            scheduleRow.put(SchedulesHelper.COL_DISCIPLINE_NAME, schedule.get(index).DISCIPLINE_NAME);
-                            scheduleRow.put(SchedulesHelper.COL_DISCIPLINE_TYPE, schedule.get(index).DISCIPLINE_TYPE);
-                            previousValue = DateUtil.dateFormatIncrease(schedule, index, previousValue);
-                            scheduleRow.put(SchedulesHelper.COL_SCHEDULE_DATE, previousValue);
-                            scheduleRow.put(SchedulesHelper.COL_CLASSROOM_ID, schedule.get(index).ID_CLASSROOM);
-                            scheduleRow.put(SchedulesHelper.COL_SUBGROUP_NUMBER, schedule.get(index).SUBGROUP_NUMBER);
-                            scheduleRow.put(SchedulesHelper.COL_IS_CANCELLED, false);//TODO Сделать обработку в ScheduleDates
 
-                            if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE, COL_SCHEDULE_DATE, previousValue))
-                                sqliteDatabase.insert(TABLE_NAME, null, scheduleRow);
+                            stmt.bindLong(1,schedule.get(index).ID_SCHEDULE);
+                            stmt.bindLong(2, schedule.get(index).ID_PAIR);
+                            stmt.bindLong(3,schedule.get(index).ID_GROUP);
+                            stmt.bindLong(4,schedule.get(index).ID_TEACHER);
+                            stmt.bindString(5,schedule.get(index).DISCIPLINE_NAME);
+                            stmt.bindString(6,schedule.get(index).DISCIPLINE_TYPE);
+                            previousValue = DateUtil.dateFormatIncrease(schedule, index, previousValue);
+                            stmt.bindString(7, previousValue);
+                            stmt.bindLong(8,schedule.get(index).ID_CLASSROOM);
+                            stmt.bindLong(9,schedule.get(index).SUBGROUP_NUMBER);
+                            stmt.bindLong(10,0);
+
+                            if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE, COL_SCHEDULE_DATE, previousValue)){
+                                stmt.execute();
+                                stmt.clearBindings();}
                             else break;
                             beginDate = format.parse(previousValue);
                         }
@@ -943,7 +985,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
             }
 
-
+            sqliteDatabase.close();
         }
 
         public static ArrayList<ScheduleModel> getSchedules(Context context, String date, int groupId, boolean isGroup) {
@@ -962,10 +1004,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 beginDate = format.parse(date);
                 String findendDate = dbHelper.getSemestersHelper().getSemesterEndDate(context, date);
                 if(findendDate!=null)
-                endDate = format.parse(DateUtil.formatStandart(findendDate));
+                    endDate = format.parse(DateUtil.formatStandart(findendDate));
                 else
                     return null;
-                    //конец семестра
+                //конец семестра
                 if(beginDate.compareTo(endDate) >= 0)
                     return null;
 
@@ -1355,7 +1397,9 @@ public class DBHelper extends SQLiteOpenHelper {
                     DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_CAMPUS, init.CAMPUSES.get(index).ID_CAMPUS);
                 }
             }
+        sqliteDatabase.close();
         }
+
     }
 
 
@@ -1378,7 +1422,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     COL_CLASSROOM_FULLNAME + " TEXT," +
                     COL_CLASSROOM_FLOOR + " INTEGER," +
                     COL_CLASSROOM_DESCRIPTION + " TEXT," +
-                    COL_CLASSROOM_TYPE + " INTEGER" +
+                    COL_CLASSROOM_TYPE + " TEXT" +
                     ");");
         }
 
@@ -1386,22 +1430,32 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_CLASSROOM+", "+COL_ID_BUILDING+", "+
+                    COL_CLASSROOM_NAME+", "+COL_CLASSROOM_FULLNAME+", "+COL_CLASSROOM_FLOOR+", "+
+                    COL_CLASSROOM_DESCRIPTION+", "+ COL_CLASSROOM_TYPE+")"+" VALUES (?, ?, ?, ?, ?, ?, ?)";
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.CLASSROOMS.size(); index++) {
                 if (!init.CLASSROOMS.get(index).IS_DELETED) {
-                    ContentValues classroomsRow = new ContentValues();
-                    classroomsRow.put(COL_ID_CLASSROOM, init.CLASSROOMS.get(index).ID_CLASSROOM);
-                    classroomsRow.put(COL_ID_BUILDING, init.CLASSROOMS.get(index).ID_BUILDING);
-                    classroomsRow.put(COL_CLASSROOM_NAME, init.CLASSROOMS.get(index).CLASSROOM_NAME);
-                    classroomsRow.put(COL_CLASSROOM_FULLNAME, init.CLASSROOMS.get(index).CLASSROOM_FULLNAME);
-                    classroomsRow.put(COL_CLASSROOM_FLOOR, init.CLASSROOMS.get(index).CLASSROOM_FLOOR);
-                    classroomsRow.put(COL_CLASSROOM_DESCRIPTION, init.CLASSROOMS.get(index).CLASSROOM_DESCRIPTION);
-                    classroomsRow.put(COL_CLASSROOM_TYPE, init.CLASSROOMS.get(index).CLASSROOM_TYPE_NAME);
-                    sqliteDatabase.insert(TABLE_NAME, null, classroomsRow);
+
+                   stmt.bindLong(1,init.CLASSROOMS.get(index).ID_CLASSROOM);
+                   stmt.bindLong(2, init.CLASSROOMS.get(index).ID_BUILDING);
+                   stmt.bindString(3,init.CLASSROOMS.get(index).CLASSROOM_NAME);
+                   stmt.bindString(4, init.CLASSROOMS.get(index).CLASSROOM_FULLNAME);
+                   stmt.bindLong(5,init.CLASSROOMS.get(index).CLASSROOM_FLOOR);
+                   stmt.bindString(6, init.CLASSROOMS.get(index).CLASSROOM_DESCRIPTION);
+                   stmt.bindString(7,init.CLASSROOMS.get(index).CLASSROOM_TYPE_NAME);
+                    stmt.execute();
+                    stmt.clearBindings();
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_CLASSROOM, init.CLASSROOMS.get(index).ID_CLASSROOM);
                 }
+
+
             }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
+
         }
 
         public String getClassroom(Context context,int classroomId){
@@ -1481,27 +1535,39 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_BUILDING+", "+COL_ID_CAMPUS+", "+
+                    COL_BUILDING_NUMBER+", "+COL_BUILDING_NAME+", "+COL_BUILDING_TYPE_NAME+", "+
+                     COL_BUILDING_FLOOR_COUNT+", "+ COL_HAS_GROUND_FLOOR+")"+" VALUES (?, ?, ?, ?, ?, ?, ?)";
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.BUILDINGS.size(); index++) {
                 if (!init.BUILDINGS.get(index).IS_DELETED) {
-                    ContentValues buildingsRow = new ContentValues();
-                    buildingsRow.put(COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
-                    buildingsRow.put(COL_ID_CAMPUS, init.BUILDINGS.get(index).ID_CAMPUS);
-                    buildingsRow.put(COL_BUILDING_NUMBER, init.BUILDINGS.get(index).BUILDING_NUMBER);
-                    buildingsRow.put(COL_BUILDING_NAME, init.BUILDINGS.get(index).BUILDING_NAME);
-                    buildingsRow.put(COL_BUILDING_TYPE_NAME, init.BUILDINGS.get(index).BUILDING_TYPE_NAME);
-                    buildingsRow.put(COL_BUILDING_FLOOR_COUNT, init.BUILDINGS.get(index).BUILDING_FLOOR_COUNT);
-                    buildingsRow.put(COL_HAS_GROUND_FLOOR, init.BUILDINGS.get(index).HAS_GROUND_FLOOR);
-                    sqliteDatabase.insert(TABLE_NAME, null, buildingsRow);
+
+                    stmt.bindLong(1, init.BUILDINGS.get(index).ID_BUILDING);
+                    stmt.bindLong(2,init.BUILDINGS.get(index).ID_CAMPUS);
+                    stmt.bindLong(3, init.BUILDINGS.get(index).BUILDING_NUMBER);
+                    stmt.bindString(4,init.BUILDINGS.get(index).BUILDING_NAME);
+                    stmt.bindString(5, init.BUILDINGS.get(index).BUILDING_TYPE_NAME);
+                    stmt.bindLong(6,init.BUILDINGS.get(index).BUILDING_FLOOR_COUNT);
+
+                    int hasGroundFloor = 1;
+                    if(!init.BUILDINGS.get(index).HAS_GROUND_FLOOR)
+                        hasGroundFloor=0;
+
+                    stmt.bindLong(7,hasGroundFloor);
+                    stmt.execute();
+                    stmt.clearBindings();
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_BUILDING, init.BUILDINGS.get(index).ID_BUILDING);
                 }
             }
-        }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
+           }
     }
 
     public class NotesHelper {
-        //TODO Поясни мне работу с enum приоритетом и типом
+
         protected static final String TABLE_NAME = "Notes";
         protected static final String COL_ID_NOTE = "note_id";
         protected static final String COL_NOTE_NAME = "note_name";
@@ -1534,7 +1600,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     COL_TYPE_DATE + " INTEGER," +
                     COL_NOTE_TEXT + " TEXT," +
                     COL_NOTE_DATE + " TEXT," +
-                    COL_PAIR_ID + " TEXT," +//Уникальный идентификатор pairID + Date из Schedules
+                    COL_PAIR_ID + " TEXT," +
                     COL_NOTE_TIME + " TEXT," +
                     COL_REPEAT_TIME + " TEXT," +
                     COL_ACCESS + " TEXT" +
@@ -1551,13 +1617,14 @@ public class DBHelper extends SQLiteOpenHelper {
             noteRow.put(COL_SENDER_NAME, "UserName");
             noteRow.put(COL_IS_DONE, 0);
             noteRow.put(COL_PRIORITY,noteModel.getPriority().toString());
-            //TODO   noteRow.put(COL_PRIORITY, noteModel.getPriority().toString());//как тут поступать?
             noteRow.put(COL_TYPE_PAIR, 1);
             noteRow.put(COL_NOTE_TEXT, noteModel.getText());
             noteRow.put(COL_PAIR_ID, noteModel.getPairId());
             noteRow.put(COL_NOTE_DATE, noteModel.getDate());
 
             sqliteDatabase.insert(TABLE_NAME, null, noteRow);
+
+            sqliteDatabase.close();
 
         }
 
@@ -1600,6 +1667,8 @@ public class DBHelper extends SQLiteOpenHelper {
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
+
+            db.close();
 
             return  noteModelArrayList;
 
@@ -1644,6 +1713,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
 
+            db.close();
+
             return  noteModelArrayList;
 
         }
@@ -1652,6 +1723,7 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase db;
             db = getWritableDatabase();
             db.delete(TABLE_NAME, COL_ID_NOTE + "=" + idNote, null);
+            db.close();
         }
 
         public void setNoteIsDone(int idNote){
@@ -1661,6 +1733,7 @@ public class DBHelper extends SQLiteOpenHelper {
             isDoneValue.put(COL_IS_DONE, 1);
 
             db.update(TABLE_NAME, isDoneValue,COL_ID_NOTE+ " = "+idNote, null);
+            db.close();
 
         }
     }

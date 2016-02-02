@@ -5,7 +5,7 @@ import android.net.Uri;
 public class PointModel {
     private int idGroup;
     private String name;
-    private int ID_PROGRESS_RAITNG_FILE;
+    private int ID_PROGRESS_RAITING_FILE;
     private boolean isDeleted;
 
     public Uri getFileUri() {
@@ -21,7 +21,7 @@ public class PointModel {
     public PointModel(int idGroup, String name, int ID_PROGRESS_RAITNG_FILE) {
         this.idGroup = idGroup;
         this.name = name;
-        this.ID_PROGRESS_RAITNG_FILE = ID_PROGRESS_RAITNG_FILE;
+        this.ID_PROGRESS_RAITING_FILE = ID_PROGRESS_RAITNG_FILE;
     }
 
     public int getIdGroup() {
@@ -41,11 +41,11 @@ public class PointModel {
     }
 
     public int getID_PROGRESS_RAITNG_FILE() {
-        return ID_PROGRESS_RAITNG_FILE;
+        return ID_PROGRESS_RAITING_FILE;
     }
 
     public void setID_PROGRESS_RAITNG_FILE(int ID_PROGRESS_RAITNG_FILE) {
-        this.ID_PROGRESS_RAITNG_FILE = ID_PROGRESS_RAITNG_FILE;
+        this.ID_PROGRESS_RAITING_FILE = ID_PROGRESS_RAITNG_FILE;
     }
 
 
