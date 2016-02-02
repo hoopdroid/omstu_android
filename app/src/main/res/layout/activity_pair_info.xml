@@ -11,7 +11,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
+        android:layout_height="210dp"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.Common.AppBarOverlay">
 
@@ -70,6 +70,15 @@
                         android:textSize="15dp"
                         android:textIsSelectable="true" />
 
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Button"
+                        android:text="Найти на карте"
+                        android:id="@+id/btnSearchOnMap"
+                        />
+
+
 
                 </LinearLayout>
             </FrameLayout>
@@ -108,7 +117,7 @@
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
 
-        android:gravity="center|right"
+        android:gravity="center_vertical|bottom|center|right"
         android:orientation="vertical">
 
         <!-- Sheet that contains your items -->
@@ -147,9 +156,9 @@
                         android:id="@+id/fab_sheet_item_note"
                         style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
                         android:drawableLeft="@drawable/ic_note"
-                        android:drawableStart="@drawable/ic_notes_select"
+                        android:drawableStart="@drawable/ic_note"
                         android:text="@string/fab_add_note"
-                        android:textColor="@color/accent"/>
+                        />
                 </LinearLayout>
 
             </LinearLayout>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -12,18 +13,21 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        style="@style/Button"
         android:text="Сообщить о найденной ошибке"
         android:id="@+id/button_error" />
 
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        style="@style/Button"
         android:text="Функционал приложения со скриншотами и пояснениями"
         android:id="@+id/button_functional" />
 
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        style="@style/Button"
         android:text="Вопросы"
         android:id="@+id/button_questions" />
 </LinearLayout>

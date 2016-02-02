@@ -15,6 +15,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+
+import com.alexmarken.navigator.my.university.NavigatorLibrary;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -37,9 +39,11 @@ import savindev.myuniversity.settings.SettingsFragment;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 import savindev.myuniversity.welcomescreen.NotInternetFragment;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        NavigatorLibrary.NavigatorMainEvents{
 
     public static MainActivity mainActivity;
+
     public static Toolbar toolbar;
     public static Fab fab;
     private TextView noteAdd;
@@ -48,11 +52,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String username;
     private String email;
     private MaterialSheetFab materialSheetFab;
-    static Drawer result;
+    static  Drawer result;
+
+    public static NavigatorLibrary naviMain = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mainActivity = this;
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         if (settings.getBoolean("isFirstStart", true)) {
@@ -64,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setContentView(R.layout.activity_main);
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
+
+                naviMain = new NavigatorLibrary(this, this, this);
             }
 
         } else {
@@ -90,20 +99,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             reminderAdd.setOnClickListener(this);
             materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
                     sheetColor, fabColor);
+
+            naviMain = new NavigatorLibrary(this, this, this);
         }
     }
 
     public static Drawer getDrawer() {
         return result;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (materialSheetFab.isSheetVisible()) {
-            materialSheetFab.hideSheet();
-        } else {
-            super.onBackPressed();
-        }
     }
 
     private void getUserSettings() {
@@ -117,8 +119,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PrimaryDrawerItem itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_calendar_clock).withSelectedIcon(R.drawable.ic_schedule_select);
         PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_map_marker).withSelectedIcon(R.drawable.ic_navigation_select);
         PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_note).withSelectedIcon(R.drawable.ic_notes_select);
-        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_library_books).withSelectedIcon(R.drawable.ic_news_select);
-        PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
+// TODO Считаю на данном этапе пока лучше убрать        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_library_books).withSelectedIcon(R.drawable.ic_news_select);
+     //   PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
         PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings_box).withSelectedIcon(R.drawable.ic_settings_select);
 
@@ -173,11 +175,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         itemSchedule,
                         itemNavigation,
                         itemNotes,
-                        itemNews,
-                        itemEducation,
+                        //itemNews,
+                        //itemEducation,
                         itemPerformance,
                         new DividerDrawerItem(),
                         itemSettings
+
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -191,21 +194,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     addfragment(R.string.drawer_schedule, new CalendarScheduleFragment());
                                 break;
                             case 2:
-                                addfragment(R.string.drawer_navigator, new WelcomeFragment());
+                                naviMain.onNavigationItemSelected(2);
+                                naviMain.onNavigationItemSelected(5);
+                                fab.hide();
                                 break;
                             case 3:
                                 addfragment(R.string.drawer_notes, new NotesFragment());
                                 break;
+                            /*
                             case 4:
                                 addfragment(R.string.drawer_news, new NewsFragment());
                                 break;
                             case 5:
                                 addfragment(R.string.drawer_education, new WelcomeFragment());
                                 break;
-                            case 6:
+                            */
+                            case 4:
                                 addfragment(R.string.drawer_performance, new PerformanceFragment());
                                 break;
-                            case 8:
+                            case 6:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
                         }
@@ -307,4 +314,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .make(v, "К сожалению, пока можно добавить только заметку", Snackbar.LENGTH_LONG);
         snackbar.show();
     }
+
+
+    @Override
+    public void onSlideFragment(android.support.v4.app.FragmentTransaction transaction, android.support.v4.app.Fragment fragment) {
+        transaction.replace(R.id.content_main, fragment).commit();
+    }
+
+    @Override
+    public void postOnAttach(String title) {
+        toolbar.setTitle(title);
+    }
+
 }

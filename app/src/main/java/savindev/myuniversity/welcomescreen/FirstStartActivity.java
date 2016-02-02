@@ -14,6 +14,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
@@ -22,24 +23,31 @@ import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 public class FirstStartActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button btnSignin;
-    private Button btnSkip;
+    public static Button btnSkip;
     AuthorizationFragment authorizationFragment;
     LinearLayout buttons;
     ImageView icon;
+    GetUniversityInfoTask getUniversityInfoTask;
+    public static ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new GetUniversityInfoTask(getBaseContext(), null).execute();
+        getUniversityInfoTask = new GetUniversityInfoTask(getBaseContext(), null);
+
+        getUniversityInfoTask.execute();
 
         setContentView(R.layout.activity_first_start);
         buttons = (LinearLayout) findViewById(R.id.buttonsLayout);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
         icon = (ImageView) findViewById(R.id.icon);
         buttons.animate();
 
         btnSignin = (Button) findViewById(R.id.btnSignin);
         btnSkip = (Button) findViewById(R.id.btnSkip);
+
+        btnSkip.setEnabled(false);
 
         btnSignin.setOnClickListener(this);
         btnSkip.setOnClickListener(this);

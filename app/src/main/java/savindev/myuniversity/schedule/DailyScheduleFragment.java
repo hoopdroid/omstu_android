@@ -77,7 +77,7 @@ public class DailyScheduleFragment extends AbstractSchedule {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
             inflater.inflate(R.menu.daily_schedule, menu);}
         else
             inflater.inflate(R.menu.daily_schedule_old_api, menu);
@@ -150,13 +150,10 @@ public class DailyScheduleFragment extends AbstractSchedule {
                 public void onClick(View v) {
 
                     Intent intent = new Intent(context, PairInfoActivity.class);
-                    intent.putExtra("pairname", models.get(i).getPairs().get(0).getName());
+                    intent.putExtra("schedulemodel",models.get(i));
                     intent.putExtra("pairtime", scheduleViewHolder.pairDate.getText().toString().substring(0, 5) + " "
                             + scheduleViewHolder.pairDayWeek.getText().toString() + " " + scheduleViewHolder.pairTime.getText().toString().substring(0, 5));
-                    intent.putExtra("scheduleId", models.get(i).getPairs().get(0).getIdSchedule());
-                    intent.putExtra("date", models.get(i).getDate());
-                    intent.putExtra("teacher", models.get(i).getPairs().get(0).getTeacher());
-                    intent.putExtra("place", models.get(i).getPairs().get(0).getClassroom());
+
                     startActivity(intent);
 
                 }

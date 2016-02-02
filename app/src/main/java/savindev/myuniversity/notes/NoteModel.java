@@ -1,6 +1,8 @@
 package savindev.myuniversity.notes;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -10,7 +12,7 @@ import java.util.HashSet;
  */
 
 
-public class NoteModel {
+public class NoteModel implements Parcelable {
 
 
     private int noteId; // идентификатор заметки
@@ -54,6 +56,28 @@ public class NoteModel {
         this.access = access;
         this.noteId = noteId;
     }
+
+    protected NoteModel(Parcel in) {
+        noteId = in.readInt();
+        name = in.readString();
+        text = in.readString();
+        isDone = in.readInt();
+        sender = in.readString();
+        date = in.readString();
+        pairId = in.readString();
+    }
+
+    public static final Creator<NoteModel> CREATOR = new Creator<NoteModel>() {
+        @Override
+        public NoteModel createFromParcel(Parcel in) {
+            return new NoteModel(in);
+        }
+
+        @Override
+        public NoteModel[] newArray(int size) {
+            return new NoteModel[size];
+        }
+    };
 
     public Access getAccess() {
         return access;
@@ -150,5 +174,21 @@ public class NoteModel {
 
     public void setIsDone(int isDone) {
         this.isDone = isDone;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(noteId);
+        dest.writeString(name);
+        dest.writeString(text);
+        dest.writeInt(isDone);
+        dest.writeString(sender);
+        dest.writeString(date);
+        dest.writeString(pairId);
     }
 }

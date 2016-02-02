@@ -169,7 +169,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
             return; //Костыль, нужен для пролистывания к позиции
         isFinished = true;
         if (data == null || data.isEmpty()) {
-            Toast.makeText(context, "Данные закончились", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Данные закончились", Toast.LENGTH_SHORT).show();
             return;
         }
         //Обновить адаптер и вернуть на последнюю просмотренную позицию
