@@ -1,6 +1,5 @@
 package savindev.myuniversity.schedule;
 
-import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +7,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
     private SharedPreferences settings;
     private boolean fullText;
     private float textSize;
+    private Drawer result;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = preInitializeData(inflater, container);
@@ -78,8 +81,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     settings.getBoolean("full_vertical", false) ||
                     getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
                             settings.getBoolean("full_horisontal", true));
-            textSize = getActivity().getResources().getDisplayMetrics().widthPixels / 96 + 8 / 3;
-            if (fullText)
+            textSize = getActivity().getResources().getDisplayMetrics().widthPixels / 96;
+            if (!fullText)
                 textSize += 2;
 
             colores = Colores.valueOf(settings.getString("calendar", "CALENDAR_NOT_ALLOCATED"));
@@ -168,7 +171,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             }
         });
 
-        new DrawerBuilder(getActivity()).withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).append(MainActivity.getDrawer());
+        result = new DrawerBuilder(getActivity()).withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).append(MainActivity.getDrawer());
     }
 
 
@@ -440,7 +443,8 @@ public class CalendarScheduleFragment extends AbstractSchedule {
 
     @Override
     public void onDestroy() {
-        drawerView.setVisibility(View.GONE);
+//        drawerView.setVisibility(View.GONE);
+        result.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         super.onDestroy();
     }
 }
