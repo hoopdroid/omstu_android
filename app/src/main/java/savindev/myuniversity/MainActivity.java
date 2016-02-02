@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 
 import com.alexmarken.navigator.my.university.NavigatorLibrary;
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.Crashlytics;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -27,8 +29,10 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenzimport io.fabric.sdk.android.Fabric;
+.materialdrawer.model.interfaces.IProfile;
 
+import io.fabric.sdk.android.Fabric;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.notes.NotesFragment;
@@ -57,8 +61,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static NavigatorLibrary naviMain = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void
+        Fabric.with(this, new Crashlytics());onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         mainActivity = this;
         SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
@@ -120,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_map_marker).withSelectedIcon(R.drawable.ic_navigation_select);
         PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_note).withSelectedIcon(R.drawable.ic_notes_select);
 // TODO Считаю на данном этапе пока лучше убрать        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_library_books).withSelectedIcon(R.drawable.ic_news_select);
-     //   PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
+        //   PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
         PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings_box).withSelectedIcon(R.drawable.ic_settings_select);
 

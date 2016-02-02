@@ -53,6 +53,12 @@
             android:name=".schedule.PairInfoActivity"
             android:label="@string/title_activity_pair_info"
             android:theme="@style/AppTheme.Common"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="aaf769f1b3cf7261e4515f0b58c0ed9dc21a598f" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="aaf769f1b3cf7261e4515f0b58c0ed9dc21a598f" />
     </application>
 
 </manifest>

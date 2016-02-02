@@ -106,6 +106,7 @@ public class SettingsFragment extends Fragment {
                         }
                         if (DBRequest.isUniversityInfoThere(getActivity())) { //если выполнено успешно или ключ существует
                            // settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                            settings.getChildAt(lastPosition).setBackgroundColor(Color.argb(1,1,1,1));
                             lastPosition = position;
                             //Запустить активность/фрагмент для выбора группы
                             if (getResources().getConfiguration().orientation ==
@@ -113,27 +114,25 @@ public class SettingsFragment extends Fragment {
                                 Intent intent = new Intent(getActivity(), GroupsActivity.class);
                                 startActivity(intent);
                             } else {
-                                //settings.setBackgroundColor(Color.WHITE);
                                 settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                                 getFragmentManager().beginTransaction().replace(R.id.frgmCont, groups).commit();
                             }
                         }
                         break;
                     case 1:
-                        settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                        settings.getChildAt(lastPosition).setBackgroundColor(Color.argb(1,1,1,1));
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
                                 Configuration.ORIENTATION_PORTRAIT) {
                             Intent intent = new Intent(getActivity(), VitalizationActivity.class);
                             startActivity(intent);
                         } else {
-                            //settings.setBackgroundColor(Color.WHITE);
                             settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                             getFragmentManager().beginTransaction().replace(R.id.frgmCont, new VitalizationFragment()).commit();
                         }
                         break;
                     case 2: // Возможность перейти на авторизацию через настройку( убираем профаил в header поэтому нужная вещь)
-                        //settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                        settings.getChildAt(lastPosition).setBackgroundColor(Color.argb(1,1,1,1));
                         lastPosition = position;
                         settingsPref.edit().putBoolean("isAuthorized", false);
                         SharedPreferences.Editor edit = settingsPref.edit();
@@ -144,14 +143,13 @@ public class SettingsFragment extends Fragment {
                         MainActivity.mainActivity.finish();//убиваем instance активит
                         break;
                     case 3://О приложении
-                        //settings.getChildAt(lastPosition).setBackgroundColor(Color.WHITE);
+                        settings.getChildAt(lastPosition).setBackgroundColor(Color.argb(1,1,1,1));
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
                                 Configuration.ORIENTATION_PORTRAIT) {
                             Intent intent = new Intent(getActivity(), AboutActivity.class);
                             startActivity(intent);
                         } else {
-                            //settings.setBackgroundColor(Color.WHITE);
                             settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
                             getFragmentManager().beginTransaction().replace(R.id.frgmCont, new AboutFragment()).commit();
                         }
