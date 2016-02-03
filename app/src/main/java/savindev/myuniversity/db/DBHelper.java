@@ -154,6 +154,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
         protected static final String TABLE_NAME = "UniversityInfo";
+        protected static final String COL_UNIVERSITY_ID = "university_id";
         protected static final String COL_FULLNAME = "fullname";
         protected static final String COL_SHORTNAME = "shortname";
         protected static final String COL_DAYS_IN_WEEK = "daysinweek";
@@ -161,6 +162,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public void create(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                    COL_UNIVERSITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     COL_FULLNAME + " TEXT," +
                     COL_SHORTNAME + " TEXT," +
                     COL_DAYS_IN_WEEK + " INTEGER" +
@@ -212,12 +214,20 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_FULLNAME+", "+COL_SHORTNAME+", "+
+                    COL_DAYS_IN_WEEK+")"+" VALUES (?, ?, ?)";
 
-            ContentValues uninfoRow = new ContentValues();
-            uninfoRow.put(DBHelper.UniversityInfoHelper.COL_FULLNAME, init.UNIVERSITY_FULLNAME);
-            uninfoRow.put(DBHelper.UniversityInfoHelper.COL_SHORTNAME, init.UNIVERSITY_SHORTNAME);
-            uninfoRow.put(DBHelper.UniversityInfoHelper.COL_DAYS_IN_WEEK, init.DAYS_IN_WEEK);
-            sqliteDatabase.insert(DBHelper.UniversityInfoHelper.TABLE_NAME, null, uninfoRow);
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
+
+            stmt.bindString(1,init.UNIVERSITY_FULLNAME);
+            stmt.bindString(2, init.UNIVERSITY_SHORTNAME);
+            stmt.bindLong(3, init.DAYS_IN_WEEK);
+
+            stmt.execute();
+            stmt.clearBindings();
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
             sqliteDatabase.close();
         }
     }
@@ -268,7 +278,7 @@ public class DBHelper extends SQLiteOpenHelper {
             sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.TEACHERS.size(); index++) {
                 if (!init.TEACHERS.get(index).IS_DELETED) {
-                    stmt.bindLong    (1,init.TEACHERS.get(index).ID_TEACHER);
+                    stmt.bindLong    (1, init.TEACHERS.get(index).ID_TEACHER);
                     stmt.bindLong    (2, init.TEACHERS.get(index).ID_DEPARTMENT);
                     stmt.bindString  (3, init.TEACHERS.get(index).TEACHER_LASTNAME);
                     stmt.bindString  (4, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
@@ -392,18 +402,24 @@ public class DBHelper extends SQLiteOpenHelper {
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
 
-
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_SEMESTER+", "+COL_BEGIN_DATE+", "+
+                    COL_END_DATE+")"+" VALUES (?, ?, ?)";
             //PARSE SEMESTRES TO SQLITE
-            ContentValues semestresRow = new ContentValues();
+
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.SEMESTERS.size(); index++) {
                 if (!init.SEMESTERS.get(index).IS_DELETED) {
-                    semestresRow.put(DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
-                    semestresRow.put(DBHelper.SemestersHelper.COL_BEGIN_DATE, init.SEMESTERS.get(index).BEGIN_DT);
-                    semestresRow.put(DBHelper.SemestersHelper.COL_END_DATE, init.SEMESTERS.get(index).END_DT);
-                    sqliteDatabase.insert(DBHelper.SemestersHelper.TABLE_NAME, null, semestresRow);
+                   stmt.bindLong(1, init.SEMESTERS.get(index).ID_SEMESTER);
+                   stmt.bindString(2, init.SEMESTERS.get(index).BEGIN_DT);
+                   stmt.bindString(3,init.SEMESTERS.get(index).END_DT);
+                    stmt.execute();
+                    stmt.clearBindings();
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.SemestersHelper.TABLE_NAME, DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
                 }
+                sqliteDatabase.setTransactionSuccessful();
+                sqliteDatabase.endTransaction();
                 sqliteDatabase.close();
             }
         }
@@ -528,21 +544,25 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_PAIR+", "+COL_PAIR_NUMBER+", "+
+                    COL_BEGIN_TIME+", "+COL_END_TIME+")"+" VALUES (?, ?, ?, ?)";
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
 
-
-            //PARSE PAIRS TO SQLITE
-            ContentValues pairsRow = new ContentValues();
             for (int index = 0; index < init.PAIRS.size(); index++) {
                 if (!init.PAIRS.get(index).IS_DELETED) {
-                    pairsRow.put(DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
-                    pairsRow.put(DBHelper.PairsHelper.COL_PAIR_NUMBER, init.PAIRS.get(index).PAIR_NUMBER);
-                    pairsRow.put(DBHelper.PairsHelper.COL_BEGIN_TIME, init.PAIRS.get(index).PAIR_BEGIN_TIME);
-                    pairsRow.put(DBHelper.PairsHelper.COL_END_TIME, init.PAIRS.get(index).PAIR_END_TIME);
-                    sqliteDatabase.insert(DBHelper.PairsHelper.TABLE_NAME, null, pairsRow);
+                    stmt.bindLong(1,init.PAIRS.get(index).ID_PAIR);
+                    stmt.bindLong(2,init.PAIRS.get(index).PAIR_NUMBER);
+                    stmt.bindString(3, init.PAIRS.get(index).PAIR_BEGIN_TIME);
+                    stmt.bindString(4, init.PAIRS.get(index).PAIR_END_TIME);
+                    stmt.execute();
+                    stmt.clearBindings();
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.PairsHelper.TABLE_NAME, DBHelper.PairsHelper.COL_ID_PAIR, init.PAIRS.get(index).ID_PAIR);
                 }
             }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
             sqliteDatabase.close();
         }
 
@@ -636,20 +656,25 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_GROUP+", "+COL_GROUP_NAME+", "+
+                    COL_ID_FACULTY+")"+" VALUES (?, ?, ?)";
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
 
-
-            //PARSE GROUPS TO SQLITE
-            ContentValues groupsRow = new ContentValues();
             for (int index = 0; index < init.GROUPS.size(); index++) {
                 if (!init.GROUPS.get(index).IS_DELETED) {
-                    groupsRow.put(DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
-                    groupsRow.put(DBHelper.GroupsHelper.COL_GROUP_NAME, init.GROUPS.get(index).GROUP_NAME);
-                    groupsRow.put(DBHelper.GroupsHelper.COL_ID_FACULTY, init.GROUPS.get(index).ID_FACULTY);
-                    sqliteDatabase.insert(DBHelper.GroupsHelper.TABLE_NAME, null, groupsRow);
+                    stmt.bindLong(1,init.GROUPS.get(index).ID_GROUP);
+                    stmt.bindString(2,init.GROUPS.get(index).GROUP_NAME);
+                    stmt.bindLong(3, init.GROUPS.get(index).ID_FACULTY);
+                    stmt.execute();
+                    stmt.clearBindings();
+
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.GroupsHelper.TABLE_NAME, DBHelper.GroupsHelper.COL_ID_GROUP, init.GROUPS.get(index).ID_GROUP);
                 }
             }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
             sqliteDatabase.close();
         }
 
@@ -721,20 +746,24 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_FACULTY_ID+", "+COL_FACULTY_FULLNAME+", "+
+                    COL_FACULTY_SHORTNAME+")"+" VALUES (?, ?, ?)";
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
 
-
-            //PARSE FACULTIES TO SQLITE
-            ContentValues facultiesRow = new ContentValues();
             for (int index = 0; index < init.FACULTIES.size(); index++) {
                 if (!init.FACULTIES.get(index).IS_DELETED) {
-                    facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
-                    facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_FULLNAME, init.FACULTIES.get(index).FACULTY_FULLNAME);
-                    facultiesRow.put(DBHelper.FacultiesHelper.COL_FACULTY_SHORTNAME, init.FACULTIES.get(index).FACULTY_SHORTNAME);
-                    sqliteDatabase.insert(DBHelper.FacultiesHelper.TABLE_NAME, null, facultiesRow);
+                    stmt.bindLong(1,init.FACULTIES.get(index).ID_FACULTY);
+                    stmt.bindString(2, init.FACULTIES.get(index).FACULTY_FULLNAME);
+                    stmt.bindString(3,init.FACULTIES.get(index).FACULTY_SHORTNAME);
+                    stmt.execute();
+                    stmt.clearBindings();
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.FacultiesHelper.TABLE_NAME, DBHelper.FacultiesHelper.COL_FACULTY_ID, init.FACULTIES.get(index).ID_FACULTY);
                 }
             }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
             sqliteDatabase.close();
         }
 
@@ -781,22 +810,28 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_DEPARTMENT_ID+", "+COL_FACULTY_ID+", "+
+                    COL_CLASSROOM_ID+", "+COL_DEPARTMENT_FULLNAME+", "+
+                    COL_DEPARTMENT_SHORTNAME+")"+" VALUES (?, ?, ?, ?, ?)";
 
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
 
-            //PARSE DEPARTMENTS TO SQLITE
-            ContentValues departmentsRow = new ContentValues();
             for (int index = 0; index < init.DEPARTMENTS.size(); index++) {
                 if (!init.DEPARTMENTS.get(index).IS_DELETED) {
-                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
-                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_FACULTY_ID, init.DEPARTMENTS.get(index).ID_FACULTY);
-                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_CLASSROOM_ID, init.DEPARTMENTS.get(index).ID_CLASSROOM);
-                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_FULLNAME, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
-                    departmentsRow.put(DBHelper.DepartmentsHelper.COL_DEPARTMENT_SHORTNAME, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
-                    sqliteDatabase.insert(DBHelper.DepartmentsHelper.TABLE_NAME, null, departmentsRow);
+                    stmt.bindLong(1, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
+                    stmt.bindLong(2,init.DEPARTMENTS.get(index).ID_FACULTY);
+                    stmt.bindLong(3, init.DEPARTMENTS.get(index).ID_CLASSROOM);
+                    stmt.bindString(4, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
+                    stmt.bindString(5, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
+                    stmt.execute();
+                    stmt.clearBindings();
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.DepartmentsHelper.TABLE_NAME, DBHelper.DepartmentsHelper.COL_DEPARTMENT_ID, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
                 }
             }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
             sqliteDatabase.close();
         }
 
@@ -1386,18 +1421,25 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
+            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_CAMPUS+", "+
+                    COL_CAMPUS_NAME+")"+" VALUES (?, ?)";
+            SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
+            sqliteDatabase.beginTransaction();
 
             for (int index = 0; index < init.CAMPUSES.size(); index++) {
                 if (!init.CAMPUSES.get(index).IS_DELETED) {
-                    ContentValues campusesRow = new ContentValues();
-                    campusesRow.put(COL_ID_CAMPUS, init.CAMPUSES.get(index).ID_CAMPUS);
-                    campusesRow.put(COL_CAMPUS_NAME, init.CAMPUSES.get(index).CAMPUS_NAME);
-                    sqliteDatabase.insert(TABLE_NAME, null, campusesRow);
+
+                    stmt.bindLong(1 ,init.CAMPUSES.get(index).ID_CAMPUS);
+                    stmt.bindString(2, init.CAMPUSES.get(index).CAMPUS_NAME);
+                    stmt.execute();
+                    stmt.clearBindings();
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_ID_CAMPUS, init.CAMPUSES.get(index).ID_CAMPUS);
                 }
             }
-        sqliteDatabase.close();
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
+            sqliteDatabase.close();
         }
 
     }

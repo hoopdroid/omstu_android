@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content" >
 
                     <RelativeLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="200dp"
                         android:layout_height="fill_parent"
                         android:orientation="vertical"
                         android:layout_gravity="left"
@@ -104,7 +104,7 @@
 
                         <TextView
                             android:id="@+id/pairName"
-                            android:layout_width="198dp"
+                            android:layout_width="wrap_content"
                             android:layout_marginLeft="8dp"
                             android:layout_height="wrap_content"
                             android:text="name"
@@ -127,7 +127,9 @@
                                 android:layout_height="24dp"
                                 android:layout_marginLeft="8dp"
                                 android:src="@drawable/ic_account"
-                                android:id="@+id/teacherIcon" />
+                                android:id="@+id/teacherIcon"
+                                android:layout_alignTop="@+id/pairTeacher"
+                                android:layout_alignBottom="@+id/pairTeacher" />
                             <TextView
                                 android:id="@+id/pairTeacher"
                                 android:layout_width="wrap_content"
@@ -142,7 +144,7 @@
 
                     </RelativeLayout>
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
@@ -151,7 +153,11 @@
                         android:paddingRight="12dp">
                         <RelativeLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true">
 
                             <TextView
                                 android:id="@+id/pairAuditory"
@@ -159,21 +165,26 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top|right"
                                 android:text="aud"
+                                android:textSize="14dp"
                                 android:layout_alignParentTop="true"
-                                android:textSize="12dp" />
-                        </RelativeLayout>
-                        <TextView
+                                android:layout_alignParentLeft="false"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentRight="true" />
+                            <TextView
                             android:id="@+id/pairType"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom|right"
+                                android:layout_below="@id/pairAuditory"
                             android:textSize="10dp"
-                            android:text="type" />
+                            android:text="type"
+                                android:layout_alignParentStart="false"
+                                android:layout_alignParentEnd="false"
+                                android:foregroundGravity="right" />
+                        </RelativeLayout>
 
-                        <Space
-                            android:layout_width="20px"
-                            android:layout_height="20px" />
-                    </LinearLayout>
+
+                    </RelativeLayout>
 
                 </LinearLayout>
 
