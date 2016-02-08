@@ -416,10 +416,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.SemestersHelper.TABLE_NAME, DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
                 }
-                sqliteDatabase.setTransactionSuccessful();
-                sqliteDatabase.endTransaction();
-                sqliteDatabase.close();
+
+
             }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
+            sqliteDatabase.close();
         }
 
         public ArrayList getSemesters(Context context) {
@@ -687,14 +689,15 @@ public class DBHelper extends SQLiteOpenHelper {
             int group_id = DBRequest.getIdFromString(context, FacultiesHelper.TABLE_NAME, selection, FacultiesHelper.COL_FACULTY_SHORTNAME, faculty);
             ArrayList<String> groupNameList = DBRequest.getList(context, TABLE_NAME, COL_GROUP_NAME, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
             ArrayList groupIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_GROUP, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
-            ArrayList<Integer> groupIsFileList = DBRequest.getList(context, TABLE_NAME, COL_IS_FILE_SCHEDULE, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
+            //TODO groupIsFileList упорно все элементы получаю null. false заменить на закомментированное
+//            ArrayList<Integer> groupIsFileList = DBRequest.getList(context, TABLE_NAME, COL_IS_FILE_SCHEDULE, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
             for (int i = 0; i < groupNameList.size(); i++) {
-                //TODO false только для компиляции, добавить параметр в базу и брать его оттуда
                 GroupsModel groupsModel = new GroupsModel(
                         groupNameList.get(i),
                         Integer.parseInt(groupIdList.get(i).toString()),
-                        groupIsFileList.get(i) == 1,
+//                        Integer.parseInt(groupIsFileList.get(i).toString()) == 1,
+                        false,
                         true
                 );
                 groupsModelArrayList.add(groupsModel);
