@@ -10,6 +10,8 @@ public class GroupsModel {
     private boolean isGroup;
     private String name;
     private String lastRefresh;
+    private boolean isFileSchedule;
+    private boolean selected;
 
     public boolean isFileSchedule() {
         return isFileSchedule;
@@ -22,9 +24,6 @@ public class GroupsModel {
     public void setGroup(boolean group) {
         isGroup = group;
     }
-
-    private boolean isFileSchedule;
-    private boolean selected;
 
     public GroupsModel(String name, int id, boolean isGroup, String lastRefresh) {
         this.name = name;

@@ -171,7 +171,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             }
         });
 
-        result = new DrawerBuilder(getActivity()).withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).append(MainActivity.getDrawer());
+        result = new DrawerBuilder(getActivity()).withCustomView(drawerView).withDisplayBelowStatusBar(true).withDrawerGravity(Gravity.END).buildForFragment();
     }
 
 

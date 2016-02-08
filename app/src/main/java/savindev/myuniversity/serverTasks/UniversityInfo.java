@@ -240,14 +240,16 @@ public class UniversityInfo {
 
         public final int ID_GROUP;
         public final int ID_FACULTY;
+        public final boolean IS_FILE_SCHEDULE;
         public final String GROUP_NAME;
         public final boolean IS_DELETED;
 
 
-        public GROUP(int ID_GROUP, int ID_FACULTY, String GROUP_NAME, boolean IS_DELETED) {
+        public GROUP(int ID_GROUP, int ID_FACULTY, String GROUP_NAME, boolean IS_FILE_SCHEDULE, boolean IS_DELETED) {
             this.ID_GROUP = ID_GROUP;
             this.ID_FACULTY = ID_FACULTY;
             this.GROUP_NAME = GROUP_NAME;
+            this.IS_FILE_SCHEDULE = IS_FILE_SCHEDULE;
             this.IS_DELETED = IS_DELETED;
         }
 
@@ -255,8 +257,9 @@ public class UniversityInfo {
             final int ID_GROUP = object.optInt("ID_GROUP", 0);
             final int ID_FACULTY = object.optInt("ID_FACULTY", 0);
             final String GROUP_NAME = object.optString("GROUP_NAME", "");
+            final boolean IS_FILE_SCHEDULE = object.optBoolean("IS_FILE_SCHEDULE", false);
             final boolean IS_DELETED = object.optBoolean("IS_DELETED", false);
-            return new GROUP(ID_GROUP, ID_FACULTY, GROUP_NAME, IS_DELETED);
+            return new GROUP(ID_GROUP, ID_FACULTY, GROUP_NAME, IS_FILE_SCHEDULE, IS_DELETED);
         }
 
         public static ArrayList<GROUP> fromJson(final JSONArray array) {
