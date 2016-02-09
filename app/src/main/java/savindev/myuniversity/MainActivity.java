@@ -121,8 +121,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PrimaryDrawerItem itemSchedule = new PrimaryDrawerItem().withName(R.string.drawer_schedule).withIcon(R.drawable.ic_calendar_clock).withSelectedIcon(R.drawable.ic_schedule_select);
         PrimaryDrawerItem itemNavigation = new PrimaryDrawerItem().withName(R.string.drawer_navigator).withIcon(R.drawable.ic_map_marker).withSelectedIcon(R.drawable.ic_navigation_select);
         PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_note).withSelectedIcon(R.drawable.ic_notes_select);
-// TODO Считаю на данном этапе пока лучше убрать        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_library_books).withSelectedIcon(R.drawable.ic_news_select);
-        //   PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
+        PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_library_books).withSelectedIcon(R.drawable.ic_news_select);
+        PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
         PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings_box).withSelectedIcon(R.drawable.ic_settings_select);
 
@@ -177,8 +177,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         itemSchedule,
                         itemNavigation,
                         itemNotes,
-                        //itemNews,
-                        //itemEducation,
+                        itemNews,
+                        itemEducation,
                         itemPerformance,
                         new DividerDrawerItem(),
                         itemSettings
@@ -203,18 +203,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             case 3:
                                 addfragment(R.string.drawer_notes, new NotesFragment());
                                 break;
-                            /*
+
                             case 4:
                                 addfragment(R.string.drawer_news, new NewsFragment());
                                 break;
                             case 5:
                                 addfragment(R.string.drawer_education, new WelcomeFragment());
                                 break;
-                            */
-                            case 4:
+
+                            case 6:
                                 addfragment(R.string.drawer_performance, new PerformanceFragment());
                                 break;
-                            case 6:
+                            case 7:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
                         }

@@ -47,7 +47,7 @@ public class NewsFragment extends Fragment {
         websettings.setSaveFormData(false);
         websettings.setSavePassword(false);
 
-        webview.loadUrl("http://new.iatit.ru/blog/");
+        webview.loadUrl("http://new.iatit.ru/mobile/");
         webview.setHorizontalScrollBarEnabled(false);
         webview.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
         webview.setBackgroundColor(128);

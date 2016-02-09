@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.alexmarken.navigator.my.university.Fragments.NaviMapsFragment;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
 
@@ -25,7 +24,7 @@ import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.notes.AttachActivity;
 import savindev.myuniversity.notes.NotesFragment;
-import savindev.myuniversity.serverTasks.Schedule;
+
 
 public class PairInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,7 +40,7 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
     private TextView reminderAdd;
     private MaterialSheetFab materialSheetFab;
     private Button searchButton;
-
+    ScheduleModel scheduleModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +53,7 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
         Bundle b = getIntent().getExtras();
         Intent i = getIntent();
 
-        ScheduleModel scheduleModel = i.getParcelableExtra("schedulemodel");
+         scheduleModel = i.getParcelableExtra("schedulemodel");
 
         pairName = scheduleModel.getPairs().get(0).getName();
         pairInfo = scheduleModel.getStartTime();
@@ -87,14 +86,6 @@ public class PairInfoActivity extends AppCompatActivity implements View.OnClickL
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                /*
-
-                TODO Здесь будет код для отображения карты
-
-
-                 */
-
 
             }
         });
