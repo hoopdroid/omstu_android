@@ -149,7 +149,6 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-
     public class UniversityInfoHelper { // [CR] либо класс сделать приватным, либо убрать геттеры для классов. правильнее - первое
 
 
@@ -214,13 +213,13 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_FULLNAME+", "+COL_SHORTNAME+", "+
-                    COL_DAYS_IN_WEEK+")"+" VALUES (?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_FULLNAME + ", " + COL_SHORTNAME + ", " +
+                    COL_DAYS_IN_WEEK + ")" + " VALUES (?, ?, ?)";
 
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
 
-            stmt.bindString(1,init.UNIVERSITY_FULLNAME);
+            stmt.bindString(1, init.UNIVERSITY_FULLNAME);
             stmt.bindString(2, init.UNIVERSITY_SHORTNAME);
             stmt.bindLong(3, init.DAYS_IN_WEEK);
 
@@ -270,20 +269,20 @@ public class DBHelper extends SQLiteOpenHelper {
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
 
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_TEACHER+", "+COL_ID_DEPARTMENT+", "+
-                    COL_TEACHER_LASTNAME+", "+COL_TEACHER_FIRSTNAME+", "+COL_TEACHER_MIDDLENAME+", "+
-                    COL_TEACHER_GENDER+")"+" VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_ID_TEACHER + ", " + COL_ID_DEPARTMENT + ", " +
+                    COL_TEACHER_LASTNAME + ", " + COL_TEACHER_FIRSTNAME + ", " + COL_TEACHER_MIDDLENAME + ", " +
+                    COL_TEACHER_GENDER + ")" + " VALUES (?, ?, ?, ?, ?, ?)";
 
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.TEACHERS.size(); index++) {
                 if (!init.TEACHERS.get(index).IS_DELETED) {
-                    stmt.bindLong    (1, init.TEACHERS.get(index).ID_TEACHER);
-                    stmt.bindLong    (2, init.TEACHERS.get(index).ID_DEPARTMENT);
-                    stmt.bindString  (3, init.TEACHERS.get(index).TEACHER_LASTNAME);
-                    stmt.bindString  (4, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
-                    stmt.bindString  (5, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
-                    stmt.bindString  (6, init.TEACHERS.get(index).GENDER);
+                    stmt.bindLong(1, init.TEACHERS.get(index).ID_TEACHER);
+                    stmt.bindLong(2, init.TEACHERS.get(index).ID_DEPARTMENT);
+                    stmt.bindString(3, init.TEACHERS.get(index).TEACHER_LASTNAME);
+                    stmt.bindString(4, init.TEACHERS.get(index).TEACHER_FIRSTNAME);
+                    stmt.bindString(5, init.TEACHERS.get(index).TEACHER_MIDDLENAME);
+                    stmt.bindString(6, init.TEACHERS.get(index).GENDER);
                     stmt.execute();
                     stmt.clearBindings();
 
@@ -336,7 +335,6 @@ public class DBHelper extends SQLiteOpenHelper {
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
 
             for (int i = 0; i < teachersNameList.size(); i++) {
-                //TODO false только для компиляции, добавить параметр в базу и брать его оттуда
                 GroupsModel groupsModel = new GroupsModel(
                         teachersNameList.get(i),
                         Integer.parseInt(teacherIdList.get(i).toString()),
@@ -402,26 +400,28 @@ public class DBHelper extends SQLiteOpenHelper {
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
 
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_SEMESTER+", "+COL_BEGIN_DATE+", "+
-                    COL_END_DATE+")"+" VALUES (?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_ID_SEMESTER + ", " + COL_BEGIN_DATE + ", " +
+                    COL_END_DATE + ")" + " VALUES (?, ?, ?)";
             //PARSE SEMESTRES TO SQLITE
 
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.SEMESTERS.size(); index++) {
                 if (!init.SEMESTERS.get(index).IS_DELETED) {
-                   stmt.bindLong(1, init.SEMESTERS.get(index).ID_SEMESTER);
-                   stmt.bindString(2, init.SEMESTERS.get(index).BEGIN_DT);
-                   stmt.bindString(3,init.SEMESTERS.get(index).END_DT);
+                    stmt.bindLong(1, init.SEMESTERS.get(index).ID_SEMESTER);
+                    stmt.bindString(2, init.SEMESTERS.get(index).BEGIN_DT);
+                    stmt.bindString(3, init.SEMESTERS.get(index).END_DT);
                     stmt.execute();
                     stmt.clearBindings();
                 } else {
                     DBRequest.delete_byID(sqliteDatabase, DBHelper.SemestersHelper.TABLE_NAME, DBHelper.SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
                 }
-                sqliteDatabase.setTransactionSuccessful();
-                sqliteDatabase.endTransaction();
-                sqliteDatabase.close();
+
+
             }
+            sqliteDatabase.setTransactionSuccessful();
+            sqliteDatabase.endTransaction();
+            sqliteDatabase.close();
         }
 
         public ArrayList getSemesters(Context context) {
@@ -442,7 +442,7 @@ public class DBHelper extends SQLiteOpenHelper {
             /*
                 Проверяем вхождение даты в интервал семестра
              */
-            if(idSemester==0)
+            if (idSemester == 0)
                 return null;
 
             DBHelper dbHelper = new DBHelper(context);
@@ -483,7 +483,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         public int getNumSemesterFromDate(String date) {
-            int num=0;
+            int num = 0;
 
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
             SQLiteDatabase database = getReadableDatabase();
@@ -501,11 +501,11 @@ public class DBHelper extends SQLiteOpenHelper {
             try {
                 while (!cursor.isAfterLast()) {
 
-                    if(format.parse(date).compareTo(format.parse(
-                            DateUtil.formatStandart(cursor.getString(cursor.getColumnIndex(COL_BEGIN_DATE))))) >=0
+                    if (format.parse(date).compareTo(format.parse(
+                            DateUtil.formatStandart(cursor.getString(cursor.getColumnIndex(COL_BEGIN_DATE))))) >= 0
                             && format.parse(date).
                             compareTo(format.parse
-                                    (DateUtil.formatStandart(cursor.getString(cursor.getColumnIndex(COL_END_DATE))))) <=0){
+                                    (DateUtil.formatStandart(cursor.getString(cursor.getColumnIndex(COL_END_DATE))))) <= 0) {
                         num = cursor.getInt(cursor.getColumnIndex(COL_ID_SEMESTER));
                     }
                     cursor.moveToNext();
@@ -544,15 +544,15 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_PAIR+", "+COL_PAIR_NUMBER+", "+
-                    COL_BEGIN_TIME+", "+COL_END_TIME+")"+" VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_ID_PAIR + ", " + COL_PAIR_NUMBER + ", " +
+                    COL_BEGIN_TIME + ", " + COL_END_TIME + ")" + " VALUES (?, ?, ?, ?)";
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
 
             for (int index = 0; index < init.PAIRS.size(); index++) {
                 if (!init.PAIRS.get(index).IS_DELETED) {
-                    stmt.bindLong(1,init.PAIRS.get(index).ID_PAIR);
-                    stmt.bindLong(2,init.PAIRS.get(index).PAIR_NUMBER);
+                    stmt.bindLong(1, init.PAIRS.get(index).ID_PAIR);
+                    stmt.bindLong(2, init.PAIRS.get(index).PAIR_NUMBER);
                     stmt.bindString(3, init.PAIRS.get(index).PAIR_BEGIN_TIME);
                     stmt.bindString(4, init.PAIRS.get(index).PAIR_END_TIME);
                     stmt.execute();
@@ -566,8 +566,8 @@ public class DBHelper extends SQLiteOpenHelper {
             sqliteDatabase.close();
         }
 
-        public int getPairsInDay(Context context){
-            int maxPair=0;
+        public int getPairsInDay(Context context) {
+            int maxPair = 0;
 
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
 
@@ -634,6 +634,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         protected static final String TABLE_NAME = "Groups";
         protected static final String COL_ID_GROUP = "group_id";
+        protected static final String COL_IS_FILE_SCHEDULE = "is_file_schedule";
         protected static final String COL_ID_FACULTY = "faculty_id";
         protected static final String COL_GROUP_NAME = "name_group";
 
@@ -642,6 +643,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
                     COL_ID_GROUP + " INTEGER PRIMARY KEY," +
                     COL_ID_FACULTY + " INTEGER," +
+                    COL_IS_FILE_SCHEDULE + " INTEGER," +
                     COL_GROUP_NAME + " TEXT" +
                     ");");
 
@@ -656,16 +658,17 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_GROUP+", "+COL_GROUP_NAME+", "+
-                    COL_ID_FACULTY+")"+" VALUES (?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_ID_GROUP + ", " + COL_GROUP_NAME + ", " +
+                    COL_ID_FACULTY + ", " + COL_GROUP_NAME + ")" + " VALUES (?, ?, ?, ?)";
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
 
             for (int index = 0; index < init.GROUPS.size(); index++) {
                 if (!init.GROUPS.get(index).IS_DELETED) {
-                    stmt.bindLong(1,init.GROUPS.get(index).ID_GROUP);
-                    stmt.bindString(2,init.GROUPS.get(index).GROUP_NAME);
+                    stmt.bindLong(1, init.GROUPS.get(index).ID_GROUP);
+                    stmt.bindString(2, init.GROUPS.get(index).GROUP_NAME);
                     stmt.bindLong(3, init.GROUPS.get(index).ID_FACULTY);
+                    stmt.bindLong(4, init.GROUPS.get(index).IS_FILE_SCHEDULE ? 1 : 0);
                     stmt.execute();
                     stmt.clearBindings();
 
@@ -686,12 +689,14 @@ public class DBHelper extends SQLiteOpenHelper {
             int group_id = DBRequest.getIdFromString(context, FacultiesHelper.TABLE_NAME, selection, FacultiesHelper.COL_FACULTY_SHORTNAME, faculty);
             ArrayList<String> groupNameList = DBRequest.getList(context, TABLE_NAME, COL_GROUP_NAME, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
             ArrayList groupIdList = DBRequest.getList(context, TABLE_NAME, COL_ID_GROUP, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
+            //TODO groupIsFileList упорно все элементы получаю null. false заменить на закомментированное
+//            ArrayList<Integer> groupIsFileList = DBRequest.getList(context, TABLE_NAME, COL_IS_FILE_SCHEDULE, COL_ID_FACULTY, group_id, COL_GROUP_NAME);
             ArrayList<GroupsModel> groupsModelArrayList = new ArrayList<>();
             for (int i = 0; i < groupNameList.size(); i++) {
-                //TODO false только для компиляции, добавить параметр в базу и брать его оттуда
                 GroupsModel groupsModel = new GroupsModel(
                         groupNameList.get(i),
                         Integer.parseInt(groupIdList.get(i).toString()),
+//                        Integer.parseInt(groupIsFileList.get(i).toString()) == 1,
                         false,
                         true
                 );
@@ -746,16 +751,16 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_FACULTY_ID+", "+COL_FACULTY_FULLNAME+", "+
-                    COL_FACULTY_SHORTNAME+")"+" VALUES (?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_FACULTY_ID + ", " + COL_FACULTY_FULLNAME + ", " +
+                    COL_FACULTY_SHORTNAME + ")" + " VALUES (?, ?, ?)";
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
 
             for (int index = 0; index < init.FACULTIES.size(); index++) {
                 if (!init.FACULTIES.get(index).IS_DELETED) {
-                    stmt.bindLong(1,init.FACULTIES.get(index).ID_FACULTY);
+                    stmt.bindLong(1, init.FACULTIES.get(index).ID_FACULTY);
                     stmt.bindString(2, init.FACULTIES.get(index).FACULTY_FULLNAME);
-                    stmt.bindString(3,init.FACULTIES.get(index).FACULTY_SHORTNAME);
+                    stmt.bindString(3, init.FACULTIES.get(index).FACULTY_SHORTNAME);
                     stmt.execute();
                     stmt.clearBindings();
                 } else {
@@ -810,9 +815,9 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_DEPARTMENT_ID+", "+COL_FACULTY_ID+", "+
-                    COL_CLASSROOM_ID+", "+COL_DEPARTMENT_FULLNAME+", "+
-                    COL_DEPARTMENT_SHORTNAME+")"+" VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_DEPARTMENT_ID + ", " + COL_FACULTY_ID + ", " +
+                    COL_CLASSROOM_ID + ", " + COL_DEPARTMENT_FULLNAME + ", " +
+                    COL_DEPARTMENT_SHORTNAME + ")" + " VALUES (?, ?, ?, ?, ?)";
 
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
@@ -820,7 +825,7 @@ public class DBHelper extends SQLiteOpenHelper {
             for (int index = 0; index < init.DEPARTMENTS.size(); index++) {
                 if (!init.DEPARTMENTS.get(index).IS_DELETED) {
                     stmt.bindLong(1, init.DEPARTMENTS.get(index).ID_DEPARTMENT);
-                    stmt.bindLong(2,init.DEPARTMENTS.get(index).ID_FACULTY);
+                    stmt.bindLong(2, init.DEPARTMENTS.get(index).ID_FACULTY);
                     stmt.bindLong(3, init.DEPARTMENTS.get(index).ID_CLASSROOM);
                     stmt.bindString(4, init.DEPARTMENTS.get(index).DEPARTMENT_FULLNAME);
                     stmt.bindString(5, init.DEPARTMENTS.get(index).DEPARTMENT_SHORTNAME);
@@ -901,21 +906,21 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-        public Set<String> getGroupLessons(Context context,int idGroup,boolean isGroup){
+        public Set<String> getGroupLessons(Context context, int idGroup, boolean isGroup) {
 
-            String selectionDB=COL_GROUP_ID;
-            if(!isGroup){
-                selectionDB=COL_TEACHER_ID;
+            String selectionDB = COL_GROUP_ID;
+            if (!isGroup) {
+                selectionDB = COL_TEACHER_ID;
             }
             SortedSet<String> lessons = new TreeSet<>();
             DBHelper dbHelper = new DBHelper(context);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             try {
-                String selectQuery = "SELECT " + COL_DISCIPLINE_NAME + " FROM " + TABLE_NAME+" WHERE "+selectionDB+" = "+idGroup;
+                String selectQuery = "SELECT " + COL_DISCIPLINE_NAME + " FROM " + TABLE_NAME + " WHERE " + selectionDB + " = " + idGroup;
                 Cursor c = db.rawQuery(selectQuery, null);
                 c.moveToFirst();
-                while (!c.isAfterLast()){
+                while (!c.isAfterLast()) {
 
                     lessons.add(c.getString(c.getColumnIndex(COL_DISCIPLINE_NAME)));
                     c.moveToNext();
@@ -929,21 +934,21 @@ public class DBHelper extends SQLiteOpenHelper {
             return lessons;
         }
 
-        public Set<String> getGroupLessonsTypes(Context context,int idGroup,boolean isGroup){
+        public Set<String> getGroupLessonsTypes(Context context, int idGroup, boolean isGroup) {
 
-            String selectionDB=COL_GROUP_ID;
-            if(!isGroup){
-                selectionDB=COL_TEACHER_ID;
+            String selectionDB = COL_GROUP_ID;
+            if (!isGroup) {
+                selectionDB = COL_TEACHER_ID;
             }
             SortedSet<String> lessons = new TreeSet<>();
             DBHelper dbHelper = new DBHelper(context);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             try {
-                String selectQuery = "SELECT " + COL_DISCIPLINE_TYPE + " FROM " + TABLE_NAME+" WHERE "+selectionDB+" = "+idGroup;
+                String selectQuery = "SELECT " + COL_DISCIPLINE_TYPE + " FROM " + TABLE_NAME + " WHERE " + selectionDB + " = " + idGroup;
                 Cursor c = db.rawQuery(selectQuery, null);
                 c.moveToFirst();
-                while (!c.isAfterLast()){
+                while (!c.isAfterLast()) {
 
                     lessons.add(c.getString(c.getColumnIndex(COL_DISCIPLINE_TYPE)));
                     c.moveToNext();
@@ -969,11 +974,11 @@ public class DBHelper extends SQLiteOpenHelper {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_SCHEDULE_ID+", "+COL_PAIR_ID+", "+
-                    COL_GROUP_ID+", "+COL_TEACHER_ID+", "+COL_DISCIPLINE_NAME+", "+
-                    COL_DISCIPLINE_TYPE+", "+COL_SCHEDULE_DATE+", "+
-                    COL_CLASSROOM_ID+", "+COL_SUBGROUP_NUMBER+", "+
-                    COL_IS_CANCELLED+")"+" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_SCHEDULE_ID + ", " + COL_PAIR_ID + ", " +
+                    COL_GROUP_ID + ", " + COL_TEACHER_ID + ", " + COL_DISCIPLINE_NAME + ", " +
+                    COL_DISCIPLINE_TYPE + ", " + COL_SCHEDULE_DATE + ", " +
+                    COL_CLASSROOM_ID + ", " + COL_SUBGROUP_NUMBER + ", " +
+                    COL_IS_CANCELLED + ")" + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
             String previousValue = "";
@@ -995,22 +1000,22 @@ public class DBHelper extends SQLiteOpenHelper {
                         while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // если дата начала пары раньше конца семестра
                             firstPair = false;
 
-                            stmt.bindLong(1,schedule.get(index).ID_SCHEDULE);
+                            stmt.bindLong(1, schedule.get(index).ID_SCHEDULE);
                             stmt.bindLong(2, schedule.get(index).ID_PAIR);
-                            stmt.bindLong(3,schedule.get(index).ID_GROUP);
-                            stmt.bindLong(4,schedule.get(index).ID_TEACHER);
-                            stmt.bindString(5,schedule.get(index).DISCIPLINE_NAME);
-                            stmt.bindString(6,schedule.get(index).DISCIPLINE_TYPE);
+                            stmt.bindLong(3, schedule.get(index).ID_GROUP);
+                            stmt.bindLong(4, schedule.get(index).ID_TEACHER);
+                            stmt.bindString(5, schedule.get(index).DISCIPLINE_NAME);
+                            stmt.bindString(6, schedule.get(index).DISCIPLINE_TYPE);
                             previousValue = DateUtil.dateFormatIncrease(schedule, index, previousValue);
                             stmt.bindString(7, previousValue);
-                            stmt.bindLong(8,schedule.get(index).ID_CLASSROOM);
-                            stmt.bindLong(9,schedule.get(index).SUBGROUP_NUMBER);
-                            stmt.bindLong(10,0);
+                            stmt.bindLong(8, schedule.get(index).ID_CLASSROOM);
+                            stmt.bindLong(9, schedule.get(index).SUBGROUP_NUMBER);
+                            stmt.bindLong(10, 0);
 
-                            if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE, COL_SCHEDULE_DATE, previousValue)){
+                            if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE, COL_SCHEDULE_DATE, previousValue)) {
                                 stmt.execute();
-                                stmt.clearBindings();}
-                            else break;
+                                stmt.clearBindings();
+                            } else break;
                             beginDate = format.parse(previousValue);
                         }
                     } catch (ParseException e) {
@@ -1038,16 +1043,15 @@ public class DBHelper extends SQLiteOpenHelper {
             try {
                 beginDate = format.parse(date);
                 String findendDate = dbHelper.getSemestersHelper().getSemesterEndDate(context, date);
-                if(findendDate!=null)
+                if (findendDate != null)
                     endDate = format.parse(DateUtil.formatStandart(findendDate));
                 else
                     return null;
                 //конец семестра
-                if(beginDate.compareTo(endDate) >= 0)
+                if (beginDate.compareTo(endDate) >= 0)
                     return null;
 
-            }
-            catch (ParseException e) {
+            } catch (ParseException e) {
                 e.printStackTrace();
             }
 
@@ -1088,7 +1092,7 @@ public class DBHelper extends SQLiteOpenHelper {
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_NAME)),
                             nameTeacher,
                             nameGroup,
-                            dbHelper.getClassroomsHelper().getClassroom(context,cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID))),
+                            dbHelper.getClassroomsHelper().getClassroom(context, cursor.getInt(cursor.getColumnIndex(COL_CLASSROOM_ID))),
                             cursor.getString(cursor.getColumnIndex(COL_DISCIPLINE_TYPE)),
                             isCancelled
                     );
@@ -1104,13 +1108,13 @@ public class DBHelper extends SQLiteOpenHelper {
                             isCancelled,
                             list,
                             dbHelper.getNotesHelper().getPairNotes(
-                                    cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)),date)
+                                    cursor.getInt(cursor.getColumnIndex(COL_SCHEDULE_ID)), date)
                     );
 
                     scheduleModelArrayList.add(scheduleModel);
                     cursor.moveToNext();
                 }
-                int a =5;
+                int a = 5;
             } catch (SQLiteException e) {
                 Log.e("SQLITE DB EXCEPTION", e.toString(), e);
             }
@@ -1125,25 +1129,25 @@ public class DBHelper extends SQLiteOpenHelper {
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
 
-            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,true);
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context, true);
 
 
-            String tempselect=idList.get(0).toString() +",";
-            String select="";
+            String tempselect = idList.get(0).toString() + ",";
+            String select = "";
 
-            for(int i =0 ; i<idList.size();i++) {
-                select += tempselect + idList.get(i).toString()+",";
-                tempselect =  idList.get(i).toString()+",";
+            for (int i = 0; i < idList.size(); i++) {
+                select += tempselect + idList.get(i).toString() + ",";
+                tempselect = idList.get(i).toString() + ",";
             }
 
-            select = select.substring(0, select.length()-1);
+            select = select.substring(0, select.length() - 1);
 
-            Log.d("SELECT",select);
+            Log.d("SELECT", select);
 
             db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
                     " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 1, null);
 
-            db.delete(TABLE_NAME, COL_GROUP_ID + " IN ("+idSchedule+") " +" AND " + COL_TEACHER_ID +" NOT IN ("+select+")", null);
+            db.delete(TABLE_NAME, COL_GROUP_ID + " IN (" + idSchedule + ") " + " AND " + COL_TEACHER_ID + " NOT IN (" + select + ")", null);
         }
 
         public static void deleteTeacherchedule(Context context, int idSchedule) {
@@ -1153,31 +1157,29 @@ public class DBHelper extends SQLiteOpenHelper {
             DBHelper dbHelper = DBHelper.getInstance(context);
             db = dbHelper.getWritableDatabase();
 
-            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,false);
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context, false);
 
 
-            String tempselect=idList.get(0).toString() +",";
-            String select="";
+            String tempselect = idList.get(0).toString() + ",";
+            String select = "";
 
-            for(int i =0 ; i<idList.size();i++) {
-                select += tempselect + idList.get(i).toString()+",";
-                tempselect =  idList.get(i).toString()+",";
+            for (int i = 0; i < idList.size(); i++) {
+                select += tempselect + idList.get(i).toString() + ",";
+                tempselect = idList.get(i).toString() + ",";
             }
 
-            select = select.substring(0, select.length()-1);
+            select = select.substring(0, select.length() - 1);
 
-            Log.d("SELECT",select);
-
-
+            Log.d("SELECT", select);
 
 
-            for(int i=0;i<idList.size();i++){
+            for (int i = 0; i < idList.size(); i++) {
 
 
                 db.delete(dbHelper.getUsedSchedulesHelper().TABLE_NAME, dbHelper.getUsedSchedulesHelper().COL_ID_SCHEDULE + "=" + idSchedule +
                         " AND " + dbHelper.getUsedSchedulesHelper().COL_IS_GROUP + "=" + 0, null);
 
-                db.delete(TABLE_NAME, COL_TEACHER_ID + " IN ("+idSchedule+") " +" AND " + COL_GROUP_ID +" NOT IN ("+select+")", null);
+                db.delete(TABLE_NAME, COL_TEACHER_ID + " IN (" + idSchedule + ") " + " AND " + COL_GROUP_ID + " NOT IN (" + select + ")", null);
             }
 
 
@@ -1187,13 +1189,12 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
+        public static boolean equalsTeachAndGroups(Context context, DBHelper dbHelper, SQLiteDatabase database, String TableName,
+                                                   String dbfieldGroup, int fieldIdGroup, String dbfieldTeacher, int fieldIdTeacher) {
 
-        public static boolean equalsTeachAndGroups(Context context,DBHelper dbHelper,SQLiteDatabase database,String TableName,
-                                                   String dbfieldGroup, int fieldIdGroup,String dbfieldTeacher,int fieldIdTeacher) {
-
-            String Query = "SELECT * FROM " + TableName + " WHERE " + dbfieldGroup + " = " + fieldIdGroup+" AND "+ dbfieldTeacher + "="+fieldIdTeacher;
+            String Query = "SELECT * FROM " + TableName + " WHERE " + dbfieldGroup + " = " + fieldIdGroup + " AND " + dbfieldTeacher + "=" + fieldIdTeacher;
             Cursor cursor = database.rawQuery(Query, null);
-            if(cursor.getCount() <= 0){
+            if (cursor.getCount() <= 0) {
                 cursor.close();
                 return false;
             }
@@ -1202,13 +1203,13 @@ public class DBHelper extends SQLiteOpenHelper {
             return true;
         }
 
-        public static  void clearDB(Context context,String selection,boolean isGroup) {
+        public static void clearDB(Context context, String selection, boolean isGroup) {
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
-            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context,isGroup);
-            for (int i = 0 ;i<idList.size();i++)
-                db.delete(TABLE_NAME, selection +"!="+idList.get(i), null);
+            ArrayList<Integer> idList = UsedSchedulesHelper.getIdSchedules(context, isGroup);
+            for (int i = 0; i < idList.size(); i++)
+                db.delete(TABLE_NAME, selection + "!=" + idList.get(i), null);
 
         }
 
@@ -1244,8 +1245,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         public static void setUsedSchedule(Context context, int groupid, boolean isGroup, boolean isMain, String lastRefresh) {
             int isGroupDB = 0;
-            if(isGroup)
-                isGroupDB=1;
+            if (isGroup)
+                isGroupDB = 1;
             SQLiteDatabase db;
             DBHelper dbHelper = new DBHelper(context);
             db = dbHelper.getWritableDatabase();
@@ -1372,9 +1373,9 @@ public class DBHelper extends SQLiteOpenHelper {
             db.update(TABLE_NAME, cv, COL_ID_SCHEDULE + "=" + idSchedule + " AND " + COL_IS_GROUP + "=" + isGroupDB, null);
         }
 
-        public static ArrayList<Integer> getIdSchedules(Context context,boolean isGroup) {
-            int isGroupDB =0;
-            if(isGroup)isGroupDB=1;
+        public static ArrayList<Integer> getIdSchedules(Context context, boolean isGroup) {
+            int isGroupDB = 0;
+            if (isGroup) isGroupDB = 1;
             //TODO Сделать добавление правильных айди,сейчас проверяется по всем в UsedSchedules,но это не критично
             ArrayList<Integer> idList = new ArrayList<>();
 
@@ -1384,7 +1385,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT "+COL_ID_SCHEDULE+" FROM " + TABLE_NAME, null);
+                cursor = db.rawQuery("SELECT " + COL_ID_SCHEDULE + " FROM " + TABLE_NAME, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
@@ -1417,19 +1418,19 @@ public class DBHelper extends SQLiteOpenHelper {
                     ");");
         }
 
-        public  void setCampuses(UniversityInfo init, Context context) {
+        public void setCampuses(UniversityInfo init, Context context) {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_CAMPUS+", "+
-                    COL_CAMPUS_NAME+")"+" VALUES (?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_ID_CAMPUS + ", " +
+                    COL_CAMPUS_NAME + ")" + " VALUES (?, ?)";
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
 
             for (int index = 0; index < init.CAMPUSES.size(); index++) {
                 if (!init.CAMPUSES.get(index).IS_DELETED) {
 
-                    stmt.bindLong(1 ,init.CAMPUSES.get(index).ID_CAMPUS);
+                    stmt.bindLong(1, init.CAMPUSES.get(index).ID_CAMPUS);
                     stmt.bindString(2, init.CAMPUSES.get(index).CAMPUS_NAME);
                     stmt.execute();
                     stmt.clearBindings();
@@ -1468,25 +1469,25 @@ public class DBHelper extends SQLiteOpenHelper {
                     ");");
         }
 
-        public  void setClassrooms(UniversityInfo init, Context context) {
+        public void setClassrooms(UniversityInfo init, Context context) {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_CLASSROOM+", "+COL_ID_BUILDING+", "+
-                    COL_CLASSROOM_NAME+", "+COL_CLASSROOM_FULLNAME+", "+COL_CLASSROOM_FLOOR+", "+
-                    COL_CLASSROOM_DESCRIPTION+", "+ COL_CLASSROOM_TYPE+")"+" VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_ID_CLASSROOM + ", " + COL_ID_BUILDING + ", " +
+                    COL_CLASSROOM_NAME + ", " + COL_CLASSROOM_FULLNAME + ", " + COL_CLASSROOM_FLOOR + ", " +
+                    COL_CLASSROOM_DESCRIPTION + ", " + COL_CLASSROOM_TYPE + ")" + " VALUES (?, ?, ?, ?, ?, ?, ?)";
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.CLASSROOMS.size(); index++) {
                 if (!init.CLASSROOMS.get(index).IS_DELETED) {
 
-                   stmt.bindLong(1,init.CLASSROOMS.get(index).ID_CLASSROOM);
-                   stmt.bindLong(2, init.CLASSROOMS.get(index).ID_BUILDING);
-                   stmt.bindString(3,init.CLASSROOMS.get(index).CLASSROOM_NAME);
-                   stmt.bindString(4, init.CLASSROOMS.get(index).CLASSROOM_FULLNAME);
-                   stmt.bindLong(5,init.CLASSROOMS.get(index).CLASSROOM_FLOOR);
-                   stmt.bindString(6, init.CLASSROOMS.get(index).CLASSROOM_DESCRIPTION);
-                   stmt.bindString(7,init.CLASSROOMS.get(index).CLASSROOM_TYPE_NAME);
+                    stmt.bindLong(1, init.CLASSROOMS.get(index).ID_CLASSROOM);
+                    stmt.bindLong(2, init.CLASSROOMS.get(index).ID_BUILDING);
+                    stmt.bindString(3, init.CLASSROOMS.get(index).CLASSROOM_NAME);
+                    stmt.bindString(4, init.CLASSROOMS.get(index).CLASSROOM_FULLNAME);
+                    stmt.bindLong(5, init.CLASSROOMS.get(index).CLASSROOM_FLOOR);
+                    stmt.bindString(6, init.CLASSROOMS.get(index).CLASSROOM_DESCRIPTION);
+                    stmt.bindString(7, init.CLASSROOMS.get(index).CLASSROOM_TYPE_NAME);
                     stmt.execute();
                     stmt.clearBindings();
                 } else {
@@ -1500,17 +1501,17 @@ public class DBHelper extends SQLiteOpenHelper {
 
         }
 
-        public String getClassroom(Context context,int classroomId){
-            String classroomName="330";
-            int buildingName=0;
-            int buildingID=0;
+        public String getClassroom(Context context, int classroomId) {
+            String classroomName = "330";
+            int buildingName = 0;
+            int buildingID = 0;
 
             DBHelper dbHelper = new DBHelper(context);
-            SQLiteDatabase  db = dbHelper.getReadableDatabase();
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE "+COL_ID_CLASSROOM+" = "+classroomId, null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID_CLASSROOM + " = " + classroomId, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
@@ -1526,7 +1527,7 @@ public class DBHelper extends SQLiteOpenHelper {
             }
 
             try {
-                cursor = db.rawQuery("SELECT "+BuildingsHelper.COL_BUILDING_NUMBER+" FROM " + BuildingsHelper.TABLE_NAME + " WHERE "+BuildingsHelper.COL_ID_BUILDING+" = "+buildingID, null);
+                cursor = db.rawQuery("SELECT " + BuildingsHelper.COL_BUILDING_NUMBER + " FROM " + BuildingsHelper.TABLE_NAME + " WHERE " + BuildingsHelper.COL_ID_BUILDING + " = " + buildingID, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
@@ -1541,14 +1542,15 @@ public class DBHelper extends SQLiteOpenHelper {
 
             }
 
-            if(classroomName == null || classroomName.equals("null")){
-                classroomName =  context.getResources().getString(R.string.building);
+            if (classroomName == null || classroomName.equals("null")) {
+                classroomName = context.getResources().getString(R.string.building);
             }
 
-            return Integer.toString(buildingName) + "-"+classroomName;
+            return Integer.toString(buildingName) + "-" + classroomName;
         }
 
     }
+
     public static class BuildingsHelper {
 
         protected static final String TABLE_NAME = "Buildings";
@@ -1573,30 +1575,30 @@ public class DBHelper extends SQLiteOpenHelper {
                     ");");
         }
 
-        public  void setBuildings(UniversityInfo init, Context context) {
+        public void setBuildings(UniversityInfo init, Context context) {
             SQLiteDatabase sqliteDatabase;
             DBHelper helper = new DBHelper(context);
             sqliteDatabase = helper.getWritableDatabase();
-            String sql = "INSERT INTO "+TABLE_NAME+" ("+COL_ID_BUILDING+", "+COL_ID_CAMPUS+", "+
-                    COL_BUILDING_NUMBER+", "+COL_BUILDING_NAME+", "+COL_BUILDING_TYPE_NAME+", "+
-                     COL_BUILDING_FLOOR_COUNT+", "+ COL_HAS_GROUND_FLOOR+")"+" VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + TABLE_NAME + " (" + COL_ID_BUILDING + ", " + COL_ID_CAMPUS + ", " +
+                    COL_BUILDING_NUMBER + ", " + COL_BUILDING_NAME + ", " + COL_BUILDING_TYPE_NAME + ", " +
+                    COL_BUILDING_FLOOR_COUNT + ", " + COL_HAS_GROUND_FLOOR + ")" + " VALUES (?, ?, ?, ?, ?, ?, ?)";
             SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
             sqliteDatabase.beginTransaction();
             for (int index = 0; index < init.BUILDINGS.size(); index++) {
                 if (!init.BUILDINGS.get(index).IS_DELETED) {
 
                     stmt.bindLong(1, init.BUILDINGS.get(index).ID_BUILDING);
-                    stmt.bindLong(2,init.BUILDINGS.get(index).ID_CAMPUS);
+                    stmt.bindLong(2, init.BUILDINGS.get(index).ID_CAMPUS);
                     stmt.bindLong(3, init.BUILDINGS.get(index).BUILDING_NUMBER);
-                    stmt.bindString(4,init.BUILDINGS.get(index).BUILDING_NAME);
+                    stmt.bindString(4, init.BUILDINGS.get(index).BUILDING_NAME);
                     stmt.bindString(5, init.BUILDINGS.get(index).BUILDING_TYPE_NAME);
-                    stmt.bindLong(6,init.BUILDINGS.get(index).BUILDING_FLOOR_COUNT);
+                    stmt.bindLong(6, init.BUILDINGS.get(index).BUILDING_FLOOR_COUNT);
 
                     int hasGroundFloor = 1;
-                    if(!init.BUILDINGS.get(index).HAS_GROUND_FLOOR)
-                        hasGroundFloor=0;
+                    if (!init.BUILDINGS.get(index).HAS_GROUND_FLOOR)
+                        hasGroundFloor = 0;
 
-                    stmt.bindLong(7,hasGroundFloor);
+                    stmt.bindLong(7, hasGroundFloor);
                     stmt.execute();
                     stmt.clearBindings();
                 } else {
@@ -1605,7 +1607,7 @@ public class DBHelper extends SQLiteOpenHelper {
             }
             sqliteDatabase.setTransactionSuccessful();
             sqliteDatabase.endTransaction();
-           }
+        }
     }
 
     public class NotesHelper {
@@ -1614,7 +1616,7 @@ public class DBHelper extends SQLiteOpenHelper {
         protected static final String COL_ID_NOTE = "note_id";
         protected static final String COL_NOTE_NAME = "note_name";
         protected static final String COL_SENDER_NAME = "sender_name";
-        protected static final String COL_IS_DONE= "is_done";
+        protected static final String COL_IS_DONE = "is_done";
         protected static final String COL_PRIORITY = "priority";
         protected static final String COL_PHOTO_LINK = "photo_link";
         protected static final String COL_TYPE_PAIR = "pair_type";
@@ -1649,7 +1651,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     ");");
         }
 
-        public void setPairNote( NoteModel noteModel ) {
+        public void setPairNote(NoteModel noteModel) {
 
 
             SQLiteDatabase sqliteDatabase = getWritableDatabase();
@@ -1658,7 +1660,7 @@ public class DBHelper extends SQLiteOpenHelper {
             noteRow.put(COL_NOTE_NAME, noteModel.getName());
             noteRow.put(COL_SENDER_NAME, "UserName");
             noteRow.put(COL_IS_DONE, 0);
-            noteRow.put(COL_PRIORITY,noteModel.getPriority().toString());
+            noteRow.put(COL_PRIORITY, noteModel.getPriority().toString());
             noteRow.put(COL_TYPE_PAIR, 1);
             noteRow.put(COL_NOTE_TEXT, noteModel.getText());
             noteRow.put(COL_PAIR_ID, noteModel.getPairId());
@@ -1671,9 +1673,6 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
 
-
-
-
         public ArrayList<NoteModel> getAllNotes() {
             ArrayList<NoteModel> noteModelArrayList = new ArrayList<>();
 
@@ -1683,7 +1682,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME+" ORDER BY "+ COL_NOTE_DATE + " IS NOT NULL", null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COL_NOTE_DATE + " IS NOT NULL", null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
@@ -1712,23 +1711,23 @@ public class DBHelper extends SQLiteOpenHelper {
 
             db.close();
 
-            return  noteModelArrayList;
+            return noteModelArrayList;
 
         }
 
 
-        public ArrayList<NoteModel> getPairNotes(int scheduleId,String scheduleDate) {
+        public ArrayList<NoteModel> getPairNotes(int scheduleId, String scheduleDate) {
 
             ArrayList<NoteModel> noteModelArrayList = new ArrayList<>();
 
             SQLiteDatabase db;
 
-            String pairId = Integer.toString(scheduleId)+scheduleDate;
+            String pairId = Integer.toString(scheduleId) + scheduleDate;
             db = getReadableDatabase();
 
             Cursor cursor;
             try {
-                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " +COL_PAIR_ID + " = "+ pairId, null);
+                cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_PAIR_ID + " = " + pairId, null);
                 cursor.moveToFirst();
 
                 while (!cursor.isAfterLast()) {
@@ -1757,29 +1756,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
             db.close();
 
-            return  noteModelArrayList;
+            return noteModelArrayList;
 
         }
 
-        public void deleteNote(int idNote){
+        public void deleteNote(int idNote) {
             SQLiteDatabase db;
             db = getWritableDatabase();
             db.delete(TABLE_NAME, COL_ID_NOTE + "=" + idNote, null);
             db.close();
         }
 
-        public void setNoteIsDone(int idNote){
+        public void setNoteIsDone(int idNote) {
             SQLiteDatabase db;
             db = getWritableDatabase();
             ContentValues isDoneValue = new ContentValues();
             isDoneValue.put(COL_IS_DONE, 1);
 
-            db.update(TABLE_NAME, isDoneValue,COL_ID_NOTE+ " = "+idNote, null);
+            db.update(TABLE_NAME, isDoneValue, COL_ID_NOTE + " = " + idNote, null);
             db.close();
 
         }
     }
-
 
     @Override
     protected void finalize() throws Throwable {

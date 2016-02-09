@@ -29,8 +29,7 @@ public class DBRequest {
             while (!cursor.isAfterLast()) {
 
                 //  list.add(cursor.getString(cursor.getColumnIndex(selection)));
-                list.add(cursor.getString(cursor.getColumnIndex(selection)))
-                ;
+                list.add(cursor.getString(cursor.getColumnIndex(selection)));
                 cursor.moveToNext();
 
             }
