@@ -39,8 +39,8 @@ import java.util.concurrent.TimeoutException;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
+import savindev.myuniversity.db.UsedSchedulesHelper;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
 import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 import savindev.myuniversity.settings.Colores;
@@ -83,8 +83,8 @@ public abstract class AbstractSchedule extends DialogFragment
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.add(Calendar.DAY_OF_MONTH, -1); //Чтобы не пропускать день при работе в цикле
-        usedList = DBHelper.UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
-        main = DBHelper.UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
+        usedList = UsedSchedulesHelper.getGroupsModelList(getActivity()); //Список используемых расписаний
+        main = UsedSchedulesHelper.getMainGroupModel(getActivity()); //Основное расписание. Его выводить сверху списка, первым открывать при запуске
 
         if (MainActivity.getOpenGroup() != 0) { //Сначала - проверка на выбранную группу (при пересоздании фрагмента)
             currentID = MainActivity.getOpenGroup();

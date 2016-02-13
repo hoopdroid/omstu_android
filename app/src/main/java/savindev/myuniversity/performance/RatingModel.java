@@ -2,12 +2,14 @@ package savindev.myuniversity.performance;
 
 import java.util.ArrayList;
 
-public class RaitingModel {
+public class RatingModel {
+
+
     private ArrayList<PointModel> points;
     private String ESTIMATION_POINT_NAME;
     private int ESTIMATION_POINT_NUMBER;
 
-    public RaitingModel(ArrayList<PointModel> points, String ESTIMATION_POINT_NAME, int ESTIMATION_POINT_NUMBER) {
+    public RatingModel(ArrayList<PointModel> points, String ESTIMATION_POINT_NAME, int ESTIMATION_POINT_NUMBER) {
         this.points = points;
         this.ESTIMATION_POINT_NAME = ESTIMATION_POINT_NAME;
         this.ESTIMATION_POINT_NUMBER = ESTIMATION_POINT_NUMBER;

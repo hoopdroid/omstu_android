@@ -191,13 +191,13 @@ public class DBRequest {
 
         DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase sqLiteDatabase = dbHelper.getReadableDatabase();
-        String find = "SELECT * FROM  " + DBHelper.GroupsHelper.TABLE_NAME + " WHERE " + DBHelper.GroupsHelper.COL_ID_GROUP + " = " + id;
+        String find = "SELECT * FROM  " + GroupsHelper.TABLE_NAME + " WHERE " + GroupsHelper.COL_ID_GROUP + " = " + id;
         Cursor cursor = sqLiteDatabase.rawQuery(find, null);
 
         cursor.moveToFirst();
 
         while (!cursor.isAfterLast()) {
-            groupName = cursor.getString(cursor.getColumnIndex(DBHelper.GroupsHelper.COL_GROUP_NAME));
+            groupName = cursor.getString(cursor.getColumnIndex(GroupsHelper.COL_GROUP_NAME));
             cursor.moveToNext();
         }
         cursor.close();

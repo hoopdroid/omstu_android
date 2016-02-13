@@ -24,10 +24,10 @@ import savindev.myuniversity.serverTasks.DownloadFileTask;
 
 public class DownloadPerformanceAdapter extends BaseExpandableListAdapter {
 
-    private ArrayList<RaitingModel> mModels;
+    private ArrayList<RatingModel> mModels;
     private Context mContext;
 
-    public DownloadPerformanceAdapter(Context context, ArrayList<RaitingModel> models) {
+    public DownloadPerformanceAdapter(Context context, ArrayList<RatingModel> models) {
         mContext = context;
         mModels = models;
     }

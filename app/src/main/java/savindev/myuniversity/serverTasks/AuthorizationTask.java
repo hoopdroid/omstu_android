@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.UsedSchedulesHelper;
 import savindev.myuniversity.schedule.GroupsModel;
 
 /**
@@ -182,9 +182,9 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                 editor.putInt("UserId", content.getInt("ID_USER"));
                 editor.apply();
 
-                DBHelper.UsedSchedulesHelper.setUsedSchedule(context, groupId, true, true, "20000101000000"); //запись нового основного в таблицу
+                UsedSchedulesHelper.setUsedSchedule(context, groupId, true, true, "20000101000000"); //запись нового основного в таблицу
 
-                ArrayList<GroupsModel> models = DBHelper.UsedSchedulesHelper.getGroupsModelList(context); //Получить список id не-основных активных расписаний
+                ArrayList<GroupsModel> models = UsedSchedulesHelper.getGroupsModelList(context); //Получить список id не-основных активных расписаний
                 forbreak:
                 {
                     for (GroupsModel model : models) { //Проверить, если ли среди них id группы авторизовавшегося - основной
@@ -195,7 +195,7 @@ public class AuthorizationTask extends AsyncTask<String, Void, Boolean> {
                     //Получить расписание для этой группы, если ранее оно не было получено
 
                     GetScheduleTask gst = new GetScheduleTask(context, null);
-                    gst.execute(DBHelper.UsedSchedulesHelper.getMainGroupModel(context));
+                    gst.execute(UsedSchedulesHelper.getMainGroupModel(context));
                 }
                 return true;
             case "ERROR":   //Неопознанная ошибка

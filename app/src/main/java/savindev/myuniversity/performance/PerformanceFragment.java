@@ -35,7 +35,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private boolean refreshing = false;
     private GetRaitingFileListTask grflt;
-    private ArrayList<RaitingModel> models;
+    private ArrayList<RatingModel> models;
     private DownloadPerformanceAdapter adapter;
 
     @Override
@@ -136,7 +136,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
     private void setMainGroup() {
         final int mainGroupId = getActivity().getSharedPreferences("UserInfo", 0).getInt("UserGroup", 0);
         forbr:
-        for (RaitingModel model : models)
+        for (RatingModel model : models)
             for (PointModel pModel : model.getPoints())
                 if (pModel.getIdGroup() == mainGroupId) {
                     main = pModel;

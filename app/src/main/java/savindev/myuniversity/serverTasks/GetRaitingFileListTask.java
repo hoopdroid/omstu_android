@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.performance.PointModel;
-import savindev.myuniversity.performance.RaitingModel;
+import savindev.myuniversity.performance.RatingModel;
 
 public class GetRaitingFileListTask extends AsyncTask<Void, Void, PointModel> {
     private Context context;
@@ -49,7 +49,7 @@ public class GetRaitingFileListTask extends AsyncTask<Void, Void, PointModel> {
         Request request = new Request.Builder().url(url).build();
         final int mainGroupId = context.getSharedPreferences("UserInfo", 0).getInt("UserGroup", 0);
         PointModel result = new PointModel(0, null, 0);
-        final ArrayList<RaitingModel> models = new ArrayList<>();
+        final ArrayList<RatingModel> models = new ArrayList<>();
         try {
             Response response = client.newCall(request).execute();
             JSONObject reply = new JSONObject(response.body().string());
@@ -87,7 +87,7 @@ public class GetRaitingFileListTask extends AsyncTask<Void, Void, PointModel> {
                     }
                     points.add(model);
                 }
-                final RaitingModel model = new RaitingModel(points, ESTIMATION_POINT_NAME, ESTIMATION_POINT_NUMBER);
+                final RatingModel model = new RatingModel(points, ESTIMATION_POINT_NAME, ESTIMATION_POINT_NUMBER);
                 models.add(model);
             }
             context.getSharedPreferences("settings", 0).edit().putString("raiting_last_refresh", modified).apply();

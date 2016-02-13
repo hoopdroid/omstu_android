@@ -1,6 +1,7 @@
 package savindev.myuniversity.notes;
 
 
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.schedule.ScheduleModel;
+import savindev.myuniversity.serverTasks.Schedule;
 
 /**
  * Фрагмент для отображения заметок
@@ -52,12 +55,17 @@ public class NotesFragment extends Fragment {
         coordinatorLayout = (CoordinatorLayout)view.findViewById(R.id.coordinatorLayout);
         MainActivity.fab.show();
 
-        Bundle arg = getActivity().getIntent().getExtras();
+        Intent arg = getActivity().getIntent();
         scheduleId=0;
         date = "";
+        ScheduleModel scheduleModel;
         if(arg!=null){
-            scheduleId = arg.getInt("scheduleId",0);
-            date = arg.getString("date","");}
+            scheduleModel = arg.getParcelableExtra("schedulemodel");
+            if(scheduleModel!=null){
+            scheduleId = scheduleModel.getPairs().get(0).getIdSchedule();
+            date = scheduleModel.getDate();
+            }
+        }
         emptyNotesLayout = (RelativeLayout)view.findViewById(R.id.no_notes);
         SwipeMenuCreator creator = new SwipeMenuCreator() {
 

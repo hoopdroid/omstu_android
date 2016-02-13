@@ -41,6 +41,7 @@ public class WelcomeFragment extends Fragment {
                 .withProvider(WelcomeCardProvider.class)
                 .setTitle("Данный раздел в разработке!")
                 .setTitleColor(Color.WHITE)
+                .setDividerColor(Color.WHITE)
                 .setDescription("Мы уже работаем над этим")
                 .setDescriptionColor(Color.WHITE)
                 .setSubtitleColor(Color.WHITE)

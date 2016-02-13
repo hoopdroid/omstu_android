@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.SchedulesHelper;
 import savindev.myuniversity.schedule.GroupsModel;
 import savindev.myuniversity.serverTasks.GetScheduleTask;
 import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
@@ -173,9 +174,9 @@ public class GroupsFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (!deleteList.isEmpty()) { //Если есть группы для удаления - удалить
                     for (GroupsModel model : deleteList) {
                         if (model.isGroup())
-                            DBHelper.SchedulesHelper.deleteGroupSchedule(getActivity().getBaseContext(), model.getId());
+                            SchedulesHelper.deleteGroupSchedule(getActivity().getBaseContext(), model.getId());
                         else
-                            DBHelper.SchedulesHelper.deleteTeacherchedule(getActivity().getBaseContext(), model.getId());
+                            SchedulesHelper.deleteTeacherchedule(getActivity().getBaseContext(), model.getId());
                     }
                 }
                 adapter.deleteLists(); //Подчистить на случай повторного сохранения

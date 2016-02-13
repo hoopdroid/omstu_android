@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static NavigatorLibrary naviMain = null;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +74,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setContentView(R.layout.activity_main);
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
-
+                initSheetView();
+                fab.hide();
+//                materialSheetFab.hideSheet();
                 naviMain = new NavigatorLibrary(this, this, this);
             }
 
@@ -86,24 +89,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             getUserSettings();
             initDrawer();
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
-            fab = (Fab) findViewById(R.id.fab);
-            fab.hide();
-            View sheetView = findViewById(R.id.fab_sheet);
-            View overlay = findViewById(R.id.overlay);
-            int sheetColor = getResources().getColor(R.color.md_white_1000);
-            int fabColor = getResources().getColor(R.color.accent);
-
-            noteAdd = (TextView) findViewById(R.id.fab_sheet_item_note);
-            homeworkAdd = (TextView) findViewById(R.id.fab_sheet_item_homework);
-            reminderAdd = (TextView) findViewById(R.id.fab_sheet_item_reminder);
-            noteAdd.setOnClickListener(this);
-            homeworkAdd.setOnClickListener(this);
-            reminderAdd.setOnClickListener(this);
-            materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
-                    sheetColor, fabColor);
+            initSheetView();
 
             naviMain = new NavigatorLibrary(this, this, this);
         }
+    }
+
+    private void initSheetView() {
+        fab = (Fab) findViewById(R.id.fab);
+        fab.hide();
+        View sheetView = findViewById(R.id.fab_sheet);
+        View overlay = findViewById(R.id.overlay);
+        int sheetColor = getResources().getColor(R.color.md_white_1000);
+        int fabColor = getResources().getColor(R.color.accent);
+
+        noteAdd = (TextView) findViewById(R.id.fab_sheet_item_note);
+        homeworkAdd = (TextView) findViewById(R.id.fab_sheet_item_homework);
+        reminderAdd = (TextView) findViewById(R.id.fab_sheet_item_reminder);
+        noteAdd.setOnClickListener(this);
+        homeworkAdd.setOnClickListener(this);
+        reminderAdd.setOnClickListener(this);
+        materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
+                sheetColor, fabColor);
     }
 
     public static Drawer getDrawer() {
@@ -161,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
                             startActivity(i);
-
                             return false;
                         }
                     })
@@ -214,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             case 6:
                                 addfragment(R.string.drawer_performance, new PerformanceFragment());
                                 break;
-                            case 7:
+                            case 8:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
                         }

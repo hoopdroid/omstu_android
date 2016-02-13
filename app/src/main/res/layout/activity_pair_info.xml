@@ -75,6 +75,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Button"
                         android:text="Найти на карте"
+                        android:visibility="gone"
                         android:id="@+id/btnSearchOnMap"
                         />
 

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.UsedSchedulesHelper;
 import savindev.myuniversity.schedule.GroupsModel;
 
 /**
@@ -150,12 +151,12 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
 
     private void addToScheduleList(String lastRefresh) { //Внос в список используемых расписаний
         for (GroupsModel model : params) {
-            if (DBHelper.UsedSchedulesHelper.getGroupsModelList(context).contains(model) ||
-                    DBHelper.UsedSchedulesHelper.getMainGroupModel(context) != null &&
-                            DBHelper.UsedSchedulesHelper.getMainGroupModel(context).equals(model)) { //Если уже имеется - обновить дату
-                DBHelper.UsedSchedulesHelper.updateRefreshDate(context, model.getId(), model.isGroup(), lastRefresh);
+            if (UsedSchedulesHelper.getGroupsModelList(context).contains(model) ||
+                    UsedSchedulesHelper.getMainGroupModel(context) != null &&
+                            UsedSchedulesHelper.getMainGroupModel(context).equals(model)) { //Если уже имеется - обновить дату
+                UsedSchedulesHelper.updateRefreshDate(context, model.getId(), model.isGroup(), lastRefresh);
             } else { //Не имеется, добавить
-                DBHelper.UsedSchedulesHelper.setUsedSchedule(context, model.getId(), model.isGroup(), false, lastRefresh);
+                UsedSchedulesHelper.setUsedSchedule(context, model.getId(), model.isGroup(), false, lastRefresh);
             }
         }
     }

@@ -90,6 +90,7 @@ public class AttachNoteFragment extends Fragment {
         Log.d("NOTE NAME",noteName);
         noteText = textNote.getText().toString();
         String pairId = Integer.toString(AttachActivity.scheduleId)+AttachActivity.date;
+        int a =5;
         //TODO null for int = -1 ? =-)
         return new NoteModel(noteName, "username",0,
                Priority.fromInt(priority.getSelectedItemPosition()),null,

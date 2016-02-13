@@ -38,7 +38,7 @@ public class NewsFragment extends Fragment {
         webview = (WebView) view.findViewById(R.id.webView);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
-        webview.setBackgroundColor(0x00000000);
+        //webview.setBackgroundColor(0x00000000);
         webview = (WebView) view.findViewById(R.id.webView);
 
         WebSettings websettings = webview.getSettings();
@@ -52,7 +52,7 @@ public class NewsFragment extends Fragment {
         webview.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
         webview.setBackgroundColor(128);
         webview.setPadding(0, 0, 0, 0);
-        webview.setInitialScale(getScale());
+        //webview.setInitialScale(getScale());
 
         webview.setWebViewClient(new NewWebViewClient());
 

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.UsedSchedulesHelper;
 import savindev.myuniversity.schedule.GroupsModel;
 
 public class ExpListAdapter extends BaseExpandableListAdapter implements Filterable {
@@ -49,8 +49,8 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
         mFab = fab;
 
         //Для выделения элементов, сохранных в расписании ранее
-        ArrayList<GroupsModel> oldListModel = DBHelper.UsedSchedulesHelper.getGroupsModelList(context); //Список старых групп
-        main = DBHelper.UsedSchedulesHelper.getMainGroupModel(context); //Основная группа, чтобы ее не добавлять и не удалять
+        ArrayList<GroupsModel> oldListModel = UsedSchedulesHelper.getGroupsModelList(context); //Список старых групп
+        main = UsedSchedulesHelper.getMainGroupModel(context); //Основная группа, чтобы ее не добавлять и не удалять
         ArrayList<Integer> oldlistId = new ArrayList<>(); //Два листа для уникальности: требуется сравнить все поля по и id idGroup
         ArrayList<Boolean> oldlist = new ArrayList<>();
         for (GroupsModel model : oldListModel) {

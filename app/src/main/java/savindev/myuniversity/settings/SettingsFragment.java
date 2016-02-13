@@ -26,8 +26,8 @@ import java.util.concurrent.TimeoutException;
 
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
-import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.db.DBRequest;
+import savindev.myuniversity.db.UsedSchedulesHelper;
 import savindev.myuniversity.serverTasks.GetUniversityInfoTask;
 import savindev.myuniversity.welcomescreen.FirstStartActivity;
 
@@ -173,7 +173,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void deleteUserPreferences(){
-        DBHelper.UsedSchedulesHelper.deleteMainSchedule(getActivity());
+        UsedSchedulesHelper.deleteMainSchedule(getActivity());
         SharedPreferences.Editor editor = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE).edit();
         editor.remove("UserLastName");
         editor.remove("UserFirstName");

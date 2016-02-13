@@ -16,6 +16,7 @@ import java.util.GregorianCalendar;
 import java.util.TreeMap;
 
 import savindev.myuniversity.db.DBHelper;
+import savindev.myuniversity.db.SchedulesHelper;
 
 /**
  * Реализует подгрузку данных при достижении конца списка в расписании
@@ -63,7 +64,7 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
                 day = "0" + day;
             if (month.length() < 2)
                 month = "0" + month;
-            daySchedule = DBHelper.SchedulesHelper.getSchedules(context, "" + calendar.get(Calendar.YEAR) + month + day,
+            daySchedule = SchedulesHelper.getSchedules(context, "" + calendar.get(Calendar.YEAR) + month + day,
                     currentID, isGroup);  //Получение расписания на день
             if (daySchedule == null)
                 return positions;   //null - семестр уже закончился
