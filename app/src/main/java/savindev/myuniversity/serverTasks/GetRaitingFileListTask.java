@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.performance.PointModel;
 import savindev.myuniversity.performance.RatingModel;
 
@@ -90,8 +91,8 @@ public class GetRaitingFileListTask extends AsyncTask<Void, Void, PointModel> {
                 final RatingModel model = new RatingModel(points, ESTIMATION_POINT_NAME, ESTIMATION_POINT_NUMBER);
                 models.add(model);
             }
+            DBHelper.getInstance(context).getRatingHelper().setRatingModels(context, models);
             context.getSharedPreferences("settings", 0).edit().putString("raiting_last_refresh", modified).apply();
-            //TODO DBHelper.RaitingHelper.setRaitingModels(models);
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }

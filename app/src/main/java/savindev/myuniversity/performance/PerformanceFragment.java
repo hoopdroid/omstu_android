@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import co.mobiwise.library.ProgressLayout;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
+import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.serverTasks.DownloadFileTask;
 import savindev.myuniversity.serverTasks.GetRaitingFileListTask;
 
@@ -42,7 +43,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         models = new ArrayList<>();
-        //TODO final ArrayList<RaitingModel> models = DBHelper.RaitingHelper.getRaitingModels();
+        ArrayList<RatingModel> models = DBHelper.getInstance(getActivity()).getRatingHelper().getRatingModels(getActivity(), 0);
         if (models.isEmpty())
             if (MainActivity.isNetworkConnected(getActivity())) {
                 grflt = new GetRaitingFileListTask(getActivity(), mSwipeRefreshLayout);
@@ -113,8 +114,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
         if (models.isEmpty())
             try {
                 main = grflt.get();
-                models = new ArrayList<>();
-                //TODO DBHelper.RaitingHelper.getRaitingModels();
+                models = DBHelper.getInstance(getActivity()).getRatingHelper().getRatingModels(getActivity(), 0);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }

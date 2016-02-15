@@ -4,8 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import savindev.myuniversity.performance.RatingModel;
-
 /**
  * Класс для работы с SQlite базой данных.
  */
@@ -132,6 +130,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public NotesHelper getNotesHelper() {
         return notesHelper;
+    }
+
+    public RatingHelper getRatingHelper() {
+        return ratingHelper;
     }
 
 

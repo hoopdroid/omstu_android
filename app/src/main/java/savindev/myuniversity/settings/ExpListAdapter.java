@@ -152,10 +152,10 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
             public void onClick(View view) {
                 //Если расписание файлом - скачать файл
                 if (mGroup.get(groupPosition).get(childPosition).isFileSchedule()) { //Расписание в файле. сразу предложить скачать
-                    Intent i = new Intent(Intent.ACTION_VIEW);
                     String url = mContext.getResources().getString(R.string.uri) + "getScheduleFile?idGroup=" +
                             mGroup.get(groupPosition).get(childPosition).getId();
-                    i.setData(Uri.parse(url));
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(i);
                     return;
                 }
@@ -176,15 +176,12 @@ public class ExpListAdapter extends BaseExpandableListAdapter implements Filtera
                         deleteGroup(mGroup.get(groupPosition).get(childPosition));
                     }
                 }
-                boolean ae = addList.isEmpty();
-                boolean de = deleteList.isEmpty();
-                boolean f = mFab.isVisible();
-                if (ae && de && f) { //Скрыть, если изменений нет, а кнопка видна
+                if (addList.isEmpty() && deleteList.isEmpty() && mFab.isVisible()) { //Скрыть, если изменений нет, а кнопка видна
                     mFab.hide();
                 }
-                if ((!ae ||
-                        !de)
-                        && !f) {//Показать, если изменения есть, а кнопки не видно
+                if ((!addList.isEmpty() ||
+                        !deleteList.isEmpty())
+                        && !mFab.isVisible()) {//Показать, если изменения есть, а кнопки не видно
                     mFab.show();
                 }
             }
