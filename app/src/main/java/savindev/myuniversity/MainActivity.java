@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NavigatorLibrary.NavigatorMainEvents{
 
     public static MainActivity mainActivity;
-
     public static Toolbar toolbar;
     public static Fab fab;
     private TextView noteAdd;
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MaterialSheetFab materialSheetFab;
     static  Drawer result;
 
-    public static NavigatorLibrary naviMain = null;
+  //  public static NavigatorLibrary naviMain = null;
 
 
     @Override
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 initSheetView();
                 fab.hide();
 //                materialSheetFab.hideSheet();
-                naviMain = new NavigatorLibrary(this, this, this);
+               // naviMain = new NavigatorLibrary(this, this, this);
             }
 
         } else {
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
             initSheetView();
 
-            naviMain = new NavigatorLibrary(this, this, this);
+            //naviMain = new NavigatorLibrary(this, this, this);
         }
     }
 
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_note).withSelectedIcon(R.drawable.ic_notes_select);
         PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_library_books).withSelectedIcon(R.drawable.ic_news_select);
         PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
-        PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
+        //PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings_box).withSelectedIcon(R.drawable.ic_settings_select);
 
         AccountHeader headerResult;
@@ -185,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         itemNotes,
                         itemNews,
                         itemEducation,
-                        itemPerformance,
+                        //itemPerformance,
                         new DividerDrawerItem(),
                         itemSettings
 
@@ -202,8 +201,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     addfragment(R.string.drawer_schedule, new CalendarScheduleFragment());
                                 break;
                             case 2:
-                                naviMain.onNavigationItemSelected(2);
-                                naviMain.onNavigationItemSelected(5);
+                               // naviMain.onNavigationItemSelected(2);
+                               // naviMain.onNavigationItemSelected(5);
                                 fab.hide();
                                 break;
                             case 3:
@@ -220,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             case 6:
                                 addfragment(R.string.drawer_performance, new PerformanceFragment());
                                 break;
-                            case 8:
+                            case 7:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
                         }

@@ -8,9 +8,11 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import savindev.myuniversity.notes.NoteModel;
 import savindev.myuniversity.notes.Priority;
+import savindev.myuniversity.performance.PointModel;
 import savindev.myuniversity.performance.RatingModel;
 import savindev.myuniversity.serverTasks.UniversityInfo;
 
@@ -18,7 +20,6 @@ import savindev.myuniversity.serverTasks.UniversityInfo;
  * Класс для работы с рейтингом из базы данных
  */
 public class RatingHelper {
-
 
     protected static final String TABLE_NAME = "Rating";
     protected static final String COL_ID_GROUP = "group_id";
@@ -73,9 +74,10 @@ public class RatingHelper {
         sqliteDatabase.close();
     }
 
-    public ArrayList<RatingModel> getRatingModels(Context context,int scheduleId) {
+    public ArrayList<RatingModel> getRatingModels() {
 
         ArrayList<RatingModel> ratingModelArrayList = new ArrayList<>();
+        ArrayList<PointModel> pointModelList = new ArrayList<>();
 
         SQLiteDatabase db;
 
@@ -83,14 +85,25 @@ public class RatingHelper {
 
         Cursor cursor;
         try {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID_GROUP+ " = " + scheduleId, null);
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
 
-                //TODO Do it tomorrow
+                PointModel pointModel = new PointModel(
+                        cursor.getInt(cursor.getColumnIndex(COL_ID_GROUP)),
+                        cursor.getString(cursor.getColumnIndex(COL_NAME)),
+                        cursor.getInt(cursor.getColumnIndex(COL_ID_PROGRESS_RATING_FILE))
+                );
+                pointModelList.add(pointModel);
 
+                RatingModel ratingModel = new RatingModel(
+                        pointModelList,
+                        cursor.getString(cursor.getColumnIndex(COL_ESTIMATION_POINT_NAME)),
+                        cursor.getInt(cursor.getColumnIndex(COL_ESTIMATION_POINT_NUMBER))
+                );
 
+                ratingModelArrayList.add(ratingModel);
                 cursor.moveToNext();
             }
             cursor.close();

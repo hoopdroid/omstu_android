@@ -43,7 +43,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         models = new ArrayList<>();
-        ArrayList<RatingModel> models = DBHelper.getInstance(getActivity()).getRatingHelper().getRatingModels(getActivity(), 0);
+        ArrayList<RatingModel> models = DBHelper.getInstance(getActivity()).getRatingHelper().getRatingModels();
         if (models.isEmpty())
             if (MainActivity.isNetworkConnected(getActivity())) {
                 grflt = new GetRaitingFileListTask(getActivity(), mSwipeRefreshLayout);
@@ -114,7 +114,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
         if (models.isEmpty())
             try {
                 main = grflt.get();
-                models = DBHelper.getInstance(getActivity()).getRatingHelper().getRatingModels(getActivity(), 0);
+                models = DBHelper.getInstance(getActivity()).getRatingHelper().getRatingModels();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -161,7 +161,8 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
         @Override
         public void onReceive(Context context, Intent intent) {
             models = new ArrayList<>();
-            //TODO DBHelper.RaitingHelper.getRaitingModels();
+            DBHelper dbHelper = DBHelper.getInstance(getActivity());
+            models = dbHelper.getRatingHelper().getRatingModels();
             adapter.notifyDataSetChanged();
         }
     };
