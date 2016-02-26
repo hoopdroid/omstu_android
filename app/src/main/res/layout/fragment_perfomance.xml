@@ -9,34 +9,26 @@
         android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <co.mobiwise.library.ProgressLayout
-            android:id="@+id/progressLayout"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_centerVertical="true"
-            app:autoProgress="true"
-            app:emptyColor="#152430"
-            android:visibility="gone"
-            app:maxProgress="100">
+            android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/checkbox_off_background" />
+        <!--<co.mobiwise.library.ProgressLayout-->
+        <!--android:id="@+id/progressLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="100dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--app:autoProgress="true"-->
+        <!--app:emptyColor="#152430"-->
+        <!--android:visibility="gone"-->
+        <!--app:maxProgress="100">-->
 
-            <Button
-                android:id="@+id/download_my_perf"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Скачать мой рейтинг"
-                android:visibility="gone" />
-
-
-        </co.mobiwise.library.ProgressLayout>
-
+        <!--<ImageView-->
+        <!--android:id="@+id/image"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@android:drawable/checkbox_off_background" />-->
 
         <!--<Button-->
         <!--android:id="@+id/download_my_perf"-->
@@ -46,20 +38,27 @@
         <!--android:text="Скачать мой рейтинг"-->
         <!--android:visibility="gone" />-->
 
-        <!--<ProgressBar-->
-        <!--android:id="@+id/progress"-->
-        <!--style="?android:attr/progressBarStyleHorizontal"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:minWidth="200dp"-->
-        <!--android:visibility="gone" />-->
+
+        <!--</co.mobiwise.library.ProgressLayout>-->
+
+
+        <Button
+            android:id="@+id/download_my_perf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Скачать мой рейтинг"
+            android:visibility="gone" />
+
 
         <ExpandableListView
             android:id="@+id/perfomance"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+        </LinearLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>
+
+
 
 </LinearLayout>

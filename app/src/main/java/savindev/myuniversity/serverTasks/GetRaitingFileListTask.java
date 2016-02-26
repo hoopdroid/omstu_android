@@ -30,6 +30,7 @@ import savindev.myuniversity.performance.RatingModel;
 public class GetRaitingFileListTask extends AsyncTask<Void, Void, PointModel> {
     private Context context;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private int errorCode = 0;
 
     public GetRaitingFileListTask(Context context, SwipeRefreshLayout mSwipeRefreshLayout) {
         super();
@@ -70,6 +71,10 @@ public class GetRaitingFileListTask extends AsyncTask<Void, Void, PointModel> {
                 }
             }
 
+            if (reply.getString("STATE").equals("NOT_FOUND")) {
+                errorCode = 1;
+                return null;
+            }
             JSONArray array = reply.getJSONArray("CONTENT");
             for (int index = 0; index < array.length(); index++) {
                 JSONObject object = array.getJSONObject(index);
@@ -95,6 +100,7 @@ public class GetRaitingFileListTask extends AsyncTask<Void, Void, PointModel> {
             context.getSharedPreferences("settings", 0).edit().putString("raiting_last_refresh", modified).apply();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+            return null;
         }
         return result;
     }
@@ -107,6 +113,9 @@ public class GetRaitingFileListTask extends AsyncTask<Void, Void, PointModel> {
         if (data != null) { //Имеется новое содержимое, обновить данные
             Toast.makeText(context, "Файлы рейтинга обновлены!", Toast.LENGTH_LONG).show();
             context.sendBroadcast(new Intent("FINISH_UPDATE")); //Отправить запрос на обновление
+        } else if (errorCode == 1) {
+            Toast.makeText(context, "Данные отсутствуют", Toast.LENGTH_LONG).show();
+            context.sendBroadcast(new Intent("NOT_FOUND"));
         } else
             Toast.makeText(context, "Не удалось получить расписание" + '\n'
                     + "Проверьте соединение с сервером", Toast.LENGTH_LONG).show();

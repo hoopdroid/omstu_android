@@ -52,8 +52,7 @@ public class DownloadFileTask extends AsyncTask<Void, String, Boolean> {
     @Override
     protected Boolean doInBackground(Void[] params) {
         final int TIMEOUT_MILLISEC = 5000;
-        String url;
-        url = context.getResources().getString(R.string.uri) + "getRaitingFile?idProgressRaitingFile=" +
+        String url = context.getResources().getString(R.string.uri) + "getRaitingFile?idProgressRaitingFile=" +
                 model.getID_PROGRESS_RAITNG_FILE();
         FileOutputStream f = null;
         try {

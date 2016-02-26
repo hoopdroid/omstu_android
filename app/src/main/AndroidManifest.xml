@@ -46,6 +46,9 @@
             android:name=".settings.AboutActivity"
             android:theme="@style/AppTheme.Common" />
         <activity
+            android:name=".settings.UpdateActivity"
+            android:theme="@style/AppTheme.Common" />
+        <activity
             android:name=".notes.AttachActivity"
             android:label="@string/title_activity_attach"
             android:theme="@style/AppTheme.Common" />

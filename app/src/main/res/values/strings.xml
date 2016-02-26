@@ -56,6 +56,7 @@
         <item>Отображаемые расписания</item>
         <item>Внешний вид</item>
         <item>Авторизация в системе</item>
+        <item>Обновление данных</item>
         <item>О приложении</item>
     </string-array>
     <string name="title_activity_profile">ProfileActivity</string>

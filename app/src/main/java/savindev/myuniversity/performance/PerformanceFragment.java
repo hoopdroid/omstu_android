@@ -43,7 +43,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         models = new ArrayList<>();
-        ArrayList<RatingModel> models = DBHelper.getInstance(getActivity()).getRatingHelper().getRatingModels();
+        models = DBHelper.getInstance(getActivity()).getRatingHelper().getRatingModels();
         if (models.isEmpty())
             if (MainActivity.isNetworkConnected(getActivity())) {
                 grflt = new GetRaitingFileListTask(getActivity(), mSwipeRefreshLayout);
@@ -97,13 +97,7 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
 //        downloadList.start();
 
         View view = inflater.inflate(R.layout.fragment_perfomance, container, false);
-        SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        if (userInfo.contains("UserGroup")) {//Если есть группа пользователя в настройках, дать возможность на скачивание личного расписания
-            pl = (ProgressLayout) view.findViewById(R.id.progressLayout);
-            download = (Button) view.findViewById(R.id.download_my_perf);
-            pl.setVisibility(View.VISIBLE);
-            download.setOnClickListener(this);
-        }
+        download = (Button) view.findViewById(R.id.download_my_perf);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
@@ -130,18 +124,26 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
         performance.setAdapter(adapter);
 
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("FINISH_UPDATE"));
+        getActivity().registerReceiver(broadcastReceiverNotFound, new IntentFilter("NOT_FOUND"));
         return view;
     }
 
     private void setMainGroup() {
-        final int mainGroupId = getActivity().getSharedPreferences("UserInfo", 0).getInt("UserGroup", 0);
-        forbr:
-        for (RatingModel model : models)
-            for (PointModel pModel : model.getPoints())
-                if (pModel.getIdGroup() == mainGroupId) {
-                    main = pModel;
-                    break forbr;
-                }
+        SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        if (userInfo.contains("UserGroup")) {//Если есть группа пользователя в настройках, дать возможность на скачивание личного расписания
+//            pl = (ProgressLayout) view.findViewById(R.id.progressLayout);
+            final int mainGroupId = getActivity().getSharedPreferences("UserInfo", 0).getInt("UserGroup", 0);
+            forbr:
+            for (RatingModel model : models)
+                for (PointModel pModel : model.getPoints())
+                    if (pModel.getIdGroup() == mainGroupId) {
+                        main = pModel;
+                        download.setVisibility(View.VISIBLE);
+//            pl.setVisibility(View.VISIBLE);
+                        download.setOnClickListener(this);
+                        break forbr;
+                    }
+        }
     }
 
     private void download() {
@@ -164,6 +166,13 @@ public class PerformanceFragment extends Fragment implements View.OnClickListene
             DBHelper dbHelper = DBHelper.getInstance(getActivity());
             models = dbHelper.getRatingHelper().getRatingModels();
             adapter.notifyDataSetChanged();
+        }
+    };
+
+    BroadcastReceiver broadcastReceiverNotFound = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            getActivity().getFragmentManager().popBackStack();
         }
     };
 

@@ -60,37 +60,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
+        if (savedInstanceState == null ) {
+            Fabric.with(this, new Crashlytics());
 
-        mainActivity = this;
-        SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        if (settings.getBoolean("isFirstStart", true)) {
-            if (isNetworkConnected(getApplication())) {
-                Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
-                this.finish();
-                startActivity(intent);
-            } else {
-                setContentView(R.layout.activity_main);
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
-                initSheetView();
-                fab.hide();
+            mainActivity = this;
+            SharedPreferences settings = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+            if (settings.getBoolean("isFirstStart", true)) {
+                if (isNetworkConnected(getApplication())) {
+                    Intent intent = new Intent(getApplicationContext(), FirstStartActivity.class);
+                    this.finish();
+                    startActivity(intent);
+                } else {
+                    setContentView(R.layout.activity_main);
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.content_main, new NotInternetFragment()).commit();
+                    initSheetView();
+                    fab.hide();
 //                materialSheetFab.hideSheet();
-               // naviMain = new NavigatorLibrary(this, this, this);
+                    // naviMain = new NavigatorLibrary(this, this, this);
+                }
+
+            } else {
+
+                setContentView(R.layout.activity_main);
+                toolbar = (Toolbar) findViewById(R.id.toolbar);
+                setSupportActionBar(toolbar);
+                toolbar.setTitle("");
+                getUserSettings();
+                initDrawer();
+                toolbar.setTitle(R.string.drawer_schedule);
+//                getSupportFragmentManager().beginTransaction()
+//                        .add(R.id.content_main, new DailyScheduleFragment()).addToBackStack(null).commit();
+                if (getSharedPreferences("settings", 0).getString("lastOpenSchedule", "list").equals("list"))
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.content_main, new DailyScheduleFragment()).commit();
+                else
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.content_main, new CalendarScheduleFragment()).commit();
+                initSheetView();
+
+                //naviMain = new NavigatorLibrary(this, this, this);
             }
-
-        } else {
-
-            setContentView(R.layout.activity_main);
-            toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            toolbar.setTitle("");
-            getUserSettings();
-            initDrawer();
-            addfragment(R.string.drawer_schedule, new DailyScheduleFragment());
-            initSheetView();
-
-            //naviMain = new NavigatorLibrary(this, this, this);
         }
     }
 
@@ -129,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PrimaryDrawerItem itemNotes = new PrimaryDrawerItem().withName(R.string.drawer_notes).withIcon(R.drawable.ic_note).withSelectedIcon(R.drawable.ic_notes_select);
         PrimaryDrawerItem itemNews = new PrimaryDrawerItem().withName(R.string.drawer_news).withIcon(R.drawable.ic_library_books).withSelectedIcon(R.drawable.ic_news_select);
         PrimaryDrawerItem itemEducation = new PrimaryDrawerItem().withName(R.string.drawer_education).withIcon(R.drawable.ic_school).withSelectedIcon(R.drawable.ic_school_select);
-        //PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
+        PrimaryDrawerItem itemPerformance = new PrimaryDrawerItem().withName(R.string.drawer_performance).withIcon(R.drawable.ic_chart_line).withSelectedIcon(R.drawable.ic_chart_line_select);
         SecondaryDrawerItem itemSettings = new SecondaryDrawerItem().withName(R.string.drawer_settings).withIcon(R.drawable.ic_settings_box).withSelectedIcon(R.drawable.ic_settings_select);
 
         AccountHeader headerResult;
@@ -184,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         itemNotes,
                         itemNews,
                         itemEducation,
-                        //itemPerformance,
+                        itemPerformance,
                         new DividerDrawerItem(),
                         itemSettings
 
@@ -208,20 +218,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             case 3:
                                 addfragment(R.string.drawer_notes, new NotesFragment());
                                 break;
-
                             case 4:
                                 addfragment(R.string.drawer_news, new NewsFragment());
                                 break;
                             case 5:
                                 addfragment(R.string.drawer_education, new WelcomeFragment());
                                 break;
-
                             case 6:
                                 addfragment(R.string.drawer_performance, new PerformanceFragment());
                                 break;
-                            case 7:
+                            case 8:
                                 addfragment(R.string.drawer_settings, new SettingsFragment());
                                 break;
+
                         }
                         return false;
                     }
@@ -299,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.remove("UserGroup");
         editor.remove("email");
         editor.remove("password");
-        editor.remove("UserId").commit();
+        editor.remove("UserId").apply();
     }
 
 
