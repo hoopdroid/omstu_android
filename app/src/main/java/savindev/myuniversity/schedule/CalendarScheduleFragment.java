@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +14,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -81,7 +83,11 @@ public class CalendarScheduleFragment extends AbstractSchedule {
                     settings.getBoolean("full_vertical", false) ||
                     getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
                             settings.getBoolean("full_horisontal", true));
-            textSize = getActivity().getResources().getDisplayMetrics().widthPixels / 96;
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int width = size.x;
+            textSize = (float) (width/168 + 36/7);
             if (!fullText)
                 textSize += 2;
 

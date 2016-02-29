@@ -35,7 +35,7 @@ public class VitalizationFragment extends Fragment {
 
         sPref = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
         vertical.setChecked(sPref.getBoolean("full_vertical", false));
-        horisontal.setChecked(sPref.getBoolean("full_horisontal", false));
+        horisontal.setChecked(sPref.getBoolean("full_horisontal", true));
         switch (sPref.getString("calendar", "CALENDAR_NOT_ALLOCATED")) {
             case "CALENDAR_BY_TYPE":
                 calendarByType.setChecked(true);

@@ -136,11 +136,41 @@ public class LoadMoreTask extends AsyncTask<Integer, Void, TreeMap<GregorianCale
 
         //Добавить дату
         pairs.add(0, new ScheduleModel(CellType.DAY, day()));
-        pairs.add(new ScheduleModel(CellType.DATE, calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH) + 1)));
+        pairs.add(new ScheduleModel(CellType.DATE, calendar.get(Calendar.DAY_OF_MONTH) + " " + month(calendar.get(Calendar.MONTH))));
 
         //Добавить месяц
         if (oldMonth != calendar.get(Calendar.MONTH)) //смена месяца
             pairs.add(0, new ScheduleModel(CellType.MONTH, calendar.get(Calendar.MONTH) + ""));
+    }
+
+    private String month(int date) {
+        switch (date) {
+            case 0:
+                return "янв.";
+            case 1:
+                return "февр.";
+            case 2:
+                return "марта";
+            case 3:
+                return "апр.";
+            case 4:
+                return "мая";
+            case 5:
+                return "июня";
+            case 6:
+                return "июля";
+            case 7:
+                return "авг.";
+            case 8:
+                return "сент.";
+            case 9:
+                return "окт.";
+            case 10:
+                return "нояб.";
+            case 11:
+                return "дек.";
+        }
+        return null;
     }
 
     private String day() { //По календарю отдает день недели

@@ -142,19 +142,19 @@ public class SettingsFragment extends Fragment {
                         startActivity(authIntent);
                         MainActivity.mainActivity.finish();//убиваем instance активит
                         break;
-                    case 3: //Настройки обновлений
-                        settings.getChildAt(lastPosition).setBackgroundColor(Color.argb(1,1,1,1));
-                        lastPosition = position;
-                        if (getResources().getConfiguration().orientation ==
-                                Configuration.ORIENTATION_PORTRAIT) {
-                            Intent intent = new Intent(getActivity(), AboutActivity.class);
-                            startActivity(intent);
-                        } else {
-                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
-                            getFragmentManager().beginTransaction().replace(R.id.frgmCont, new AboutFragment()).commit();
-                        }
-                        break;
-                    case 4://О приложении
+//                    case 3: //Настройки обновлений
+//                        settings.getChildAt(lastPosition).setBackgroundColor(Color.argb(1,1,1,1));
+//                        lastPosition = position;
+//                        if (getResources().getConfiguration().orientation ==
+//                                Configuration.ORIENTATION_PORTRAIT) {
+//                            Intent intent = new Intent(getActivity(), AboutActivity.class);
+//                            startActivity(intent);
+//                        } else {
+//                            settings.getChildAt(position).setBackgroundColor(getActivity().getResources().getColor(R.color.primary));
+//                            getFragmentManager().beginTransaction().replace(R.id.frgmCont, new AboutFragment()).commit();
+//                        }
+//                        break;
+                    case 3://О приложении
                         settings.getChildAt(lastPosition).setBackgroundColor(Color.argb(1,1,1,1));
                         lastPosition = position;
                         if (getResources().getConfiguration().orientation ==
