@@ -18,7 +18,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import savindev.myuniversity.schedule.DateUtil;
-import savindev.myuniversity.schedule.ScheduleModel;
 import savindev.myuniversity.serverTasks.Schedule;
 
 /**
@@ -57,7 +56,7 @@ public class SchedulesHelper {
     }
 
     public String dateFormat(ArrayList<Schedule> schedule, int index) {
-        String dt = schedule.get(0).SCHEDULE_FIRST_DATE;
+        String dt = schedule.get(0).getSCHEDULE_FIRST_DATE();
         Log.d("BEFORE", dt);// Start date
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         Calendar c = Calendar.getInstance();
@@ -66,7 +65,7 @@ public class SchedulesHelper {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        c.add(Calendar.DATE, schedule.get(index).SCHEDULE_INTERVAL);  // number of days to add
+        c.add(Calendar.DATE, schedule.get(index).getSCHEDULE_INTERVAL());  // number of days to add
         dt = sdf.format(c.getTime());  // dt is now the new date
         Log.d("AFTER", dt);
         return dt;
@@ -156,31 +155,31 @@ public class SchedulesHelper {
         SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
 
         for (int index = 0; index < schedule.size(); index++) {
-            if (!schedule.get(index).IS_DELETED) {
+            if (!schedule.get(index).getIS_DELETED()) {
 
                 try {
                     firstPair = true;
-                    previousValue = schedule.get(index).SCHEDULE_FIRST_DATE;
-                    beginDate = format.parse(schedule.get(index).SCHEDULE_FIRST_DATE);//дата начала пары
+                    previousValue = schedule.get(index).getSCHEDULE_FIRST_DATE();
+                    beginDate = format.parse(schedule.get(index).getSCHEDULE_FIRST_DATE());//дата начала пары
                     endDate = format.parse(DateUtil.formatStandart(helper.getSemestersHelper().getSemesterEndDate(context, previousValue))); //конец семестра
                     int j = 0;
-                    while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).SCHEDULE_INTERVAL > 0 || firstPair)) { // если дата начала пары раньше конца семестра
+                    while (beginDate.compareTo(endDate) <= 0 && (schedule.get(index).getSCHEDULE_INTERVAL() > 0 || firstPair)) { // если дата начала пары раньше конца семестра
 
                         firstPair = false;
 
-                        stmt.bindLong(1, schedule.get(index).ID_SCHEDULE);
-                        stmt.bindLong(2, schedule.get(index).ID_PAIR);
-                        stmt.bindLong(3, schedule.get(index).ID_GROUP);
-                        stmt.bindLong(4, schedule.get(index).ID_TEACHER);
-                        stmt.bindString(5, schedule.get(index).DISCIPLINE_NAME);
-                        stmt.bindString(6, schedule.get(index).DISCIPLINE_TYPE);
+                        stmt.bindLong(1, schedule.get(index).getID_SCHEDULE());
+                        stmt.bindLong(2, schedule.get(index).getID_PAIR());
+                        stmt.bindLong(3, schedule.get(index).getID_GROUP());
+                        stmt.bindLong(4, schedule.get(index).getID_TEACHER());
+                        stmt.bindString(5, schedule.get(index).getDISCIPLINE_NAME());
+                        stmt.bindString(6, schedule.get(index).getDISCIPLINE_TYPE());
                         previousValue = DateUtil.dateFormatIncrease(schedule.get(index), j, previousValue);
                         stmt.bindString(7, previousValue);
-                        stmt.bindLong(8, schedule.get(index).ID_CLASSROOM);
-                        stmt.bindLong(9, schedule.get(index).SUBGROUP_NUMBER);
+                        stmt.bindLong(8, schedule.get(index).getID_CLASSROOM());
+                        stmt.bindLong(9, schedule.get(index).getSUBGROUP_NUMBER());
                         stmt.bindLong(10, 0);
 
-                        if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE, COL_SCHEDULE_DATE, previousValue)) {
+                        if (!DBRequest.checkIsDataAlreadyInDBorNot(context, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).getID_SCHEDULE(), COL_SCHEDULE_DATE, previousValue)) {
                             stmt.execute();
                             stmt.clearBindings();
                         } else break;
@@ -193,7 +192,7 @@ public class SchedulesHelper {
                 }
             }
             else
-                DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).ID_SCHEDULE);
+                DBRequest.delete_byID(sqliteDatabase, TABLE_NAME, COL_SCHEDULE_ID, schedule.get(index).getID_SCHEDULE());
         }
 
         sqliteDatabase.close();

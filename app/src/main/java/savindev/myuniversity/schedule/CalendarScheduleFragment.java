@@ -39,6 +39,7 @@ import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
 import savindev.myuniversity.settings.Colores;
+import savindev.myuniversity.utils.StringUtils;
 
 /**
  * Класс, отображающий расписание на определенный срок в виде сетки с предметами. Имеет различные методы фильтрации предметов
@@ -145,11 +146,26 @@ public class CalendarScheduleFragment extends AbstractSchedule {
         return view;
     }
 
+    private void editdist(ArrayList<String> list) {
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = i+1; j < list.size(); j++) {
+                if (like (list.get(i), list.get(j)))
+                    list.remove(j--);
+            }
+        }
+    }
+
+    private boolean like(String s1, String s2) {
+        double a = StringUtils.INSTANCE.editdist(s1, s2);
+        double b = s2.length();
+        return a / b - 0.35 < 0;
+    }
+
 
     private void initializeFiltersLists() {
         filterType = new ArrayList<>(DBHelper.getInstance(getActivity()).getSchedulesHelper().getGroupLessonsTypes(getActivity(), currentID, isGroup));
         filterName = new ArrayList<>(DBHelper.getInstance(getActivity()).getSchedulesHelper().getGroupLessons(getActivity(), currentID, isGroup));
-
+        editdist(filterName);
         pairNames.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.list_filters, filterName));
         pairTypes.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.list_filters, filterType));
         for (int i = 0; i < filterName.size(); i++) {
@@ -375,7 +391,7 @@ public class CalendarScheduleFragment extends AbstractSchedule {
             {
                 if (chosenName != null)
                     for (int j = 0; j < chosenName.size(); j++) { //Выделено ли такое имя
-                        if (chosenName.valueAt(j) && model.getName().equals(filterName.get(chosenName.keyAt(j)))) {//Если имеется такая запись в выделенных
+                        if (chosenName.valueAt(j) && like(model.getName(), filterName.get(chosenName.keyAt(j)))) {//Если имеется такая запись в выделенных
                             break name;
                         }
                     }

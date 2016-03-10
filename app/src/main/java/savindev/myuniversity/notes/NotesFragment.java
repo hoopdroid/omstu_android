@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import savindev.myuniversity.MainActivity;
 import savindev.myuniversity.R;
 import savindev.myuniversity.db.DBHelper;
-import savindev.myuniversity.schedule.ScheduleModel;
-import savindev.myuniversity.serverTasks.Schedule;
 
 /**
  * Фрагмент для отображения заметок

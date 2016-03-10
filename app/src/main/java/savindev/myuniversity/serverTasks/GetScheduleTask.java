@@ -114,7 +114,7 @@ public class GetScheduleTask extends AsyncTask<GroupsModel, Void, Integer> {
                 ArrayList<Schedule> sched;
                 ArrayList<ScheduleDates> scheddates;
                 try {
-                    sched = Schedule.fromJson(content.getJSONArray("SCHEDULES"));
+                    sched = Schedule.Companion.fromJson(content.getJSONArray("SCHEDULES"));
                     DBHelper dbHelper = DBHelper.getInstance(context);
                     dbHelper.getSchedulesHelper().setSchedule(context, sched);
                 } catch (JSONException e) { //Поле оказалось нулевым?

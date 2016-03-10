@@ -8,7 +8,6 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import savindev.myuniversity.notes.NoteModel;
 import savindev.myuniversity.notes.Priority;
 
 /**

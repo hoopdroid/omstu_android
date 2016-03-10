@@ -20,14 +20,14 @@ public class DateUtil {
         String dt = previousValue;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
         Calendar c = Calendar.getInstance();
-        if(schedule.SCHEDULE_INTERVAL>0){
+        if(schedule.getSCHEDULE_INTERVAL() >0){
         if(index>0){
             try {
                 c.setTime(sdf.parse(dt));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            c.add(Calendar.DATE, schedule.SCHEDULE_INTERVAL);  // number of days to add
+            c.add(Calendar.DATE, schedule.getSCHEDULE_INTERVAL());  // number of days to add
             dt = sdf.format(c.getTime());  // dt is now the new date
             return  dt;}
 

@@ -8,13 +8,9 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import savindev.myuniversity.notes.NoteModel;
-import savindev.myuniversity.notes.Priority;
 import savindev.myuniversity.performance.PointModel;
 import savindev.myuniversity.performance.RatingModel;
-import savindev.myuniversity.serverTasks.UniversityInfo;
 
 /**
  * Класс для работы с рейтингом из базы данных

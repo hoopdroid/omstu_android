@@ -1,17 +1,23 @@
 buildscript {
+    ext.kotlin_version = '1.0.0'
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        mavenCentral()
     }
 
     dependencies {
         classpath 'io.fabric.tools:gradle:1.21.4'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    mavenCentral()
 }
 
 
@@ -22,7 +28,7 @@ android {
     defaultConfig {
         applicationId "com.omgups.app"
         minSdkVersion 14
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -31,6 +37,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
     }
 }
 
@@ -57,4 +66,6 @@ dependencies {
         transitive = true;
     }
     compile 'com.github.feeeei:CircleSeekbar:v1.0.2'
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

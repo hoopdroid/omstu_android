@@ -87,9 +87,9 @@ public class UniversityInfoHelper { // [CR] либо класс сделать �
         SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
         sqliteDatabase.beginTransaction();
 
-        stmt.bindString(1, init.UNIVERSITY_FULLNAME);
-        stmt.bindString(2, init.UNIVERSITY_SHORTNAME);
-        stmt.bindLong(3, init.DAYS_IN_WEEK);
+        stmt.bindString(1, init.getUNIVERSITY_FULLNAME());
+        stmt.bindString(2, init.getUNIVERSITY_SHORTNAME());
+        stmt.bindLong(3, init.getDAYS_IN_WEEK());
 
         stmt.execute();
         stmt.clearBindings();

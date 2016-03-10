@@ -55,14 +55,14 @@ public class SemestersHelper {
         SQLiteStatement stmt = sqliteDatabase.compileStatement(sql);
         sqliteDatabase.beginTransaction();
         for (int index = 0; index < init.SEMESTERS.size(); index++) {
-            if (!init.SEMESTERS.get(index).IS_DELETED) {
-                stmt.bindLong(1, init.SEMESTERS.get(index).ID_SEMESTER);
-                stmt.bindString(2, init.SEMESTERS.get(index).BEGIN_DT);
-                stmt.bindString(3, init.SEMESTERS.get(index).END_DT);
+            if (!init.SEMESTERS.get(index).getIS_DELETED()) {
+                stmt.bindLong(1, init.SEMESTERS.get(index).getID_SEMESTER());
+                stmt.bindString(2, init.SEMESTERS.get(index).getBEGIN_DT());
+                stmt.bindString(3, init.SEMESTERS.get(index).getEND_DT());
                 stmt.execute();
                 stmt.clearBindings();
             } else {
-                DBRequest.delete_byID(sqliteDatabase, SemestersHelper.TABLE_NAME, SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).ID_SEMESTER);
+                DBRequest.delete_byID(sqliteDatabase, SemestersHelper.TABLE_NAME, SemestersHelper.COL_ID_SEMESTER, init.SEMESTERS.get(index).getID_SEMESTER());
             }
 
 
